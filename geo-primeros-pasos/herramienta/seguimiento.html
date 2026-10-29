@@ -47,10 +47,9 @@
 
   /* El contenido va en una tarjeta más clara, casi pegada a los bordes de la ventana; el menú queda a su izquierda. */
   main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 24px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
-  main > * { max-width: 1100px; }
   /* Cabecera de cada paso: una fila fija (foto y título) y, debajo, la explicación del paso, que se despliega como un
      comentario sin mover la fila. */
-  .intro { max-width: none !important; margin: 0 -24px; padding: 16px 24px; border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  .intro { margin: 0 -24px; padding: 16px 24px; border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
   .intro__row { display: flex; align-items: center; gap: 14px; }
   .intro__row img { flex: none; width: 26px; height: 26px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
   .intro__text { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; min-width: 0; }
@@ -122,7 +121,7 @@
   .note { margin-top: 14px; font-size: 13px; color: var(--fg-muted); }
   /* Pie siempre abajo: al final de la tarjeta si cabe todo, y pegado al borde inferior al hacer scroll. */
   .spacer { flex: 1 0 48px; }
-  footer.credit { position: sticky; bottom: 0; max-width: none !important; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
+  footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
   @media (max-width: 860px) {
     .app { grid-template-columns: 1fr; } aside { position: static; height: auto; }
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; } .intro__card { margin-left: 0; } .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
