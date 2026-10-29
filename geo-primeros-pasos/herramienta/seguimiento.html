@@ -84,12 +84,12 @@
   tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
   td { padding: 6px 8px; vertical-align: top; }
   td.static { padding: 14px 16px; vertical-align: middle; }
-  td input, td select, td textarea { width: 100%; padding: 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--fg-strong); font: inherit; resize: vertical; transition: border-color 150ms var(--ease), background-color 150ms var(--ease), box-shadow 150ms var(--ease); }
+  td input, td select, td textarea { width: 100%; padding: 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--fg-strong); font: inherit; resize: vertical; transition: border-color 150ms var(--ease); }
   td input::placeholder, td textarea::placeholder { color: rgba(163, 163, 163, 0.35); }
   td input:focus::placeholder, td textarea:focus::placeholder { color: rgba(163, 163, 163, 0.55); }
   td input:hover, td select:hover, td textarea:hover { border-color: var(--border); }
-  /* Al editar, la celda se ilumina un punto sobre la tarjeta (nunca más oscura) y lleva un halo suave. */
-  td input:focus, td select:focus, td textarea:focus { outline: none; border-color: var(--border-strong); background: rgba(255, 255, 255, 0.035); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05); }
+  /* Al editar, basta con que se marque el borde de la celda. */
+  td input:focus, td select:focus, td textarea:focus { outline: none; border-color: var(--border-strong); }
   td textarea { field-sizing: content; min-height: 38px; }
   td select { appearance: none; cursor: pointer; }
   td select option { background: var(--bg); color: var(--fg-strong); }
