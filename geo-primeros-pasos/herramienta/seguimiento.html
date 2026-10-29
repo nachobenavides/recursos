@@ -74,7 +74,8 @@
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
 
-  .table-wrap { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  /* Las tablas van un punto más claras que la tarjeta, como el comentario de la cabecera. */
+  .table-wrap { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: rgba(255, 255, 255, 0.03); }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   thead { border-bottom: 1px solid var(--border); }
   th { height: 40px; padding: 0 16px; text-align: left; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); white-space: nowrap; }
