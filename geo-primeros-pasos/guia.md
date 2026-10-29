@@ -8,14 +8,16 @@ Son 5 pasos. Lleva el control con la [herramienta de seguimiento](herramienta/se
 
 No intentes hacerlo con todo. Elige **dos o tres productos o servicios**: los que más margen te dejan, los que quieres vender más o aquellos en los que crees que podrías destacar.
 
-> Ejemplo: un hosting elige «hosting WordPress» y «servidores VPS».
+De cada uno, apunta **la URL de su página** en tu web. Es la que filtrarás en Search Console en el paso 2.
+
+> Ejemplo: un hosting elige «hosting WordPress» y «servidores VPS», con las URL de esas dos páginas.
 
 ## Paso 2 · Saca las preguntas de tu cliente
 
 Parte de lo que ya busca la gente que llega a tu web, no de lo que crees que busca.
 
 1. **Entra en [Google Search Console → Rendimiento](https://search.google.com/search-console/performance/search-analytics)** y elige tu web.
-2. **Filtra por la página** de uno de los productos del paso 1: *+ Nuevo → Página*.
+2. **Filtra por la URL** de uno de los productos del paso 1: *+ Nuevo → Página*.
 3. **Exporta:** botón *Exportar → Descargar CSV*. Se descarga un ZIP; dentro está el archivo de **Consultas**.
 4. **Pásaselo a la IA** que uses (ChatGPT, Gemini, Claude…) con el [prompt para sacar las preguntas](prompts.md#prompt-1--sacar-las-preguntas-de-tu-cliente). Te devuelve un CSV.
 5. **Carga ese CSV en la herramienta**, en el paso 2, con el botón *Importar CSV*.
