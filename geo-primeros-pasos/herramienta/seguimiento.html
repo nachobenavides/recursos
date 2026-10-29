@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dónde deberías estar · Seguimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b0b; --bg-elevated: #111111; --border: #2b2b2b; --border-strong: #404040;
+    --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
+    --success: #10b981; --error: #ef4444;
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-full: 9999px;
+    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.18);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--fg-strong); }
+  .mono { font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
+  .app { display: grid; grid-template-columns: 272px 1fr; min-height: 100vh; }
+
+  aside { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 28px 16px 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 0 12px 28px; }
+  .brand img { height: 18px; width: auto; }
+  .brand span { line-height: 1.3; }
+  .side-title { padding: 0 12px 10px; }
+  .nav { all: unset; display: flex; align-items: center; gap: 14px; padding: 9px 12px; border-radius: var(--r-md); cursor: pointer; font-size: 14px; color: var(--fg-muted); transition: background-color 200ms var(--ease), color 200ms var(--ease); }
+  .nav:hover { color: var(--fg-strong); background: rgba(17, 17, 17, 0.6); }
+  .nav.is-on { color: var(--fg-strong); background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--border); }
+  .nav .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.4); }
+  .nav.is-on .n { color: var(--fg-muted); }
+  .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot--success { background: var(--success); }
+  .dot--error { background: var(--error); }
+  .dot--strong { background: var(--fg-strong); }
+  .dot--faint { background: rgba(163, 163, 163, 0.25); }
+  .nav--tasks { margin-top: 14px; }
+  .divider { height: 1px; margin: 14px 12px 0; background: var(--border); }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
+  .side-foot .btn { justify-content: flex-start; }
+
+  /* El contenido va en una tarjeta más clara, casi pegada a los bordes de la ventana; el menú queda a su izquierda. */
+  main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 48px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
+  main > * { max-width: 1100px; }
+  /* Cabecera de cada paso: una fila fija (foto, título y explicación corta) y, debajo, la explicación de quien da la
+     clase, que se despliega como un comentario sin mover la fila. */
+  .intro { max-width: none !important; margin: 0 -48px; padding: 16px 48px; border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  .intro__row { display: flex; align-items: center; gap: 14px; }
+  .intro__row img { flex: none; width: 26px; height: 26px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
+  .intro__text { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; min-width: 0; }
+  h1 { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.4; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .lead { margin: 0; font-size: 13px; color: var(--fg-muted); }
+  .intro .intro__toggle { all: unset; margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: rgba(163, 163, 163, 0.6); transition: color 200ms var(--ease); }
+  .intro .intro__toggle:hover { color: var(--fg); }
+  .intro__toggle svg { transition: transform 200ms var(--ease); }
+  .intro.is-open .intro__toggle svg { transform: rotate(180deg); }
+  .intro__body { display: none; margin: 14px 0 4px 40px; padding-left: 16px; border-left: 1px solid var(--border); }
+  .intro.is-open .intro__body { display: block; }
+  .intro__by { margin: 0 0 10px; font-size: 12px; color: var(--fg-muted); }
+  .intro__by strong { font-weight: 500; color: var(--fg); }
+  .intro + * { margin-top: 28px !important; }
+  .help { margin: 0; padding: 0; max-width: 820px; list-style: none; display: grid; gap: 10px; }
+  .help li { position: relative; padding-left: 22px; color: var(--fg); }
+  .help li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 10px; height: 1px; background: var(--border-strong); }
+
+  .table-wrap { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead { border-bottom: 1px solid var(--border); }
+  th { height: 40px; padding: 0 16px; text-align: left; font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); white-space: nowrap; }
+  tbody tr { transition: background-color 200ms var(--ease); }
+  tbody tr + tr { border-top: 1px solid var(--border); }
+  tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+  td { padding: 6px 8px; vertical-align: top; }
+  td.static { padding: 14px 16px; vertical-align: middle; }
+  td input, td select, td textarea { width: 100%; padding: 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--fg-strong); font: inherit; resize: vertical; transition: border-color 150ms var(--ease); }
+  td input::placeholder, td textarea::placeholder { color: rgba(163, 163, 163, 0.4); }
+  td input:hover, td select:hover, td textarea:hover { border-color: var(--border); }
+  td input:focus, td select:focus, td textarea:focus { outline: none; border-color: var(--border-strong); background: var(--bg); }
+  td textarea { field-sizing: content; min-height: 38px; }
+  td select { appearance: none; cursor: pointer; }
+  td select option { background: var(--bg); color: var(--fg-strong); }
+  td.del { width: 44px; text-align: center; vertical-align: middle; }
+  .x { all: unset; cursor: pointer; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-full); color: rgba(163, 163, 163, 0.5); transition: color 150ms var(--ease), background-color 150ms var(--ease); }
+  .x:hover { color: var(--fg-strong); background: var(--bg); }
+  .x svg { width: 14px; height: 14px; }
+  .empty td { padding: 32px 16px; text-align: center; color: var(--fg-muted); }
+
+  .actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn { all: unset; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: var(--r-full); font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease); }
+  .btn--primary { background: var(--fg-strong); color: var(--bg); box-shadow: var(--shadow-key); }
+  .btn--primary:hover { background: var(--fg); }
+  .btn--secondary { border: 1px solid var(--border); color: var(--fg-muted); }
+  .btn--secondary:hover { border-color: var(--border-strong); color: var(--fg); }
+  .btn--ghost { color: var(--fg-muted); }
+  .btn--ghost:hover { background: var(--bg-elevated); color: var(--fg-strong); }
+
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border); border-radius: var(--r-lg); margin: 28px 0 24px; }
+  .metric { padding: 22px 24px; }
+  .metric + .metric { border-left: 1px solid var(--border); }
+  .metric b { display: block; margin-bottom: 6px; font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .state { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); }
+  .prompt { margin: 0 0 28px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .prompt__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+  .prompt__head strong { display: block; margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--fg-strong); }
+  .prompt__head p { margin: 4px 0 0; font-size: 13px; color: var(--fg-muted); }
+  .prompt pre { margin: 0; padding: 18px 20px; max-height: 168px; overflow: auto; background: var(--bg); font: 13px/1.6 var(--mono); color: var(--fg); white-space: pre-wrap; }
+  .prompt-step { margin: 28px 0 10px; }
+  .note { margin-top: 14px; font-size: 13px; color: var(--fg-muted); }
+  /* Pie siempre abajo: al final de la tarjeta si cabe todo, y pegado al borde inferior al hacer scroll. */
+  .spacer { flex: 1 0 48px; }
+  footer.credit { position: sticky; bottom: 0; max-width: none !important; margin: 0 -48px; padding: 16px 48px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; } aside { position: static; height: auto; }
+    main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; } .intro__body { margin-left: 0; } .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><img src="data:image/png;base64,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" alt=""><span class="mono">#RaiolaWebinar</span></div>
+    <div class="side-title mono">Dónde deberías estar</div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <button class="btn btn--ghost" id="export-json">Guardar copia (.json)</button>
+      <button class="btn btn--ghost" id="import-json">Cargar copia</button>
+      <button class="btn btn--ghost" id="reset">Empezar de cero</button>
+      <input type="file" id="file" accept="application/json" hidden>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+const KEY = 'geo-primeros-pasos/donde-deberias-estar'
+const YESNO = ['', 'Sí', 'No']
+const TIPOS = ['', 'Comparativa', 'Reseñas', 'Medio', 'Foro', 'Blog', 'Vídeo', 'Red social', 'Directorio', 'Web de un competidor', 'Otro']
+
+const STEPS = [
+  {
+    id: 'productos', title: 'Qué quieres potenciar', short: 'Productos',
+    lead: 'Elige dos o tres productos o servicios que quieras potenciar.',
+    help: ['No intentes hacerlo con todo: con dos o tres basta para empezar.'],
+    cols: [{ k: 'nombre', label: 'Producto o servicio' }, { k: 'motivo', label: 'Por qué este', area: true }],
+  },
+  {
+    id: 'preguntas', title: 'Saca las preguntas de tu cliente', short: 'Preguntas',
+    lead: 'Convierte lo que ya buscan en Google en preguntas para la IA.',
+    help: ['Entra en <a href="https://search.google.com/search-console/performance/search-analytics" target="_blank" rel="noopener">Google Search Console → Rendimiento</a>, elige tu web y filtra por la página del producto (+ Nuevo → Página).', 'Exportar → Descargar CSV. Dentro del ZIP está el archivo de Consultas.', 'Adjúntalo a tu IA con el prompt de aquí abajo. Guarda su respuesta como .csv y cárgala con Importar CSV.', 'Repite con cada producto y borra las preguntas que tu cliente nunca haría.'],
+    cols: [{ k: 'pregunta', label: 'Pregunta', area: true }, { k: 'producto', label: 'Producto', from: 'productos' }, { k: 'origen', label: 'Consulta de origen' }],
+    importable: true,
+  },
+  {
+    id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
+    lead: 'Haz las preguntas en ChatGPT y en el Modo IA y apunta qué webs citan.',
+    help: ['Las fuentes están en las etiquetas junto a cada párrafo: en ChatGPT, al pasar el ratón; en Google, también en la lista del final.', 'Una fila por web citada. Escribe solo el dominio (por ejemplo, comparativa.com) para que se agrupe bien.', 'Repite este paso cada pocos meses con las mismas preguntas para ver si empiezas a salir.'],
+    cols: [{ k: 'pregunta', label: 'Pregunta', from: 'preguntas', field: 'pregunta' }, { k: 'buscador', label: 'Dónde', opts: ['', 'ChatGPT', 'Modo IA', 'AI Overview'] }, { k: 'web', label: 'Web citada' }, { k: 'tipo', label: 'Tipo', opts: TIPOS }, { k: 'tu', label: '¿Sales tú?', opts: YESNO }, { k: 'comp', label: '¿Tu competencia?', opts: YESNO }],
+  },
+  {
+    id: 'analisis', title: 'Analiza las webs que más se repiten', short: 'Análisis',
+    lead: 'Mira qué tienen las webs que citan a tu competencia y a ti no.',
+    help: ['Qué tipo de contenido es, qué dice de tu competencia, a qué páginas suyas enlaza y quién lo firma.', 'Te ayuda el prompt de aquí abajo. Comprueba los enlaces abriendo la página.'],
+    cols: [{ k: 'web', label: 'Web', from: 'fuentes', field: 'web' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
+  },
+  {
+    id: 'contactos', title: 'Dales motivos y contacta', short: 'Contactos',
+    lead: 'Dales un motivo para hablar de ti y escríbeles.',
+    help: ['No compres enlaces: Google lo considera spam. Si alguna aparición es de pago, tiene que ir marcada como patrocinada.'],
+    cols: [{ k: 'web', label: 'Web', from: 'fuentes', field: 'web' }, { k: 'contacto', label: 'Contacto' }, { k: 'aporte', label: 'Qué les aportas', area: true }, { k: 'estado', label: 'Estado', opts: ['', 'Pendiente', 'Contactado', 'En conversación', 'Incluido', 'Descartado'] }, { k: 'fecha', label: 'Fecha', date: true }],
+  },
+]
+
+// Los mismos prompts que prompts.md, para copiarlos sin salir de aquí.
+const PROMPTS = [
+  { id: 'p1', step: 'preguntas', title: 'Sacar las preguntas de tu cliente', how: 'Adjunta el archivo de Consultas de Search Console y pega este prompt.', text: `Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
+
+Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes de comprar: en lenguaje natural, en primera persona y con el contexto que daría alguien real (para qué lo quiere, su presupuesto, su situación).
+
+Reglas:
+- Usa solo consultas del archivo. No te inventes temas.
+- Ignora las consultas que llevan el nombre de mi marca.
+- Junta las consultas que signifiquen lo mismo en una sola pregunta.
+- Da prioridad a las consultas con más clics e impresiones.
+- Como máximo, 15 preguntas.
+
+Devuélveme solo un CSV, sin texto antes ni después, separado por punto y coma, con esta cabecera exacta:
+Pregunta;Producto;Consulta de origen
+
+En la columna Producto pon siempre: [PRODUCTO O SERVICIO]` },
+  { id: 'p2', step: 'analisis', title: 'Analizar una web citada', how: 'Con la búsqueda en la web activada. Comprueba los enlaces abriendo la página.', text: `Analiza esta página: [URL]
+
+Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
+1. Qué tipo de contenido es (comparativa, guía, reseña, lista de recomendados u otro) y de qué fecha.
+2. Qué marcas menciona y qué dice de cada una.
+3. A qué páginas de esas marcas enlaza, con la URL exacta.
+4. Quién lo firma y si hay una forma de contacto visible.
+5. Qué podría aportar yo para que tuviera sentido incluirme: datos, una página mejor, producto para probar o una corrección.
+
+Si algo no aparece en la página, dilo. No lo supongas.` },
+]
+
+const blank = () => Object.fromEntries(STEPS.map((s) => [s.id, []]))
+const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(KEY)) } } catch { return blank() } }
+let data = load()
+// Se puede entrar directamente a una vista desde un enlace: seguimiento.html#prompts
+let view = ['tareas', 'prompts', ...STEPS.map((s) => s.id)].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'productos'
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)) } catch {} }
+
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+const domain = (s) => String(s || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
+
+// Lista de tareas: una fila por web citada, con cuántas veces sale y si sales tú o tu competencia.
+const tasks = () => {
+  const by = new Map()
+  for (const r of data.fuentes) {
+    const d = domain(r.web)
+    if (!d) continue
+    const t = by.get(d) || { web: d, veces: 0, tipo: r.tipo, tu: false, comp: false }
+    t.veces++
+    t.tipo ||= r.tipo
+    t.tu ||= r.tu === 'Sí'
+    t.comp ||= r.comp === 'Sí'
+    by.set(d, t)
+  }
+  const prio = (t) => (t.comp && !t.tu ? 2 : !t.tu ? 1 : 0)
+  return [...by.values()].sort((a, b) => prio(b) - prio(a) || b.veces - a.veces)
+}
+
+const pad = (n) => String(n).padStart(2, '0')
+const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+
+function renderNav() {
+  const nav = document.getElementById('nav')
+  const pending = tasks().filter((t) => t.comp && !t.tu).length
+  nav.innerHTML = STEPS.map((s, i) => `
+    <button class="nav ${view === s.id ? 'is-on' : ''}" data-v="${s.id}">
+      <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
+      <span class="c">${data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
+    </button>`).join('') + `
+    <div class="divider"></div>
+    <button class="nav nav--tasks ${view === 'tareas' ? 'is-on' : ''}" data-v="tareas">
+      <span class="n">→</span><span>Tu lista de tareas</span><span class="c">${pending || ''}</span>
+    </button>
+    <button class="nav ${view === 'prompts' ? 'is-on' : ''}" data-v="prompts">
+      <span class="n">→</span><span>Prompts</span><span class="c">${PROMPTS.length}</span>
+    </button>`
+  nav.querySelectorAll('[data-v]').forEach((b) => b.onclick = () => { view = b.dataset.v; render() })
+}
+
+// Cabecera discreta, separada del área de trabajo: el título del paso y una línea, pegada arriba al hacer scroll.
+// Cabecera de cada paso, como una clase: quien la da, el título y cómo hacerlo. Se puede plegar y se recuerda.
+const AUTHOR = { name: 'Nacho Benavides', role: 'Co-founder, CEO · Blinders Group', photo: 'data:image/jpeg;base64,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' }
+const INTRO_KEY = 'geo-primeros-pasos/intro-plegada'
+let introClosed = (() => { try { return localStorage.getItem(INTRO_KEY) === '1' } catch { return false } })()
+const CHEVRON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+const intro = (title, lead, items = []) => `
+  <header class="intro ${items.length && !introClosed ? 'is-open' : ''}">
+    <div class="intro__row">
+      <img src="${AUTHOR.photo}" alt="${AUTHOR.name}">
+      <div class="intro__text"><h1>${title}</h1><p class="lead">${lead}</p></div>
+      ${items.length ? `<button class="intro__toggle" id="intro-toggle">Cómo hacerlo ${CHEVRON}</button>` : ''}
+    </div>
+    ${items.length ? `<div class="intro__body">
+      <p class="intro__by"><strong>${AUTHOR.name}</strong> · ${AUTHOR.role}</p>
+      <ul class="help">${items.map((h) => `<li>${h}</li>`).join('')}</ul>
+    </div>` : ''}
+  </header>`
+function wireIntro(root) {
+  const b = root.querySelector('#intro-toggle')
+  if (b) b.onclick = () => {
+    introClosed = !introClosed
+    try { localStorage.setItem(INTRO_KEY, introClosed ? '1' : '0') } catch {}
+    root.querySelector('.intro').classList.toggle('is-open', !introClosed)
+  }
+}
+const credit = `<div class="spacer"></div><footer class="credit"><span class="mono">#RaiolaWebinar</span><span class="mono">Se guarda solo en este navegador</span></footer>`
+
+function cell(step, col, row, i) {
+  const v = row[col.k] ?? ''
+  const attrs = `data-i="${i}" data-k="${col.k}"`
+  let opts = col.opts
+  if (col.from) {
+    const src = data[col.from].map((r) => (col.field ? r[col.field] : r.nombre)).map((x) => (col.from === 'fuentes' ? domain(x) : x)).filter(Boolean)
+    opts = ['', ...new Set(src)]
+    if (v && !opts.includes(v)) opts.push(v)
+  }
+  if (opts) return `<select ${attrs}>${opts.map((o) => `<option ${o === v ? 'selected' : ''} value="${esc(o)}">${esc(o || '—')}</option>`).join('')}</select>`
+  if (col.area) return `<textarea rows="${Math.max(1, Math.ceil(String(v).length / 42))}" ${attrs}>${esc(v)}</textarea>`
+  return `<input ${attrs} value="${esc(v)}" ${col.num ? 'inputmode="numeric"' : ''} ${col.date ? 'type="date"' : ''}>`
+}
+
+const promptCard = (p) => `
+  <div class="prompt">
+    <div class="prompt__head"><div><span class="mono">Prompt</span><strong>${p.title}</strong><p>${p.how} Cambia lo que va entre corchetes.</p></div>
+      <button class="btn btn--primary" data-copy="${p.id}">Copiar prompt</button></div>
+    <pre>${esc(p.text)}</pre>
+  </div>`
+
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true } catch {
+    const t = document.createElement('textarea')
+    t.value = text
+    document.body.appendChild(t)
+    t.select()
+    const ok = document.execCommand('copy')
+    t.remove()
+    return ok
+  }
+}
+function wireCopy(root) {
+  root.querySelectorAll('[data-copy]').forEach((b) => b.onclick = async () => {
+    const ok = await copyText(PROMPTS.find((p) => p.id === b.dataset.copy).text)
+    b.textContent = ok ? 'Copiado' : 'No se ha podido copiar'
+    setTimeout(() => (b.textContent = 'Copiar prompt'), 1800)
+  })
+}
+
+function renderPrompts() {
+  return `
+    ${intro('Prompts', 'Cópialos y pégalos en la IA que uses.')}
+    ${PROMPTS.map((p) => `<div class="prompt-step mono">Paso ${pad(STEPS.findIndex((s) => s.id === p.step) + 1)} · ${STEPS.find((s) => s.id === p.step).short}</div>${promptCard(p)}`).join('')}
+    ${credit}`
+}
+
+function renderStep(step, i) {
+  const rows = data[step.id]
+  return `
+    ${intro(step.title, step.lead, step.help)}
+    ${PROMPTS.filter((p) => p.step === step.id).map(promptCard).join('')}
+    <div class="table-wrap"><table>
+      <thead><tr>${step.cols.map((c) => `<th>${c.label}</th>`).join('')}<th></th></tr></thead>
+      <tbody>${rows.length ? rows.map((r, ri) => `<tr>${step.cols.map((c) => `<td>${cell(step, c, r, ri)}</td>`).join('')}<td class="del"><button class="x" data-del="${ri}" title="Borrar fila">${X}</button></td></tr>`).join('')
+        : `<tr class="empty"><td colspan="${step.cols.length + 1}">Todavía no hay nada. Añade la primera fila.</td></tr>`}</tbody>
+    </table></div>
+    <div class="actions">
+      <button class="btn btn--primary" id="add">Añadir fila</button>
+      ${step.importable ? '<button class="btn btn--secondary" id="import-csv">Importar CSV</button>' : ''}
+      <button class="btn btn--secondary" id="csv">Exportar a CSV</button>
+      <button class="btn btn--secondary" id="next">${i < STEPS.length - 1 ? 'Siguiente paso' : 'Ver tu lista de tareas'} →</button>
+    </div>
+    ${credit}`
+}
+
+function renderTasks() {
+  const t = tasks()
+  const todo = t.filter((x) => x.comp && !x.tu)
+  const state = (on, yes, no, tone) => `<span class="state"><span class="dot ${on ? tone : 'dot--faint'}"></span>${on ? yes : no}</span>`
+  return `
+    ${intro('Tu lista de tareas', 'Las webs que cita la IA, primero las que citan a tu competencia y a ti no.')}
+    <div class="metrics">
+      <div class="metric"><b>${t.length}</b><span class="mono">Webs citadas</span></div>
+      <div class="metric"><b>${todo.length}</b><span class="mono">Con tu competencia y sin ti</span></div>
+      <div class="metric"><b>${t.filter((x) => x.tu).length}</b><span class="mono">En las que ya sales</span></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Web</th><th>Veces citada</th><th>Tipo</th><th>Tú</th><th>Tu competencia</th><th>Contacto</th></tr></thead>
+      <tbody>${t.length ? t.map((x) => {
+        const c = data.contactos.find((r) => domain(r.web) === x.web)
+        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}</td><td class="static">${x.veces}</td><td class="static">${esc(x.tipo || '—')}</td>
+          <td class="static">${state(x.tu, 'Sales', 'No sales', 'dot--success')}</td>
+          <td class="static">${state(x.comp, 'Sale', 'No sale', 'dot--strong')}</td>
+          <td class="static">${esc(c?.estado || '—')}</td></tr>`
+      }).join('') : `<tr class="empty"><td colspan="6">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
+    </table></div>
+    <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
+    <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
+    ${credit}`
+}
+
+function toCSV(cols, rows) {
+  const q = (s) => `"${String(s ?? '').replace(/"/g, '""')}"`
+  return '﻿' + [cols.map((c) => q(c.label)).join(';'), ...rows.map((r) => cols.map((c) => q(r[c.k])).join(';'))].join('\n')
+}
+function download(name, text, type = 'text/csv') {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([text], { type }))
+  a.download = name
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
+// Lee un CSV separado por punto y coma o por comas, con comillas, como los que devuelven las IA y Excel.
+function parseCSV(text) {
+  text = text.replace(/^﻿/, '').trim()
+  const first = text.split('\n')[0]
+  const sep = (first.match(/;/g) || []).length >= (first.match(/,/g) || []).length ? ';' : ','
+  const rows = [[]]
+  let cur = '', q = false
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') { cur += '"'; i++ }
+      else if (ch === '"') q = false
+      else cur += ch
+    } else if (ch === '"') q = true
+    else if (ch === sep) { rows.at(-1).push(cur); cur = '' }
+    else if (ch === '\n') { rows.at(-1).push(cur); rows.push([]); cur = '' }
+    else if (ch !== '\r') cur += ch
+  }
+  rows.at(-1).push(cur)
+  return rows.filter((r) => r.some((c) => c.trim()))
+}
+const norm = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ¿?¡!]/g, '').trim()
+// Empareja las columnas del CSV con las de la tabla por su nombre, sin tildes ni mayúsculas.
+function fromCSV(cols, rows) {
+  const [head, ...body] = rows
+  const map = cols.map((c) => head.findIndex((h) => [norm(c.label), norm(c.k)].includes(norm(h))))
+  if (map.every((i) => i < 0)) return []
+  return body.map((r) => Object.fromEntries(cols.map((c, j) => [c.k, map[j] < 0 ? '' : (r[map[j]] || '').trim()])))
+}
+function pickCSV(done) {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.csv,text/csv,text/plain'
+  input.onchange = async () => { const f = input.files[0]; if (f) done(parseCSV(await f.text())) }
+  input.click()
+}
+
+function render() {
+  renderNav()
+  const main = document.getElementById('main')
+  const i = STEPS.findIndex((s) => s.id === view)
+  if (view === 'prompts') { main.innerHTML = renderPrompts(); wireCopy(main); wireIntro(main); return }
+  if (i < 0) {
+    main.innerHTML = renderTasks()
+    wireIntro(main)
+    document.getElementById('csv-tasks').onclick = () => download('lista-de-tareas.csv', toCSV(
+      [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'tipo', label: 'Tipo' }, { k: 'tuTxt', label: 'Sales tú' }, { k: 'compTxt', label: 'Sale tu competencia' }],
+      tasks().map((t) => ({ ...t, tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
+    return
+  }
+  const step = STEPS[i]
+  main.innerHTML = renderStep(step, i)
+  main.querySelectorAll('[data-k]').forEach((el) => {
+    el.oninput = el.onchange = () => { data[step.id][+el.dataset.i][el.dataset.k] = el.value; save(); renderNav() }
+  })
+  main.querySelectorAll('[data-del]').forEach((b) => b.onclick = () => { data[step.id].splice(+b.dataset.del, 1); save(); render() })
+  document.getElementById('add').onclick = () => {
+    data[step.id].push({})
+    save()
+    render()
+    const inputs = main.querySelectorAll('tbody tr:last-child [data-k]')
+    inputs[0]?.focus()
+  }
+  wireCopy(main)
+  wireIntro(main)
+  const imp = document.getElementById('import-csv')
+  if (imp) imp.onclick = () => pickCSV((rows) => {
+    const added = fromCSV(step.cols, rows)
+    if (!added.length) { alert('No he encontrado columnas que encajen. La primera fila del CSV tiene que ser la cabecera: ' + step.cols.map((c) => c.label).join(';')); return }
+    data[step.id].push(...added)
+    save()
+    render()
+  })
+  document.getElementById('csv').onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
+  document.getElementById('next').onclick = () => { view = STEPS[i + 1]?.id || 'tareas'; render(); scrollTo(0, 0) }
+}
+
+document.getElementById('export-json').onclick = () => download('seguimiento-donde-deberias-estar.json', JSON.stringify(data, null, 2), 'application/json')
+document.getElementById('import-json').onclick = () => document.getElementById('file').click()
+document.getElementById('file').onchange = async (e) => {
+  const f = e.target.files[0]
+  if (!f) return
+  try { data = { ...blank(), ...JSON.parse(await f.text()) }; save(); render() } catch { alert('Ese archivo no es una copia válida.') }
+  e.target.value = ''
+}
+document.getElementById('reset').onclick = () => {
+  if (!confirm('¿Borrar todo lo apuntado? Guarda antes una copia si la quieres conservar.')) return
+  data = blank(); save(); view = 'productos'; render()
+}
+
+render()
+</script>
+</body>
+</html>
