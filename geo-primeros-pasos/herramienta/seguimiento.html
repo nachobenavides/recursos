@@ -185,6 +185,7 @@ const STEPS = [
   {
     id: 'productos', title: 'Qué quieres potenciar', short: 'A potenciar',
     cols: [
+      { k: 'marca', label: 'Tu marca', ph: 'Por ejemplo, Tuweb', tag: '[MARCA]', hint: 'Para que la IA descarte las búsquedas de tu propia marca.' },
       { k: 'nombre', label: 'Producto o servicio', ph: 'Por ejemplo, hosting WordPress', tag: '[PRODUCTO O SERVICIO]' },
       { k: 'url', label: 'URL de su página', ph: 'https://tuweb.com/hosting-wordpress', url: true, hint: 'La que filtrarás en Search Console.' },
       { k: 'cliente', label: 'A quién se lo vendes', ph: 'Por ejemplo, agencias pequeñas', tag: '[TIPO DE CLIENTE]' },
@@ -227,7 +228,7 @@ Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Ignora las consultas que llevan el nombre de mi marca.
+- Ignora las consultas que llevan el nombre de mi marca: [MARCA].
 - Junta las consultas que signifiquen lo mismo en una sola pregunta.
 - Da prioridad a las consultas con más clics e impresiones.
 - Como máximo, 15 preguntas.
@@ -392,7 +393,7 @@ function renderGuide() {
   const pr = product()
   const url = (pr.url || '').trim()
   const items = [
-    { t: 'Abre Search Console', sub: 'Entra en Rendimiento y elige tu web.',
+    { t: 'Abre Search Console', sub: `Entra en Rendimiento y elige tu web${url ? ` (${esc(domain(url))})` : ''}.`,
       do: `<a class="btn btn--secondary btn--sm" href="${GSC}" target="_blank" rel="noopener">Abrir Search Console →</a>` },
     { t: 'Filtra por tu URL', sub: 'Pulsa + Nuevo → Página y pega la URL.',
       do: url ? `<div class="urls"><div><code>${esc(url)}</code><button class="btn btn--secondary btn--sm" id="copy-url">Copiar URL</button></div></div>`

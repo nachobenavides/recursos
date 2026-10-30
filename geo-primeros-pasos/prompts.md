@@ -13,7 +13,7 @@ Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Ignora las consultas que llevan el nombre de mi marca.
+- Ignora las consultas que llevan el nombre de mi marca: [MARCA].
 - Junta las consultas que signifiquen lo mismo en una sola pregunta.
 - Da prioridad a las consultas con más clics e impresiones.
 - Como máximo, 15 preguntas.
