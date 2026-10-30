@@ -7,13 +7,13 @@
 Para el [paso 2](guia.md#paso-2--saca-las-preguntas-de-tu-cliente). Adjunta el archivo de **Consultas** que exportaste de Search Console.
 
 ```text
-Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
+Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web, [WEB]. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
 
 Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes de comprar: en lenguaje natural, en primera persona y con el contexto que daría alguien real (para qué lo quiere, su presupuesto, su situación).
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Ignora las consultas que llevan el nombre de mi marca: [MARCA].
+- Ignora las consultas que llevan el nombre de mi marca (la de [WEB]).
 - Junta las consultas que signifiquen lo mismo en una sola pregunta.
 - Da prioridad a las consultas con más clics e impresiones.
 - Como máximo, 15 preguntas.

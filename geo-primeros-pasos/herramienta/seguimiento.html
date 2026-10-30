@@ -185,7 +185,6 @@ const STEPS = [
   {
     id: 'productos', title: 'Qué quieres potenciar', short: 'A potenciar',
     cols: [
-      { k: 'marca', label: 'Tu marca', ph: 'Por ejemplo, Tuweb', tag: '[MARCA]', hint: 'Para que la IA descarte las búsquedas de tu propia marca.' },
       { k: 'nombre', label: 'Producto o servicio', ph: 'Por ejemplo, hosting WordPress', tag: '[PRODUCTO O SERVICIO]' },
       { k: 'url', label: 'URL de su página', ph: 'https://tuweb.com/hosting-wordpress', url: true, hint: 'La que filtrarás en Search Console.' },
       { k: 'cliente', label: 'A quién se lo vendes', ph: 'Por ejemplo, agencias pequeñas', tag: '[TIPO DE CLIENTE]' },
@@ -222,13 +221,13 @@ const STEPS = [
 
 // Los mismos prompts que prompts.md, para copiarlos sin salir de aquí.
 const PROMPTS = [
-  { id: 'p1', step: 'preguntas', title: 'Sacar las preguntas de tu cliente', how: 'Adjunta el archivo de Consultas de Search Console y pega este prompt.', text: `Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
+  { id: 'p1', step: 'preguntas', title: 'Sacar las preguntas de tu cliente', how: 'Adjunta el archivo de Consultas de Search Console y pega este prompt.', text: `Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web, [WEB]. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
 
 Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes de comprar: en lenguaje natural, en primera persona y con el contexto que daría alguien real (para qué lo quiere, su presupuesto, su situación).
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Ignora las consultas que llevan el nombre de mi marca: [MARCA].
+- Ignora las consultas que llevan el nombre de mi marca (la de [WEB]).
 - Junta las consultas que signifiquen lo mismo en una sola pregunta.
 - Da prioridad a las consultas con más clics e impresiones.
 - Como máximo, 15 preguntas.
@@ -374,13 +373,13 @@ function renderPrompts() {
 
 const GSC = 'https://search.google.com/search-console/performance/search-analytics'
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
-// Las variables del prompt 1 salen del formulario del paso 1; en pantalla, lo que falta se marca.
-const VARS = STEPS[0].cols.filter((c) => c.tag)
+// Las variables del prompt 1 salen del formulario del paso 1 (la web, del dominio de la URL); en pantalla, lo que falta se marca.
+const VARS = [...STEPS[0].cols.filter((c) => c.tag), { k: 'web', tag: '[WEB]', get: (p) => domain(p.url) }]
 const filledPrompt = (html) => {
   const p = PROMPTS.find((x) => x.id === 'p1')
   let t = html ? esc(p.text) : p.text
   for (const v of VARS) {
-    const val = (product()[v.k] || '').trim()
+    const val = ((v.get ? v.get(product()) : product()[v.k]) || '').trim()
     t = t.split(v.tag).join(html ? `<mark class="${val ? '' : 'empty'}">${esc(val || v.tag)}</mark>` : val || v.tag)
   }
   return t
@@ -424,7 +423,7 @@ function wireGuide(main) {
     u.textContent = ok ? 'Copiada' : 'No se ha podido copiar'
     setTimeout(() => (u.textContent = 'Copiar URL'), 1800)
   }
-  const missing = VARS.filter((v) => !(product()[v.k] || '').trim()).length
+  const missing = STEPS[0].cols.filter((c) => (c.tag || c.url) && !(product()[c.k] || '').trim()).length
   main.querySelector('#filled-state').textContent = missing ? `${missing === 1 ? 'Falta 1 dato' : `Faltan ${missing} datos`} del paso 1` : 'Listo para copiar'
   const c = main.querySelector('#copy-filled')
   c.onclick = async () => {
