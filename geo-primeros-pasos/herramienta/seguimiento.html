@@ -159,6 +159,43 @@
   .metric + .metric { border-left: 1px solid var(--border); }
   .metric b { display: block; margin-bottom: 6px; font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .state { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); }
+  /* Paso 4: cifras arriba, selector de buscador y la clasificación de webs con su barra de peso. */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .kpis > div { padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
+  .kpis b { display: block; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
+  .kpis span { display: block; margin-top: 10px; font-size: 13px; color: var(--fg-muted); }
+  .rank-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: var(--r-full); }
+  .seg button { all: unset; cursor: pointer; padding: 5px 14px; border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+  .seg button:hover { color: var(--fg-strong); }
+  .seg button.is-on { background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
+  .ranking { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .rank { border-bottom: 1px solid var(--border); }
+  .rank__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 32px minmax(0, 1.4fr) minmax(80px, 1fr) 190px 40px 20px; align-items: center; gap: 16px; padding: 14px 4px; transition: background-color 150ms var(--ease); }
+  .rank__row:hover { background: rgba(255, 255, 255, 0.02); }
+  .rank__n { font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.5); }
+  .rank__web { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .rank__web > span { min-width: 0; }
+  .rank__web b { font-weight: 500; font-size: 15px; color: var(--fg-strong); }
+  .rank__web small { display: block; margin-top: 2px; font-size: 12px; color: var(--fg-muted); }
+  .fav { flex: none; width: 20px; height: 20px; border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.06); }
+  .rank__bar { height: 6px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+  .rank__bar span { display: block; height: 100%; border-radius: inherit; background: var(--fg); }
+  .rank__eng { display: flex; gap: 6px; }
+  .eng-tag { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 11px; color: var(--fg-muted); white-space: nowrap; }
+  .eng-tag b { font-weight: 500; color: var(--fg); }
+  .dot--muted { background: var(--fg-muted); }
+  .rank__c { text-align: right; font: 500 15px var(--mono); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
+  .rank__chev { display: grid; place-items: center; color: var(--fg-muted); transition: transform 200ms var(--ease); }
+  .rank.is-open .rank__chev { transform: rotate(180deg); }
+  .rank__pages { display: none; margin: 0; padding: 0 4px 14px 80px; list-style: none; }
+  .rank.is-open .rank__pages { display: grid; gap: 6px; }
+  .rank__pages li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .rank__pages a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); text-decoration: none; }
+  .rank__pages a:hover { color: var(--fg-strong); text-decoration: underline; }
+  .rank__pages span { flex: none; font-size: 12px; color: var(--fg-muted); }
+  .rank--mine { opacity: 0.6; }
+  @media (max-width: 860px) { .kpis { grid-template-columns: 1fr; } .rank__row { grid-template-columns: 28px minmax(0, 1fr) 36px 20px; } .rank__bar, .rank__eng { display: none; } .rank__pages { padding-left: 4px; } }
   .prompt { margin: 0 0 28px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .prompt__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
   .prompt__head strong { display: block; margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--fg-strong); }
@@ -285,18 +322,26 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const domain = (s) => String(s || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
 
 // Lista final: una fila por web citada, con sus páginas, de la que más se repite a la que menos. Tu propia web se marca sola.
-const tasks = () => {
+const tasks = (engine) => {
   const by = new Map()
   const mine = domain(product().url)
   for (const r of data.fuentes) {
     const d = domain(r.web)
-    if (!d) continue
-    const t = by.get(d) || { web: d, veces: 0, urls: [], tu: !!mine && d === mine }
+    if (!d || (engine && r.buscador !== engine)) continue
+    const t = by.get(d) || { web: d, veces: 0, urls: new Map(), preguntas: new Set(), engines: {}, tu: !!mine && d === mine }
     t.veces++
-    if (r.url && !t.urls.includes(r.url)) t.urls.push(r.url)
+    t.preguntas.add(r.pregunta)
+    t.engines[r.buscador] = (t.engines[r.buscador] || 0) + 1
+    if (r.url) {
+      const u = t.urls.get(r.url) || { url: r.url, veces: 0, engines: new Set() }
+      u.veces++
+      u.engines.add(r.buscador)
+      t.urls.set(r.url, u)
+    }
     by.set(d, t)
   }
-  return [...by.values()].sort((a, b) => a.tu - b.tu || b.veces - a.veces)
+  return [...by.values()].map((t) => ({ ...t, urls: [...t.urls.values()].sort((a, b) => b.veces - a.veces) }))
+    .sort((a, b) => a.tu - b.tu || b.veces - a.veces || b.preguntas.size - a.preguntas.size)
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -586,25 +631,59 @@ function renderStep(step, i) {
     ${credit}`
 }
 
+// Paso 4: la clasificación de webs. Cada fila es una web con su peso (barra), dónde la cita la IA y, al abrirla,
+// sus páginas. Se puede ver todo junto o por buscador.
+let taskEngine = ''
+const openWebs = new Set()
+const favicon = (d) => `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=32" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
 function renderTasks() {
-  const t = tasks()
+  const all = tasks()
+  const t = tasks(taskEngine)
   const list = t.filter((x) => !x.tu)
-  const paths = (x) => x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u)}</a>`).join('')}</div>` : ''
+  const mine = t.find((x) => x.tu)
+  const max = Math.max(1, ...list.map((x) => x.veces))
+  const both = all.filter((x) => !x.tu && Object.keys(x.engines).length > 1).length
+  const engineTag = (k, n) => `<span class="eng-tag"><span class="dot ${k === 'ChatGPT' ? 'dot--strong' : 'dot--muted'}"></span>${k}${n ? ` <b>${n}</b>` : ''}</span>`
+  const row = (x, i) => `
+    <li class="rank ${openWebs.has(x.web) ? 'is-open' : ''} ${x.tu ? 'rank--mine' : ''}">
+      <button class="rank__row" data-web="${esc(x.web)}" aria-expanded="${openWebs.has(x.web)}">
+        <span class="rank__n">${x.tu ? '—' : pad(i + 1)}</span>
+        <span class="rank__web">${favicon(x.web)}<span><b>${esc(x.web)}</b>${x.tu ? ' <span class="qcount">Tu web</span>' : ''}
+          <small>${x.preguntas.size} ${x.preguntas.size === 1 ? 'pregunta' : 'preguntas'} · ${x.urls.length} ${x.urls.length === 1 ? 'página' : 'páginas'}</small></span></span>
+        <span class="rank__bar"><span style="width:${Math.round((x.veces / max) * 100)}%"></span></span>
+        <span class="rank__eng">${ENGINES.map((e) => x.engines[e.k] ? engineTag(e.k, taskEngine ? '' : x.engines[e.k]) : '').join('')}</span>
+        <span class="rank__c">${x.veces}</span>
+        <span class="rank__chev">${CHEVRON}</span>
+      </button>
+      <ul class="rank__pages">${x.urls.map((u) => `<li><a href="${esc(u.url)}" target="_blank" rel="noopener" title="${esc(u.url)}">${esc(u.url)}</a><span>${[...u.engines].join(' · ')}${u.veces > 1 ? ` · ${u.veces} veces` : ''}</span></li>`).join('')}</ul>
+    </li>`
   return `
     ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.')}
-    <div class="metrics">
-      <div class="metric"><b>${list.length}</b><span class="mono">Webs citadas</span></div>
-      <div class="metric"><b>${list.reduce((n, x) => n + x.urls.length, 0)}</b><span class="mono">Páginas citadas</span></div>
-      <div class="metric"><b>${list.filter((x) => x.veces > 1).length}</b><span class="mono">Citadas más de una vez</span></div>
+    <div class="kpis">
+      <div><b>${all.filter((x) => !x.tu).length}</b><span>Webs citadas</span></div>
+      <div><b>${all.filter((x) => !x.tu).reduce((n, x) => n + x.urls.length, 0)}</b><span>Páginas citadas</span></div>
+      <div><b>${both}</b><span>Citadas por ChatGPT y el Modo IA</span></div>
     </div>
-    <div class="table-wrap"><table>
-      <thead><tr><th>Web</th><th>Veces citada</th></tr></thead>
-      <tbody>${t.length ? t.map((x) => `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.tu ? ' <span class="qcount">Tu web</span>' : ''}${paths(x)}</td><td class="static">${x.veces}</td></tr>`).join('')
-        : `<tr class="empty"><td colspan="2">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
-    </table></div>
+    <div class="rank-head">
+      <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${l}</button>`).join('')}</div>
+      <button class="link" id="csv-tasks">Exportar a CSV</button>
+    </div>
+    ${list.length || mine ? `<ol class="ranking">${list.map(row).join('')}${mine ? row(mine, 0) : ''}</ol>`
+      : '<p class="qempty">Aparecerá cuando apuntes webs citadas en el paso 03.</p>'}
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
-    <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
     ${credit}`
+}
+function wireTasks(main) {
+  main.querySelectorAll('[data-web]').forEach((b) => b.onclick = () => {
+    const w = b.dataset.web
+    openWebs.has(w) ? openWebs.delete(w) : openWebs.add(w)
+    b.closest('.rank').classList.toggle('is-open', openWebs.has(w))
+    b.setAttribute('aria-expanded', openWebs.has(w))
+  })
+  main.querySelectorAll('[data-eng]').forEach((b) => b.onclick = () => { taskEngine = b.dataset.eng; render() })
+  document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
+    [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'preg', label: 'Preguntas' }, { k: 'chatgpt', label: 'ChatGPT' }, { k: 'modoia', label: 'Modo IA' }, { k: 'pages', label: 'Páginas citadas' }],
+    tasks().filter((t) => !t.tu).map((t) => ({ ...t, preg: t.preguntas.size, chatgpt: t.engines.ChatGPT || 0, modoia: t.engines['Modo IA'] || 0, pages: t.urls.map((u) => u.url).join(' ') }))))
 }
 
 function toCSV(cols, rows) {
@@ -671,9 +750,7 @@ function render() {
   if (i < 0) {
     main.innerHTML = renderTasks()
     wireIntro(main)
-    document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
-      [{ k: 'web', label: 'Web' }, { k: 'pages', label: 'Páginas citadas' }, { k: 'veces', label: 'Veces citada' }],
-      tasks().filter((t) => !t.tu).map((t) => ({ ...t, pages: t.urls.join(' ') }))))
+    wireTasks(main)
     return
   }
   const step = STEPS[i]
