@@ -159,13 +159,12 @@
   .metric b { display: block; margin-bottom: 6px; font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .state { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); }
   /* Paso 4: cifras arriba, selector de buscador y la clasificación de webs con su barra de peso. */
-  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-  .kpis > div { padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
-  .kpis b { display: block; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
-  .kpis span { display: block; margin-top: 10px; font-size: 13px; color: var(--fg-muted); }
-  .rank-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .rank-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .rank-sum { margin-right: auto; font-size: 13px; color: var(--fg-muted); }
+  .rank-cols { display: grid; grid-template-columns: 32px minmax(0, 1.4fr) minmax(80px, 1fr) 190px 40px 20px; gap: 16px; padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(163, 163, 163, 0.6); }
+  .rank-cols span:nth-child(5) { text-align: right; }
   .seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: var(--r-full); }
-  .seg button { all: unset; cursor: pointer; padding: 5px 14px; border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+  .seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); transition: background-color 150ms var(--ease), color 150ms var(--ease); }
   .seg button:hover { color: var(--fg-strong); }
   .seg button.is-on { background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
   .ranking { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
@@ -183,18 +182,20 @@
   .rank__eng { display: flex; gap: 6px; }
   .eng-tag { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 11px; color: var(--fg-muted); white-space: nowrap; }
   .eng-tag b { font-weight: 500; color: var(--fg); }
-  .dot--muted { background: var(--fg-muted); }
   .rank__c { text-align: right; font: 500 15px var(--mono); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
   .rank__chev { display: grid; place-items: center; color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .rank.is-open .rank__chev { transform: rotate(180deg); }
-  .rank__pages { display: none; margin: 0; padding: 0 4px 14px 80px; list-style: none; }
-  .rank.is-open .rank__pages { display: grid; gap: 6px; }
-  .rank__pages li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-  .rank__pages a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); text-decoration: none; }
-  .rank__pages a:hover { color: var(--fg-strong); text-decoration: underline; }
-  .rank__pages span { flex: none; font-size: 12px; color: var(--fg-muted); }
+  .eng-ico { width: 12px; height: 12px; border-radius: 2px; flex: none; }
+  .rank__more { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0 4px 16px 48px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
+  .rank.is-open .rank__more { display: grid; }
+  .rank__more ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .rank__more li { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+  .rank__more li span { flex: none; display: inline-flex; gap: 4px; }
+  .rank__more a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); text-decoration: none; }
+  .rank__more a:hover { color: var(--fg-strong); text-decoration: underline; }
+  .rank__more p { margin: 0; min-width: 0; font-size: 13px; line-height: 1.45; color: var(--fg); }
   .rank--mine { opacity: 0.6; }
-  @media (max-width: 860px) { .kpis { grid-template-columns: 1fr; } .rank__row { grid-template-columns: 28px minmax(0, 1fr) 36px 20px; } .rank__bar, .rank__eng { display: none; } .rank__pages { padding-left: 4px; } }
+  @media (max-width: 860px) { .rank__row { grid-template-columns: 28px minmax(0, 1fr) 36px 20px; } .rank__bar, .rank__eng, .rank-cols { display: none; } .rank__more { grid-template-columns: 1fr; margin-left: 4px; } }
   .prompt { margin: 0 0 28px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .prompt__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
   .prompt__head strong { display: block; margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--fg-strong); }
@@ -330,6 +331,8 @@ const tasks = (engine) => {
     const t = by.get(d) || { web: d, veces: 0, urls: new Map(), preguntas: new Set(), engines: {}, tu: !!mine && d === mine }
     t.veces++
     t.preguntas.add(r.pregunta)
+    t.qeng = t.qeng || new Map()
+    t.qeng.set(r.pregunta, new Set([...(t.qeng.get(r.pregunta) || []), r.buscador]))
     t.engines[r.buscador] = (t.engines[r.buscador] || 0) + 1
     if (r.url) {
       const u = t.urls.get(r.url) || { url: r.url, veces: 0, engines: new Set() }
@@ -634,15 +637,14 @@ function renderStep(step, i) {
 // sus páginas. Se puede ver todo junto o por buscador.
 let taskEngine = ''
 const openWebs = new Set()
+const engIcon = (k) => `<img class="eng-ico" src="https://www.google.com/s2/favicons?domain=${k === 'ChatGPT' ? 'chatgpt.com' : 'google.com'}&sz=32" alt="" onerror="this.style.display='none'">`
 const favicon = (d) => `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=32" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
 function renderTasks() {
-  const all = tasks()
   const t = tasks(taskEngine)
   const list = t.filter((x) => !x.tu)
   const mine = t.find((x) => x.tu)
   const max = Math.max(1, ...list.map((x) => x.veces))
-  const both = all.filter((x) => !x.tu && Object.keys(x.engines).length > 1).length
-  const engineTag = (k, n) => `<span class="eng-tag"><span class="dot ${k === 'ChatGPT' ? 'dot--strong' : 'dot--muted'}"></span>${k}${n ? ` <b>${n}</b>` : ''}</span>`
+  const engineTag = (k, n) => `<span class="eng-tag">${engIcon(k)}${k}${n ? ` <b>${n}</b>` : ''}</span>`
   const row = (x, i) => `
     <li class="rank ${openWebs.has(x.web) ? 'is-open' : ''} ${x.tu ? 'rank--mine' : ''}">
       <button class="rank__row" data-web="${esc(x.web)}" aria-expanded="${openWebs.has(x.web)}">
@@ -654,19 +656,21 @@ function renderTasks() {
         <span class="rank__c">${x.veces}</span>
         <span class="rank__chev">${CHEVRON}</span>
       </button>
-      <ul class="rank__pages">${x.urls.map((u) => `<li><a href="${esc(u.url)}" target="_blank" rel="noopener" title="${esc(u.url)}">${esc(u.url)}</a><span>${[...u.engines].join(' · ')}${u.veces > 1 ? ` · ${u.veces} veces` : ''}</span></li>`).join('')}</ul>
+      <div class="rank__more">
+        <div><span class="mono">Páginas citadas</span>
+          <ul>${x.urls.map((u) => `<li><a href="${esc(u.url)}" target="_blank" rel="noopener" title="${esc(u.url)}">${esc(u.url)}</a><span>${[...u.engines].map(engIcon).join('')}</span></li>`).join('')}</ul></div>
+        <div><span class="mono">Sale en estas preguntas</span>
+          <ul>${[...x.qeng].map(([q, es]) => `<li><p>${esc(q)}</p><span>${[...es].map(engIcon).join('')}</span></li>`).join('')}</ul></div>
+      </div>
     </li>`
   return `
-    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.')}
-    <div class="kpis">
-      <div><b>${all.filter((x) => !x.tu).length}</b><span>Webs citadas</span></div>
-      <div><b>${all.filter((x) => !x.tu).reduce((n, x) => n + x.urls.length, 0)}</b><span>Páginas citadas</span></div>
-      <div><b>${both}</b><span>Citadas por ChatGPT y el Modo IA</span></div>
-    </div>
+    ${introPlain('Dónde deberías estar', ['Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.'])}
     <div class="rank-head">
-      <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${l}</button>`).join('')}</div>
+      <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${k ? engIcon(k) : ''}${l}</button>`).join('')}</div>
+      <span class="rank-sum">${list.length} webs · ${list.reduce((n, x) => n + x.urls.length, 0)} páginas</span>
       <button class="link" id="csv-tasks">Exportar a CSV</button>
     </div>
+    ${list.length ? `<div class="rank-cols"><span></span><span>Web</span><span>Citas, frente a la más citada</span><span>Dónde la cita</span><span>Citas</span><span></span></div>` : ''}
     ${list.length || mine ? `<ol class="ranking">${list.map(row).join('')}${mine ? row(mine, 0) : ''}</ol>`
       : '<p class="qempty">Aparecerá cuando apuntes webs citadas en el paso 03.</p>'}
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
