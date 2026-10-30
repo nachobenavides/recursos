@@ -508,11 +508,15 @@ function download(name, text, type = 'text/csv') {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
 
-// Lee un CSV separado por punto y coma o por comas, con comillas, como los que devuelven las IA y Excel.
+// Lee un CSV separado por punto y coma o por comas, con comillas, como los que devuelven las IA y Excel. Acepta también
+// lo que se copia de un chat: quita las líneas de bloque de código (```) y convierte una tabla en Markdown.
 function parseCSV(text) {
-  text = text.replace(/^﻿/, '').trim()
-  const first = text.split('\n')[0]
-  const sep = (first.match(/;/g) || []).length >= (first.match(/,/g) || []).length ? ';' : ','
+  text = text.replace(/^﻿/, '').split(/\r?\n/)
+    .filter((l) => !/^\s*```/.test(l) && !/^\s*\|?\s*:?-{3,}/.test(l))
+    .map((l) => /^\s*\|.*\|\s*$/.test(l) ? l.trim().slice(1, -1).split('|').map((c) => c.trim()).join(';') : l)
+    .join('\n').trim()
+  // Se pide punto y coma; si no aparece en ninguna línea, el CSV va con comas.
+  const sep = text.includes(';') ? ';' : ','
   const rows = [[]]
   let cur = '', q = false
   for (let i = 0; i < text.length; i++) {
@@ -531,11 +535,14 @@ function parseCSV(text) {
 }
 const norm = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ¿?¡!]/g, '').trim()
 // Empareja las columnas del CSV con las de la tabla por su nombre, sin tildes ni mayúsculas.
+// La cabecera es la primera fila que tiene alguna de las columnas: lo que la IA escriba antes se ignora.
 function fromCSV(cols, rows) {
-  const [head, ...body] = rows
+  const at = rows.findIndex((r) => r.some((h) => cols.some((c) => [norm(c.label), norm(c.k)].includes(norm(h)))))
+  if (at < 0) return []
+  const [head, ...body] = rows.slice(at)
   const map = cols.map((c) => head.findIndex((h) => [norm(c.label), norm(c.k)].includes(norm(h))))
-  if (map.every((i) => i < 0)) return []
-  return body.map((r) => Object.fromEntries(cols.map((c, j) => [c.k, map[j] < 0 ? '' : (r[map[j]] || '').trim()])))
+  // Una línea suelta sin separador (lo que la IA añada después, como «¿Quieres más?») no es una fila.
+  return body.filter((r) => head.length < 2 || r.length > 1).map((r) => Object.fromEntries(cols.map((c, j) => [c.k, map[j] < 0 ? '' : (r[map[j]] || '').trim()])))
 }
 function pickCSV(done) {
   const input = document.createElement('input')
