@@ -666,7 +666,7 @@ function renderTasks() {
       </div>
     </li>`
   return `
-    ${introPlain('Dónde deberías estar', ['Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.'])}
+    ${introPlain('Dónde deberías estar', ['Las webs que cita la IA sobre lo que vendes, de la que más sale a la que menos.'])}
     <div class="rank-head">
       <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${l}</button>`).join('')}</div>
       <button class="link" id="csv-tasks">Exportar a CSV</button>
