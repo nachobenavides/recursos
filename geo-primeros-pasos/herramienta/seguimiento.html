@@ -156,7 +156,7 @@
   .filled pre { margin: 0; padding: 16px 18px; max-height: 168px; overflow: auto; font: 12.5px/1.7 var(--mono); color: var(--fg-muted); white-space: pre-wrap; }
   .filled mark { background: none; color: var(--fg-strong); }
   .filled mark.empty { color: var(--error); }
-  .filled-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 18px; border-top: 1px solid var(--border); font-size: 13px; color: var(--fg-muted); }
+  .filled-foot { display: flex; align-items: center; gap: 12px; padding: 10px; border-top: 1px solid var(--border); font-size: 13px; color: var(--fg-muted); }
   /* Pie siempre abajo: al final de la tarjeta si cabe todo, y pegado al borde inferior al hacer scroll. */
   .spacer { flex: 1 0 48px; }
   footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
@@ -413,7 +413,7 @@ function renderGuide() {
         : '<p class="sub">Apunta antes la URL en el paso 1.</p>' },
     { t: 'Exporta las consultas', sub: 'Exportar → Descargar CSV. Descomprime el ZIP: necesitas el archivo Consultas.' },
     { t: 'Copia el prompt y pásaselo a tu IA', sub: 'Pégalo en ChatGPT, Gemini o Claude y adjunta el archivo Consultas. Guarda su respuesta como archivo .csv.',
-      do: `<div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><span id="filled-state"></span><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
+      do: `<div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
     { t: 'Importa el CSV que te ha dado la IA', sub: 'Las preguntas aparecerán en la tabla de aquí abajo. Borra las que tu cliente nunca haría.',
       do: '<button class="btn btn--secondary btn--sm" data-import>Importar CSV</button>' },
   ]
@@ -437,8 +437,6 @@ function wireGuide(main) {
     u.textContent = ok ? 'Copiada' : 'No se ha podido'
     setTimeout(() => (u.textContent = 'Copiar'), 1800)
   }
-  const missing = STEPS[0].cols.filter((c) => (c.tag || c.url) && !(product()[c.k] || '').trim()).length
-  main.querySelector('#filled-state').textContent = missing ? `${missing === 1 ? 'Falta 1 dato' : `Faltan ${missing} datos`} del paso 1` : 'Listo para copiar'
   const c = main.querySelector('#copy-filled')
   c.onclick = async () => {
     const ok = await copyText(filledPrompt(false))
