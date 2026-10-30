@@ -138,20 +138,19 @@
   .urls > div { display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 14px; }
   .urls > div + div { border-top: 1px solid var(--border); }
   .urls code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px var(--mono); color: var(--fg); }
-  .vars { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .vars--form { max-width: 900px; grid-template-columns: 1fr 1.5fr; }
-  .vars label { display: flex; flex-direction: column; gap: 6px; }
-  .vars input, .vars select { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-sm); background: transparent; color: var(--fg-strong); font: 14px var(--sans); transition: border-color 150ms var(--ease); }
-  .vars input::placeholder { color: rgba(163, 163, 163, 0.35); }
-  .vars input:hover, .vars select:hover { border-color: var(--border-strong); }
-  .vars input:focus, .vars select:focus { outline: none; border-color: var(--fg-muted); }
-  .vars select option { background: var(--bg); }
+  /* Paso 1: un formulario corto, un dato por fila. */
+  .form { max-width: 560px; display: grid; gap: 20px; }
+  .form label { display: flex; flex-direction: column; gap: 8px; }
+  .form input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.03); color: var(--fg-strong); font: 15px var(--sans); transition: border-color 150ms var(--ease); }
+  .form input::placeholder { color: rgba(163, 163, 163, 0.35); }
+  .form input:hover { border-color: var(--border-strong); }
+  .form input:focus { outline: none; border-color: var(--fg-muted); }
+  .form small { font-size: 13px; color: var(--fg-muted); }
   .filled { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
   .filled pre { margin: 0; padding: 14px 16px; max-height: 180px; overflow: auto; background: var(--bg); font: 13px/1.6 var(--mono); color: var(--fg-muted); white-space: pre-wrap; }
   .filled mark { background: none; color: var(--fg-strong); }
   .filled mark.empty { color: var(--error); }
   .filled-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--fg-muted); }
-  @media (max-width: 860px) { .vars { grid-template-columns: 1fr; } }
   /* Pie siempre abajo: al final de la tarjeta si cabe todo, y pegado al borde inferior al hacer scroll. */
   .spacer { flex: 1 0 48px; }
   footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
@@ -185,9 +184,14 @@ const TIPOS = ['', 'Comparativa', 'Reseñas', 'Medio', 'Foro', 'Blog', 'Vídeo',
 const STEPS = [
   {
     id: 'productos', title: 'Qué quieres potenciar', short: 'A potenciar',
-    lead: 'Elige un producto o servicio que quieras potenciar y apunta la URL de su página.',
-    help: ['Mejor uno que te deje margen o en el que creas que puedes destacar.', 'La URL es la que filtrarás en Search Console en el paso siguiente.'],
-    cols: [{ k: 'nombre', label: 'Producto o servicio', ph: 'Por ejemplo, hosting WordPress' }, { k: 'url', label: 'URL de su página', ph: 'https://tuweb.com/hosting-wordpress', url: true }],
+    lead: 'Elige un producto o servicio que quieras potenciar y apunta a quién se lo vendes.',
+    help: ['Mejor uno que te deje margen o en el que creas que puedes destacar.', 'Con estos datos se rellena solo el prompt del paso siguiente.'],
+    cols: [
+      { k: 'nombre', label: 'Producto o servicio', ph: 'Por ejemplo, hosting WordPress', tag: '[PRODUCTO O SERVICIO]' },
+      { k: 'url', label: 'URL de su página', ph: 'https://tuweb.com/hosting-wordpress', url: true, hint: 'La que filtrarás en Search Console.' },
+      { k: 'cliente', label: 'A quién se lo vendes', ph: 'Por ejemplo, agencias pequeñas', tag: '[TIPO DE CLIENTE]' },
+      { k: 'lugar', label: 'Dónde', ph: 'Por ejemplo, España o Madrid', tag: '[PAÍS O CIUDAD]', hint: 'País o ciudad.' },
+    ],
     form: true,
   },
   {
@@ -244,7 +248,7 @@ Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
 Si algo no aparece en la página, dilo. No lo supongas.` },
 ]
 
-const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {}, vars: {} })
+const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {} })
 const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(KEY)) } } catch { return blank() } }
 let data = load()
 // Se puede entrar directamente a una vista desde un enlace: seguimiento.html#prompts
@@ -370,16 +374,13 @@ function renderPrompts() {
 
 const GSC = 'https://search.google.com/search-console/performance/search-analytics'
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
-const VARS = [
-  { k: 'cliente', tag: '[TIPO DE CLIENTE]', label: 'Tipo de cliente', ph: 'Por ejemplo, agencias pequeñas' },
-  { k: 'lugar', tag: '[PAÍS O CIUDAD]', label: 'País o ciudad', ph: 'Por ejemplo, España' },
-]
-// El prompt 1 con las variables puestas; en pantalla, lo que falta por rellenar se marca.
+// Las variables del prompt 1 salen del formulario del paso 1; en pantalla, lo que falta se marca.
+const VARS = STEPS[0].cols.filter((c) => c.tag)
 const filledPrompt = (html) => {
   const p = PROMPTS.find((x) => x.id === 'p1')
   let t = html ? esc(p.text) : p.text
-  for (const v of [{ k: 'producto', tag: '[PRODUCTO O SERVICIO]' }, ...VARS]) {
-    const val = (v.k === 'producto' ? product().nombre || '' : data.vars[v.k] || '').trim()
+  for (const v of VARS) {
+    const val = (product()[v.k] || '').trim()
     t = t.split(v.tag).join(html ? `<mark class="${val ? '' : 'empty'}">${esc(val || v.tag)}</mark>` : val || v.tag)
   }
   return t
@@ -398,9 +399,8 @@ function renderGuide() {
       do: url ? `<div class="urls"><div><code>${esc(url)}</code><button class="btn btn--secondary btn--sm" id="copy-url">Copiar URL</button></div></div>`
         : '<p class="sub">Apunta antes la URL en el paso 1.</p>' },
     { t: 'Exporta las consultas', sub: 'Exportar → Descargar CSV. Descomprime el ZIP: necesitas el archivo Consultas.' },
-    { t: 'Rellena el prompt y pásaselo a tu IA', sub: 'Pégalo en ChatGPT, Gemini o Claude y adjunta el archivo Consultas. Guarda su respuesta como archivo .csv.',
-      do: `<div class="vars">${VARS.map((v) => `<label><span class="mono">${v.label}</span><input data-var="${v.k}" value="${esc(data.vars[v.k] || '')}" placeholder="${esc(v.ph)}"></label>`).join('')}</div>
-        <div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><span id="filled-state"></span><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
+    { t: 'Copia el prompt y pásaselo a tu IA', sub: 'Pégalo en ChatGPT, Gemini o Claude y adjunta el archivo Consultas. Guarda su respuesta como archivo .csv.',
+      do: `<div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><span id="filled-state"></span><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
     { t: 'Importa el CSV que te ha dado la IA', sub: 'Las preguntas aparecerán en la tabla de aquí abajo.',
       do: '<button class="btn btn--secondary btn--sm" data-import>Importar CSV</button>' },
   ]
@@ -424,17 +424,8 @@ function wireGuide(main) {
     u.textContent = ok ? 'Copiada' : 'No se ha podido copiar'
     setTimeout(() => (u.textContent = 'Copiar URL'), 1800)
   }
-  const state = () => {
-    const missing = VARS.filter((v) => !(data.vars[v.k] || '').trim()).length + (product().nombre?.trim() ? 0 : 1)
-    main.querySelector('#filled-state').textContent = missing ? (missing === 1 ? 'Falta 1 dato por rellenar' : `Faltan ${missing} datos por rellenar`) : 'Listo para copiar'
-  }
-  main.querySelectorAll('[data-var]').forEach((el) => el.oninput = el.onchange = () => {
-    data.vars[el.dataset.var] = el.value
-    save()
-    main.querySelector('#filled').innerHTML = filledPrompt(true)
-    state()
-  })
-  state()
+  const missing = VARS.filter((v) => !(product()[v.k] || '').trim()).length
+  main.querySelector('#filled-state').textContent = missing ? `${missing === 1 ? 'Falta 1 dato' : `Faltan ${missing} datos`} del paso 1` : 'Listo para copiar'
   const c = main.querySelector('#copy-filled')
   c.onclick = async () => {
     const ok = await copyText(filledPrompt(false))
@@ -447,8 +438,8 @@ function renderForm(step) {
   const pr = product()
   return `
     ${intro(step.title, step.lead, step.help)}
-    <div class="vars vars--form">${step.cols.map((c) => `<label><span class="mono">${c.label}</span><input data-f="${c.k}" value="${esc(pr[c.k] || '')}" placeholder="${esc(c.ph)}" ${c.url ? 'type="url" spellcheck="false"' : ''}></label>`).join('')}</div>
-    <p class="note">Para hacerlo con otra URL, guarda una copia (abajo a la izquierda) y empieza de cero.</p>
+    <div class="form">${step.cols.map((c) => `<label><span class="mono">${c.label}</span><input data-f="${c.k}" value="${esc(pr[c.k] || '')}" placeholder="${esc(c.ph)}" ${c.url ? 'type="url" spellcheck="false"' : ''}>${c.hint ? `<small>${c.hint}</small>` : ''}</label>`).join('')}</div>
+    <p class="note" style="margin-top:24px">Para hacerlo con otra URL, guarda una copia (abajo a la izquierda) y empieza de cero.</p>
     ${credit}`
 }
 
