@@ -200,8 +200,6 @@ const STEPS = [
   },
   {
     id: 'preguntas', title: 'Saca las preguntas de tu cliente', short: 'Preguntas',
-    lead: 'Convierte lo que ya buscan en Google en preguntas para la IA.',
-    help: ['Sigue la lista de aquí abajo, en orden.', 'Después, borra las preguntas que tu cliente nunca haría.'],
     cols: [{ k: 'pregunta', label: 'Pregunta', area: true }, { k: 'origen', label: 'Consulta de origen' }],
     importable: true, guide: true,
   },
@@ -413,7 +411,7 @@ function renderGuide() {
     { t: 'Exporta las consultas', sub: 'Exportar → Descargar CSV. Descomprime el ZIP: necesitas el archivo Consultas.' },
     { t: 'Copia el prompt y pásaselo a tu IA', sub: 'Pégalo en ChatGPT, Gemini o Claude y adjunta el archivo Consultas. Guarda su respuesta como archivo .csv.',
       do: `<div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><span id="filled-state"></span><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
-    { t: 'Importa el CSV que te ha dado la IA', sub: 'Las preguntas aparecerán en la tabla de aquí abajo.',
+    { t: 'Importa el CSV que te ha dado la IA', sub: 'Las preguntas aparecerán en la tabla de aquí abajo. Borra las que tu cliente nunca haría.',
       do: '<button class="btn btn--secondary btn--sm" data-import>Importar CSV</button>' },
   ]
   return `<ol class="guide">${items.map((it, j) => `
