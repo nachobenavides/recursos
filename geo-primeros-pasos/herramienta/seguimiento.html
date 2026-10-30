@@ -254,8 +254,7 @@ const STEPS = [
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
     cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'url', label: 'URL citada' }, { k: 'web', label: 'Web' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
-    lead: 'Haz cada pregunta y apunta las webs que cita la IA.',
-    help: ['Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada.', 'Copia la URL exacta de cada fuente: abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige «Copiar dirección del enlace».', 'Después, marca si te nombra a ti o a tu competencia.'],
+    help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente: botón derecho sobre el enlace de la cita → Copiar dirección del enlace.', 'Marca si esa página te nombra a ti o a tu competencia.'],
     ask: true,
   },
   {
@@ -533,7 +532,7 @@ function renderAsk(step) {
   const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
   const done = qs.filter(asked).length
   return `
-    ${introPlain(step.title, [step.lead, ...step.help])}
+    ${introPlain(step.title, step.help)}
     <div class="qhead qhead--top"><h2>Tus preguntas</h2><span class="qcount">${done} de ${qs.length} hechas</span>
       ${data.fuentes.length ? '<div class="qactions"><button class="link" id="csv">Exportar a CSV</button></div>' : ''}</div>
     <ol class="asks">${qs.map((q, qi) => `
