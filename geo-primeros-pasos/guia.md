@@ -30,14 +30,14 @@ Revisa las preguntas y borra las que tu cliente nunca haría.
 
 - Usa una ventana de **incógnito**, sin iniciar sesión, para que la respuesta no salga personalizada.
 - En la herramienta, cada pregunta tiene dos botones: **Preguntar en ChatGPT** y en el **Modo IA de Google**. Se abren con la pregunta ya enviada.
-- Copia la **URL exacta** de cada fuente: abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige *Copiar dirección del enlace*. Pégala en la herramienta.
+- Copia la **URL exacta** de cada fuente: abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige *Copiar dirección del enlace*. Pégala en la herramienta. No apuntes las webs de tu competencia: ahí no vas a aparecer.
 - Si quieres, repite la pregunta en un chat nuevo: cada vez cita webs distintas. Añade las nuevas en la misma casilla.
 
 No le pidas a la IA que te liste sus fuentes: lo hemos probado y se deja muchas. Copiar la respuesta tampoco copia las fuentes.
 
 ## Paso 4 · Analiza las webs que más se repiten
 
-La herramienta te las ordena en **Dónde deberías estar**, de la que más se repite a la que menos. Si sale la web de una marca de tu competencia, márcala con *Es competencia*: se aparta, porque ahí no vas a aparecer.
+La herramienta te las ordena en **Dónde deberías estar**, de la que más se repite a la que menos.
 
 De cada una, mira:
 - **qué tipo de contenido es:** comparativa, guía, reseña, lista de recomendados;
