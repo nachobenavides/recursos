@@ -42,8 +42,8 @@
   .dot--error { background: var(--error); }
   .dot--strong { background: var(--fg-strong); }
   .dot--faint { background: rgba(163, 163, 163, 0.25); }
-  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
-  .side-foot .btn { justify-content: flex-start; }
+  /* Abajo, lo que se hace con el trabajo guardado, con la misma forma que los pasos del menú. */
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
 
   /* El contenido va en una tarjeta más clara, casi pegada a los bordes de la ventana; el menú queda a su izquierda. */
   main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 24px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
@@ -160,19 +160,20 @@
   .state { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); }
   /* Paso 4: cifras arriba, selector de buscador y la clasificación de webs con su barra de peso. */
   .rank-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-  .rank-cols { display: grid; grid-template-columns: 32px minmax(200px, 340px) 200px minmax(24px, 1fr) 240px 20px; gap: 16px; padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(163, 163, 163, 0.6); }
+  .rank-cols { display: grid; grid-template-columns: 32px minmax(180px, 340px) 190px minmax(0, 1fr) minmax(140px, 240px) 20px; gap: 16px; padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(163, 163, 163, 0.6); }
   .seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: var(--r-full); }
   .seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); transition: background-color 150ms var(--ease), color 150ms var(--ease); }
   .seg button:hover { color: var(--fg-strong); }
   .seg button.is-on { background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
   .ranking { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
   .rank { border-bottom: 1px solid var(--border); }
-  .rank__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 32px minmax(200px, 340px) 200px minmax(24px, 1fr) 240px 20px; align-items: center; gap: 16px; padding: 14px 4px; transition: background-color 150ms var(--ease); }
+  .rank__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 32px minmax(180px, 340px) 190px minmax(0, 1fr) minmax(140px, 240px) 20px; align-items: center; gap: 16px; padding: 14px 4px; transition: background-color 150ms var(--ease); }
   .rank__row:hover { background: rgba(255, 255, 255, 0.02); }
   .rank__n { font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.5); }
   .rank__web { display: flex; align-items: center; gap: 12px; min-width: 0; }
   .rank__web > span { min-width: 0; }
   .rank__web b { font-weight: 500; font-size: 15px; color: var(--fg-strong); }
+  .rank__web b, .rank__web small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rank__web small { display: block; margin-top: 2px; font-size: 12px; color: var(--fg-muted); }
   .fav { flex: none; width: 20px; height: 20px; border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.06); }
   /* La barra y el número van juntos: en cuántas de tus preguntas sale la web. */
@@ -255,9 +256,10 @@
     <div class="side-title mono">Pasos</div>
     <nav id="nav"></nav>
     <div class="side-foot">
-      <button class="btn btn--ghost" id="export-json">Guardar copia (.json)</button>
-      <button class="btn btn--ghost" id="import-json">Cargar copia</button>
-      <button class="btn btn--ghost" id="reset">Empezar de cero</button>
+      <div class="side-title mono">Tu trabajo</div>
+      <button class="nav" id="export-json">Descargar mi trabajo</button>
+      <button class="nav" id="import-json">Abrir un trabajo guardado</button>
+      <button class="nav" id="reset">Empezar con otra URL</button>
       <input type="file" id="file" accept="application/json" hidden>
     </div>
   </aside>
@@ -518,7 +520,7 @@ function renderForm(step) {
   return `
     ${intro(step.title)}
     <div class="form">${step.cols.map((c) => `<label><span class="mono">${c.label}</span><input data-f="${c.k}" value="${esc(pr[c.k] || '')}" placeholder="${esc(c.ph)}" ${c.url ? 'type="url" spellcheck="false"' : ''}>${c.hint ? `<small>${c.hint}</small>` : ''}</label>`).join('')}</div>
-    <p class="note" style="margin-top:24px">Para hacerlo con otra URL, guarda una copia (abajo a la izquierda) y empieza de cero.</p>
+    <p class="note" style="margin-top:24px">Para hacerlo con otra URL, pulsa abajo a la izquierda «Descargar mi trabajo» y después «Empezar con otra URL».</p>
     ${credit}`
 }
 
@@ -803,16 +805,16 @@ function render() {
   if (csv) csv.onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
 }
 
-document.getElementById('export-json').onclick = () => download('seguimiento-donde-deberias-estar.json', JSON.stringify(data, null, 2), 'application/json')
+document.getElementById('export-json').onclick = () => download(`donde-deberias-estar-${domain(product().url) || 'trabajo'}.json`, JSON.stringify(data, null, 2), 'application/json')
 document.getElementById('import-json').onclick = () => document.getElementById('file').click()
 document.getElementById('file').onchange = async (e) => {
   const f = e.target.files[0]
   if (!f) return
-  try { data = { ...blank(), ...JSON.parse(await f.text()) }; save(); render() } catch { alert('Ese archivo no es una copia válida.') }
+  try { data = { ...blank(), ...JSON.parse(await f.text()) }; save(); render() } catch { alert('Ese archivo no es un trabajo guardado con esta herramienta.') }
   e.target.value = ''
 }
 document.getElementById('reset').onclick = () => {
-  if (!confirm('¿Borrar todo lo apuntado? Guarda antes una copia si la quieres conservar.')) return
+  if (!confirm('¿Empezar con otra URL? Se borra todo lo apuntado. Si quieres conservarlo, cancela y pulsa antes «Descargar mi trabajo».')) return
   data = blank(); save(); view = 'productos'; render()
 }
 
