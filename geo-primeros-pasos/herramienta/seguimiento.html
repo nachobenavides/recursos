@@ -185,11 +185,7 @@
   .rank__c { text-align: right; font: 500 15px var(--mono); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
   .rank__chev { display: grid; place-items: center; color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .rank.is-open .rank__chev { transform: rotate(180deg); }
-  /* Los iconos de los buscadores, en monocromo para que no salgan sobre un cuadro blanco: se invierten a gris claro y
-     su fondo blanco desaparece con el modo de fusión. */
-  .eng-ico { width: 12px; height: 12px; flex: none; }
-  .eng-ico--gpt { filter: invert(1) grayscale(1); mix-blend-mode: screen; opacity: 0.85; }
-  .eng-ico--google { filter: grayscale(1) invert(1) contrast(1.6); mix-blend-mode: screen; opacity: 0.85; }
+  .eng-ico { width: 12px; height: 12px; flex: none; color: var(--fg); }
   .rank__more { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0 4px 16px 48px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
   .rank.is-open .rank__more { display: grid; }
   .rank__more ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
@@ -641,7 +637,9 @@ function renderStep(step, i) {
 // sus páginas. Se puede ver todo junto o por buscador.
 let taskEngine = ''
 const openWebs = new Set()
-const engIcon = (k) => `<img class="eng-ico eng-ico--${k === 'ChatGPT' ? 'gpt' : 'google'}" src="https://www.google.com/s2/favicons?domain=${k === 'ChatGPT' ? 'chatgpt.com' : 'google.com'}&sz=32" alt="" onerror="this.style.display='none'">`
+// Iconos propios de los buscadores, dibujados aquí: la «G» de Google en color y el símbolo de ChatGPT en el color del texto.
+const ENGINE_ICONS = { ChatGPT: '<svg class="eng-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.52 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zm-9.02 12.61a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.79.79 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zm-9.66-4.13a4.47 4.47 0 0 1-.53-3.01l.14.09 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06L9.74 19.95a4.5 4.5 0 0 1-6.14-1.65zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.67a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17a.08.08 0 0 1-.07 0l-4.83-2.79A4.5 4.5 0 0 1 2.34 7.87zm16.6 3.86-5.84-3.39 2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.67a.79.79 0 0 0-.4-.67zm2.01-3.02-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08L8.7 5.46a.79.79 0 0 0-.39.68zm1.1-2.37 2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5z"/></svg>', 'Modo IA': '<svg class="eng-ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>' }
+const engIcon = (k) => ENGINE_ICONS[k] || ''
 const favicon = (d) => `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=32" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
 function renderTasks() {
   const t = tasks(taskEngine)
