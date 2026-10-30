@@ -160,14 +160,14 @@
   .state { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); }
   /* Paso 4: cifras arriba, selector de buscador y la clasificación de webs con su barra de peso. */
   .rank-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-  .rank-cols { display: grid; grid-template-columns: 32px minmax(0, 1fr) 200px 240px 20px; gap: 16px; padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(163, 163, 163, 0.6); }
+  .rank-cols { display: grid; grid-template-columns: 32px minmax(200px, 340px) 200px minmax(24px, 1fr) 240px 20px; gap: 16px; padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: rgba(163, 163, 163, 0.6); }
   .seg { display: inline-flex; padding: 3px; border: 1px solid var(--border); border-radius: var(--r-full); }
   .seg button { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); transition: background-color 150ms var(--ease), color 150ms var(--ease); }
   .seg button:hover { color: var(--fg-strong); }
   .seg button.is-on { background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
   .ranking { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
   .rank { border-bottom: 1px solid var(--border); }
-  .rank__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 32px minmax(0, 1fr) 200px 240px 20px; align-items: center; gap: 16px; padding: 14px 4px; transition: background-color 150ms var(--ease); }
+  .rank__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 32px minmax(200px, 340px) 200px minmax(24px, 1fr) 240px 20px; align-items: center; gap: 16px; padding: 14px 4px; transition: background-color 150ms var(--ease); }
   .rank__row:hover { background: rgba(255, 255, 255, 0.02); }
   .rank__n { font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.5); }
   .rank__web { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -177,7 +177,7 @@
   .fav { flex: none; width: 20px; height: 20px; border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.06); }
   /* La barra y el número van juntos: en cuántas de tus preguntas sale la web. */
   .rank__q { display: flex; align-items: center; gap: 12px; padding-left: 24px; }
-  .rank-cols span:nth-child(4) { padding-left: 24px; }
+  .rank-cols span:nth-child(5) { padding-left: 24px; }
   .rank__bar { flex: 1; height: 6px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
   .rank__bar span { display: block; height: 100%; border-radius: inherit; background: var(--fg); }
   .rank__eng { display: flex; gap: 6px; }
@@ -196,7 +196,7 @@
   .rank__more a:hover { color: var(--fg-strong); text-decoration: underline; }
   .rank__more p { margin: 0; min-width: 0; font-size: 13px; line-height: 1.45; color: var(--fg); }
   .rank--mine { opacity: 0.6; }
-  @media (max-width: 860px) { .rank__row { grid-template-columns: 28px minmax(0, 1fr) 64px 20px; } .rank__bar, .rank__eng, .rank-cols { display: none; } .rank__more { grid-template-columns: 1fr; margin-left: 4px; } }
+  @media (max-width: 860px) { .rank__row { grid-template-columns: 28px minmax(0, 1fr) 0 64px 20px; } .rank__bar, .rank__eng, .rank-cols { display: none; } .rank__more { grid-template-columns: 1fr; margin-left: 4px; } }
   .prompt { margin: 0 0 28px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .prompt__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
   .prompt__head strong { display: block; margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--fg-strong); }
@@ -655,6 +655,7 @@ function renderTasks() {
         <span class="rank__web">${favicon(x.web)}<span><b>${esc(x.web)}</b>${x.tu ? ' <span class="qcount">Tu web</span>' : ''}
           <small>${x.urls.length} ${x.urls.length === 1 ? 'página citada' : 'páginas citadas'}</small></span></span>
         <span class="rank__eng">${ENGINES.map((e) => x.engines[e.k] ? engineTag(e.k, taskEngine ? '' : x.engines[e.k]) : '').join('')}</span>
+        <span></span>
         <span class="rank__q"><span class="rank__bar"><span style="width:${Math.round((x.preguntas.size / total) * 100)}%"></span></span><span class="rank__c">${x.preguntas.size} de ${total}</span></span>
         <span class="rank__chev">${CHEVRON}</span>
       </button>
@@ -671,7 +672,7 @@ function renderTasks() {
       <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${l}</button>`).join('')}</div>
       <button class="link" id="csv-tasks">Exportar a CSV</button>
     </div>
-    ${list.length ? `<div class="rank-cols"><span></span><span>Web</span><span>Dónde la cita</span><span>Preguntas en las que sale</span><span></span></div>` : ''}
+    ${list.length ? `<div class="rank-cols"><span></span><span>Web</span><span>Dónde la cita</span><span></span><span>Preguntas en las que sale</span><span></span></div>` : ''}
     ${list.length || mine ? `<ol class="ranking">${list.map(row).join('')}${mine ? row(mine, 0) : ''}</ol>`
       : '<p class="qempty">Aparecerá cuando apuntes webs citadas en el paso 03.</p>'}
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
