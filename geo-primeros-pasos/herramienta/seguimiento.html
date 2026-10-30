@@ -185,7 +185,11 @@
   .rank__c { text-align: right; font: 500 15px var(--mono); color: var(--fg-strong); font-variant-numeric: tabular-nums; }
   .rank__chev { display: grid; place-items: center; color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .rank.is-open .rank__chev { transform: rotate(180deg); }
-  .eng-ico { width: 12px; height: 12px; border-radius: 2px; flex: none; }
+  /* Los iconos de los buscadores, en monocromo para que no salgan sobre un cuadro blanco: se invierten a gris claro y
+     su fondo blanco desaparece con el modo de fusión. */
+  .eng-ico { width: 12px; height: 12px; flex: none; }
+  .eng-ico--gpt { filter: invert(1) grayscale(1); mix-blend-mode: screen; opacity: 0.85; }
+  .eng-ico--google { filter: grayscale(1) invert(1) contrast(1.6); mix-blend-mode: screen; opacity: 0.85; }
   .rank__more { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 0 4px 16px 48px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
   .rank.is-open .rank__more { display: grid; }
   .rank__more ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; }
@@ -637,7 +641,7 @@ function renderStep(step, i) {
 // sus páginas. Se puede ver todo junto o por buscador.
 let taskEngine = ''
 const openWebs = new Set()
-const engIcon = (k) => `<img class="eng-ico" src="https://www.google.com/s2/favicons?domain=${k === 'ChatGPT' ? 'chatgpt.com' : 'google.com'}&sz=32" alt="" onerror="this.style.display='none'">`
+const engIcon = (k) => `<img class="eng-ico eng-ico--${k === 'ChatGPT' ? 'gpt' : 'google'}" src="https://www.google.com/s2/favicons?domain=${k === 'ChatGPT' ? 'chatgpt.com' : 'google.com'}&sz=32" alt="" onerror="this.style.display='none'">`
 const favicon = (d) => `<img class="fav" src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=32" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`
 function renderTasks() {
   const t = tasks(taskEngine)
@@ -670,7 +674,7 @@ function renderTasks() {
       <span class="rank-sum">${list.length} webs · ${list.reduce((n, x) => n + x.urls.length, 0)} páginas</span>
       <button class="link" id="csv-tasks">Exportar a CSV</button>
     </div>
-    ${list.length ? `<div class="rank-cols"><span></span><span>Web</span><span>Citas, frente a la más citada</span><span>Dónde la cita</span><span>Citas</span><span></span></div>` : ''}
+    ${list.length ? `<div class="rank-cols"><span></span><span>Web</span><span></span><span>Dónde la cita</span><span>Veces</span><span></span></div>` : ''}
     ${list.length || mine ? `<ol class="ranking">${list.map(row).join('')}${mine ? row(mine, 0) : ''}</ol>`
       : '<p class="qempty">Aparecerá cuando apuntes webs citadas en el paso 03.</p>'}
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
