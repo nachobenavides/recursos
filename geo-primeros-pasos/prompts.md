@@ -9,11 +9,11 @@ Para el [paso 2](guia.md#paso-2--saca-las-preguntas-de-tu-cliente). Adjunta el a
 ```text
 Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web, [WEB]. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
 
-Con esas consultas, escribe las preguntas que una persona así le haría a ChatGPT cuando está eligiendo qué contratar o a quién comprar. En lenguaje natural y en primera persona, como las escribiría alguien real.
+Con esas consultas, escribe las preguntas que una persona así le haría a ChatGPT sobre [PRODUCTO O SERVICIO]. En lenguaje natural y en primera persona, como las escribiría alguien real.
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Quédate con las consultas de alguien que está decidiendo qué comprar: mejor, barato, precio, opiniones, comparativas, alternativas o para un uso concreto. Descarta las de quien solo quiere aprender algo (qué es, cómo se hace).
+- Incluye tanto las de quien está eligiendo qué comprar (mejor, precio, opiniones, comparativas, alternativas) como las de quien quiere entender o resolver algo relacionado (qué es, cómo se hace).
 - Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Las que nombran a otras marcas sí valen.
 - Junta en una sola pregunta las consultas que signifiquen lo mismo.
 - Una sola pregunta por fila.
