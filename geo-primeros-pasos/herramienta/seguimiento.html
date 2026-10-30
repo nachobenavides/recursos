@@ -76,8 +76,7 @@
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
   /* Paso 3: una tarjeta por pregunta, con ChatGPT y el Modo IA lado a lado. */
-  .ask-hint { margin: 0; max-width: 720px; font-size: 14px; color: var(--fg-muted); }
-  .qhead--top { margin-top: 24px; }
+  .qhead--top { margin-top: 0; padding-top: 0; border-top: 0; }
   .asks { margin: 0; padding: 0; list-style: none; }
   .asks > li { padding: 18px 0 22px; }
   .asks > li + li { border-top: 1px solid var(--border); }
@@ -247,6 +246,8 @@ const STEPS = [
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
     cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'web', label: 'Web citada' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
+    lead: 'Haz cada pregunta y apunta las webs que cita la IA.',
+    help: ['Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada.', 'Apunta cada web que sale en las etiquetas de cita junto a los párrafos: vale su nombre o su dirección.', 'Después, marca si te nombra a ti o a tu competencia.'],
     ask: true,
   },
   {
@@ -507,8 +508,7 @@ function renderAsk(step) {
   const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
   const done = qs.filter(asked).length
   return `
-    ${intro(step.title)}
-    <p class="ask-hint">Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada. Apunta cada web que sale en las etiquetas de cita junto a los párrafos: vale su nombre o su dirección. Después, marca si te nombra a ti o a tu competencia.</p>
+    ${intro(step.title, step.lead, step.help)}
     <div class="qhead qhead--top"><h2>Tus preguntas</h2><span class="qcount">${done} de ${qs.length} hechas</span>
       ${data.fuentes.length ? '<div class="qactions"><button class="link" id="csv">Exportar a CSV</button></div>' : ''}</div>
     <ol class="asks">${qs.map((q, qi) => `
@@ -696,6 +696,7 @@ function render() {
   const step = STEPS[i]
   main.innerHTML = renderStep(step, i)
   if (step.ask) {
+    wireIntro(main)
     wireAsk(main)
     const c = document.getElementById('csv')
     if (c) c.onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
