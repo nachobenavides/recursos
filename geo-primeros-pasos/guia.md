@@ -37,7 +37,7 @@ No le pidas a la IA que te liste sus fuentes: lo hemos probado y se deja muchas.
 
 ## Paso 4 · Analiza las webs que más se repiten
 
-La herramienta te las ordena en **Dónde deberías estar**, de la que más se repite a la que menos.
+La herramienta te las ordena en **Dónde deberías estar**, de la que más se repite a la que menos. Si sale la web de una marca de tu competencia, márcala con *Es competencia*: se aparta, porque ahí no vas a aparecer.
 
 De cada una, mira:
 - **qué tipo de contenido es:** comparativa, guía, reseña, lista de recomendados;

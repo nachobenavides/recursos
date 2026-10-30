@@ -13,8 +13,9 @@ Con esas consultas, escribe las preguntas que una persona así le haría a ChatG
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Incluye tanto las de quien está eligiendo qué comprar (mejor, precio, opiniones, comparativas, alternativas) como las de quien quiere entender o resolver algo relacionado (qué es, cómo se hace).
-- Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Las que nombran a otras marcas sí valen.
+- Escribe preguntas de quien quiere entender, comparar o resolver algo: qué es, cómo elegir, en qué fijarse, diferencias, cuánto cuesta, ventajas e inconvenientes.
+- No pidas que te recomiende una marca o un proveedor (nada de «¿cuál me recomiendas?» o «¿cuál es el mejor?»): convierte esas consultas en preguntas sobre cómo elegir. Así la IA cita guías, comparativas, medios y foros, y no las webs de las propias marcas.
+- Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Si una consulta nombra a otras marcas, pregunta en qué se diferencian, sin pedir que elija una.
 - Junta en una sola pregunta las consultas que signifiquen lo mismo.
 - Una sola pregunta por fila.
 - Añade solo el contexto que se deduce de la consulta o de a quién vendo. No inventes datos que no estén ahí, como cifras, nombres o situaciones personales.

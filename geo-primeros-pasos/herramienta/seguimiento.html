@@ -94,6 +94,11 @@
   .web__d b { font-weight: 400; color: var(--fg-strong); }
   .web__d:hover b { text-decoration: underline; }
   .addweb.is-bad { border-color: var(--error); }
+  td.del-col { width: 1%; white-space: nowrap; text-align: right; }
+  .apart { margin-top: 20px; }
+  .apart summary { cursor: pointer; padding: 6px 0 12px; list-style: none; }
+  .apart summary::-webkit-details-marker { display: none; }
+  .apart .table-wrap { opacity: 0.6; }
   .paths { display: flex; flex-direction: column; margin-top: 4px; }
   .paths a { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
   .paths a:hover { color: var(--fg); text-decoration: underline; }
@@ -270,8 +275,9 @@ Con esas consultas, escribe las preguntas que una persona así le haría a ChatG
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Incluye tanto las de quien está eligiendo qué comprar (mejor, precio, opiniones, comparativas, alternativas) como las de quien quiere entender o resolver algo relacionado (qué es, cómo se hace).
-- Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Las que nombran a otras marcas sí valen.
+- Escribe preguntas de quien quiere entender, comparar o resolver algo: qué es, cómo elegir, en qué fijarse, diferencias, cuánto cuesta, ventajas e inconvenientes.
+- No pidas que te recomiende una marca o un proveedor (nada de «¿cuál me recomiendas?» o «¿cuál es el mejor?»): convierte esas consultas en preguntas sobre cómo elegir. Así la IA cita guías, comparativas, medios y foros, y no las webs de las propias marcas.
+- Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Si una consulta nombra a otras marcas, pregunta en qué se diferencian, sin pedir que elija una.
 - Junta en una sola pregunta las consultas que signifiquen lo mismo.
 - Una sola pregunta por fila.
 - Añade solo el contexto que se deduce de la consulta o de a quién vendo. No inventes datos que no estén ahí, como cifras, nombres o situaciones personales.
@@ -291,7 +297,7 @@ Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
 Si algo no aparece en la página, dilo. No lo supongas.` },
 ]
 
-const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {} })
+const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {}, competencia: [] })
 const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(KEY)) } } catch { return blank() } }
 let data = load()
 // Se puede entrar directamente a una vista desde un enlace: seguimiento.html#prompts
@@ -308,12 +314,12 @@ const tasks = () => {
   for (const r of data.fuentes) {
     const d = domain(r.web)
     if (!d) continue
-    const t = by.get(d) || { web: d, veces: 0, urls: [], tu: !!mine && d === mine }
+    const t = by.get(d) || { web: d, veces: 0, urls: [], tu: !!mine && d === mine, comp: (data.competencia || []).includes(d) }
     t.veces++
     if (r.url && !t.urls.includes(r.url)) t.urls.push(r.url)
     by.set(d, t)
   }
-  return [...by.values()].sort((a, b) => a.tu - b.tu || b.veces - a.veces)
+  return [...by.values()].sort((a, b) => a.tu - b.tu || a.comp - b.comp || b.veces - a.veces)
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -335,7 +341,7 @@ const LOCK = '<svg class="lock" viewBox="0 0 24 24" width="12" height="12" fill=
 
 function renderNav() {
   const nav = document.getElementById('nav')
-  const pending = tasks().filter((t) => !t.tu).length
+  const pending = tasks().filter((t) => !t.tu && !t.comp).length
   nav.innerHTML = STEPS.map((s, i) => `
     <button class="nav ${view === s.id ? 'is-on' : ''} ${isOpen(s.id) ? '' : 'is-locked'}" data-v="${s.id}" ${isOpen(s.id) ? '' : `title="${lockedTitle(s.id)}"`}>
       <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
@@ -614,21 +620,27 @@ function renderStep(step, i) {
     ${credit}`
 }
 
+// Las webs de tu competencia (sus propias webs, que la IA cita al recomendarlas) se apartan a mano: no son sitios donde
+// puedas aparecer. Quedan abajo, plegadas, por si alguna se marcó sin querer.
 function renderTasks() {
   const t = tasks()
-  const others = t.filter((x) => !x.tu)
+  const list = t.filter((x) => !x.tu && !x.comp)
+  const apart = t.filter((x) => x.tu || x.comp)
+  const paths = (x) => x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''
+  const row = (x) => `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.tu ? ' <span class="qcount">Tu web</span>' : ''}${paths(x)}</td><td class="static">${x.veces}</td>
+    <td class="static del-col">${x.tu ? '' : `<button class="link" data-comp="${esc(x.web)}">${x.comp ? 'No es competencia' : 'Es competencia'}</button>`}</td></tr>`
   return `
-    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.')}
+    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.', ['Si sale la web de una marca de tu competencia, márcala con «Es competencia»: se aparta de la lista.'])}
     <div class="metrics">
-      <div class="metric"><b>${others.length}</b><span class="mono">Webs citadas</span></div>
-      <div class="metric"><b>${others.reduce((n, x) => n + x.urls.length, 0)}</b><span class="mono">Páginas citadas</span></div>
-      <div class="metric"><b>${others.filter((x) => x.veces > 1).length}</b><span class="mono">Citadas más de una vez</span></div>
+      <div class="metric"><b>${list.length}</b><span class="mono">Webs citadas</span></div>
+      <div class="metric"><b>${list.reduce((n, x) => n + x.urls.length, 0)}</b><span class="mono">Páginas citadas</span></div>
+      <div class="metric"><b>${list.filter((x) => x.veces > 1).length}</b><span class="mono">Citadas más de una vez</span></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Web</th><th>Veces citada</th></tr></thead>
-      <tbody>${t.length ? t.map((x) => `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.tu ? ' <span class="qcount">Tu web</span>' : ''}${x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''}</td><td class="static">${x.veces}</td></tr>`).join('')
-        : `<tr class="empty"><td colspan="2">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
+      <thead><tr><th>Web</th><th>Veces citada</th><th></th></tr></thead>
+      <tbody>${list.length ? list.map(row).join('') : `<tr class="empty"><td colspan="3">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
     </table></div>
+    ${apart.length ? `<details class="apart"><summary class="mono">Apartadas · ${apart.length}</summary><div class="table-wrap"><table><tbody>${apart.map(row).join('')}</tbody></table></div></details>` : ''}
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
     <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
     ${credit}`
@@ -701,7 +713,13 @@ function render() {
     wireIntro(main)
     document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
       [{ k: 'web', label: 'Web' }, { k: 'pages', label: 'Páginas citadas' }, { k: 'veces', label: 'Veces citada' }],
-      tasks().filter((t) => !t.tu).map((t) => ({ ...t, pages: t.urls.join(' ') }))))
+      tasks().filter((t) => !t.tu && !t.comp).map((t) => ({ ...t, pages: t.urls.join(' ') }))))
+    main.querySelectorAll('[data-comp]').forEach((b) => b.onclick = () => {
+      const list = data.competencia ||= []
+      const d = b.dataset.comp
+      list.includes(d) ? list.splice(list.indexOf(d), 1) : list.push(d)
+      save(); render()
+    })
     return
   }
   const step = STEPS[i]
