@@ -35,8 +35,7 @@ Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
 1. Qué tipo de contenido es (comparativa, guía, reseña, lista de recomendados u otro) y de qué fecha.
 2. Qué marcas menciona y qué dice de cada una.
 3. A qué páginas de esas marcas enlaza, con la URL exacta.
-4. Quién lo firma y si hay una forma de contacto visible.
-5. Qué podría aportar yo para que tuviera sentido incluirme: datos, una página mejor, producto para probar o una corrección.
+4. Quién lo firma.
 
 Si algo no aparece en la página, dilo. No lo supongas.
 ```

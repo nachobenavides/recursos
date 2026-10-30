@@ -2,7 +2,7 @@
 
 Cuando alguien pregunta por tu sector, la IA cita sobre todo webs de otros: comparativas, reseñas, medios, foros. Esta guía sirve para encontrar cuáles son en tu caso y conseguir que hablen de ti.
 
-Son 5 pasos. Lleva el control con la [herramienta de seguimiento](herramienta/seguimiento.html): descárgala y ábrela en el navegador.
+Son 4 pasos y al final tendrás la lista de webs en las que te interesa aparecer para potenciar ese producto. Lleva el control con la [herramienta de seguimiento](herramienta/seguimiento.html): descárgala y ábrela en el navegador.
 
 ## Paso 1 · Elige qué quieres potenciar
 
@@ -39,30 +39,18 @@ Las fuentes se ven en las etiquetas que hay junto a cada párrafo: en ChatGPT, a
 
 ## Paso 4 · Analiza las webs que más se repiten
 
-La herramienta te las ordena en **Tu lista de tareas**: primero las que citan a tu competencia y a ti no, y dentro de ellas, las que más se repiten.
+La herramienta te las ordena en **Dónde deberías estar**: primero las que citan a tu competencia y a ti no, y dentro de ellas, las que más se repiten.
 
 De cada una, mira:
 - **qué tipo de contenido es:** comparativa, guía, reseña, lista de recomendados;
 - **qué dice de tu competencia** y por qué la incluye;
 - **a qué páginas de tu competencia enlaza:** te dice qué contenido valoran;
-- **quién lo escribe y cómo contactar.**
+- **quién lo escribe.**
 
 Te puede ayudar el [prompt para analizar una web citada](prompts.md#prompt-2--analizar-una-web-citada).
 
-## Paso 5 · Dales motivos para hablar de ti y contacta
-
-Nadie te incluye porque se lo pidas. Te incluye si tienes algo que aporte a sus lectores:
-- **datos propios:** un estudio, una encuesta, cifras de tu sector;
-- **una página mejor** que la que enlazan ahora;
-- **producto o servicio para probar,** si hacen análisis;
-- **una corrección útil:** un dato desactualizado de su artículo.
-
-Después, escribe a la persona que firma el contenido. Corto, concreto y con el motivo por el que les interesa a sus lectores.
-
-**Reglas:**
-- No compres enlaces. Google lo considera spam.
-- Si alguna aparición es de pago, tiene que ir marcada como patrocinada.
-
 ## Y después
+
+Con esa lista ya sabes dónde te interesa aparecer. Si vas a por esas webs, una regla: no compres enlaces, porque Google lo considera spam; si alguna aparición es de pago, tiene que ir marcada como patrocinada.
 
 Repite el paso 3 cada pocos meses con las mismas preguntas. Así verás si empiezas a salir y qué webs nuevas cita la IA.

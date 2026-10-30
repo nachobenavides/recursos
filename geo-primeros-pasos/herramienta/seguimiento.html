@@ -34,6 +34,8 @@
   .nav.is-on { color: var(--fg-strong); background: var(--bg-elevated); box-shadow: inset 0 0 0 1px var(--border); }
   .nav .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.4); }
   .nav.is-on .n { color: var(--fg-muted); }
+  .nav.is-locked { opacity: 0.35; cursor: not-allowed; }
+  .nav.is-locked:hover { color: var(--fg-muted); background: none; }
   .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
   .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
   .dot--success { background: var(--success); }
@@ -215,12 +217,6 @@ const STEPS = [
     help: ['Qué tipo de contenido es, qué dice de tu competencia, a qué páginas suyas enlaza y quién lo firma.', 'Te ayuda el prompt de aquí abajo. Comprueba los enlaces abriendo la página.'],
     cols: [{ k: 'web', label: 'Web', from: 'fuentes', field: 'web' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
   },
-  {
-    id: 'contactos', title: 'Dales motivos y contacta', short: 'Contactos',
-    lead: 'Dales un motivo para hablar de ti y escríbeles.',
-    help: ['No compres enlaces: Google lo considera spam. Si alguna aparición es de pago, tiene que ir marcada como patrocinada.'],
-    cols: [{ k: 'web', label: 'Web', from: 'fuentes', field: 'web' }, { k: 'contacto', label: 'Contacto' }, { k: 'aporte', label: 'Qué les aportas', area: true }, { k: 'estado', label: 'Estado', opts: ['', 'Pendiente', 'Contactado', 'En conversación', 'Incluido', 'Descartado'] }, { k: 'fecha', label: 'Fecha', date: true }],
-  },
 ]
 
 // Los mismos prompts que prompts.md, para copiarlos sin salir de aquí.
@@ -244,8 +240,7 @@ Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
 1. Qué tipo de contenido es (comparativa, guía, reseña, lista de recomendados u otro) y de qué fecha.
 2. Qué marcas menciona y qué dice de cada una.
 3. A qué páginas de esas marcas enlaza, con la URL exacta.
-4. Quién lo firma y si hay una forma de contacto visible.
-5. Qué podría aportar yo para que tuviera sentido incluirme: datos, una página mejor, producto para probar o una corrección.
+4. Quién lo firma.
 
 Si algo no aparece en la página, dilo. No lo supongas.` },
 ]
@@ -280,22 +275,34 @@ const tasks = () => {
 const pad = (n) => String(n).padStart(2, '0')
 const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>'
 
+// Cada paso se abre cuando el anterior tiene lo que necesita; la lista final y el análisis, cuando hay webs citadas.
+const isDone = (id) => id === 'productos' ? STEPS[0].cols.every((c) => (product()[c.k] || '').trim())
+  : id === 'fuentes' ? data.fuentes.some((r) => domain(r.web)) : data[id].length > 0
+const isOpen = (id) => {
+  if (id === 'prompts') return true
+  if (id === 'tareas') return isDone('fuentes')
+  const i = STEPS.findIndex((s) => s.id === id)
+  return i <= 0 || isDone(STEPS[i - 1].id)
+}
+const firstOpen = () => [...STEPS].reverse().find((s) => isOpen(s.id))?.id || 'productos'
+const lockedTitle = (id) => id === 'tareas' ? 'Se abre cuando apuntes webs citadas en el paso 3' : `Completa antes el paso ${STEPS.findIndex((s) => s.id === id)}`
+
 function renderNav() {
   const nav = document.getElementById('nav')
   const pending = tasks().filter((t) => t.comp && !t.tu).length
   nav.innerHTML = STEPS.map((s, i) => `
-    <button class="nav ${view === s.id ? 'is-on' : ''}" data-v="${s.id}">
+    <button class="nav ${view === s.id ? 'is-on' : ''} ${isOpen(s.id) ? '' : 'is-locked'}" data-v="${s.id}" ${isOpen(s.id) ? '' : `title="${lockedTitle(s.id)}"`}>
       <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
-      <span class="c">${s.form ? (product().url ? '<span class="dot dot--success"></span>' : '') : data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
+      <span class="c">${s.form ? (isDone(s.id) ? '<span class="dot dot--success"></span>' : '') : data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
     </button>`).join('') + `
     <div class="divider"></div>
-    <button class="nav nav--tasks ${view === 'tareas' ? 'is-on' : ''}" data-v="tareas">
-      <span class="n">→</span><span>Tu lista de tareas</span><span class="c">${pending || ''}</span>
+    <button class="nav nav--tasks ${view === 'tareas' ? 'is-on' : ''} ${isOpen('tareas') ? '' : 'is-locked'}" data-v="tareas" ${isOpen('tareas') ? '' : `title="${lockedTitle('tareas')}"`}>
+      <span class="n">→</span><span>Dónde deberías estar</span><span class="c">${pending || ''}</span>
     </button>
     <button class="nav ${view === 'prompts' ? 'is-on' : ''}" data-v="prompts">
       <span class="n">→</span><span>Prompts</span><span class="c">${PROMPTS.length}</span>
     </button>`
-  nav.querySelectorAll('[data-v]').forEach((b) => b.onclick = () => { view = b.dataset.v; render() })
+  nav.querySelectorAll('[data-v]').forEach((b) => b.onclick = () => { if (isOpen(b.dataset.v)) { view = b.dataset.v; render() } })
 }
 
 // Cabecera de cada paso, como una clase: la foto de quien la da, el título y cómo hacerlo. Se puede plegar y se recuerda.
@@ -470,21 +477,19 @@ function renderTasks() {
   const todo = t.filter((x) => x.comp && !x.tu)
   const state = (on, yes, no, tone) => `<span class="state"><span class="dot ${on ? tone : 'dot--faint'}"></span>${on ? yes : no}</span>`
   return `
-    ${intro('Tu lista de tareas', 'Las webs que cita la IA, primero las que citan a tu competencia y a ti no.')}
+    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes. Primero, las que citan a tu competencia y a ti no: ahí es donde te interesa aparecer.')}
     <div class="metrics">
       <div class="metric"><b>${t.length}</b><span class="mono">Webs citadas</span></div>
       <div class="metric"><b>${todo.length}</b><span class="mono">Con tu competencia y sin ti</span></div>
       <div class="metric"><b>${t.filter((x) => x.tu).length}</b><span class="mono">En las que ya sales</span></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Web</th><th>Veces citada</th><th>Tipo</th><th>Tú</th><th>Tu competencia</th><th>Contacto</th></tr></thead>
+      <thead><tr><th>Web</th><th>Veces citada</th><th>Tipo</th><th>Tú</th><th>Tu competencia</th></tr></thead>
       <tbody>${t.length ? t.map((x) => {
-        const c = data.contactos.find((r) => domain(r.web) === x.web)
         return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}</td><td class="static">${x.veces}</td><td class="static">${esc(x.tipo || '—')}</td>
           <td class="static">${state(x.tu, 'Sales', 'No sales', 'dot--success')}</td>
-          <td class="static">${state(x.comp, 'Sale', 'No sale', 'dot--strong')}</td>
-          <td class="static">${esc(c?.estado || '—')}</td></tr>`
-      }).join('') : `<tr class="empty"><td colspan="6">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
+          <td class="static">${state(x.comp, 'Sale', 'No sale', 'dot--strong')}</td></tr>`
+      }).join('') : `<tr class="empty"><td colspan="5">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
     </table></div>
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
     <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
@@ -541,6 +546,7 @@ function pickCSV(done) {
 }
 
 function render() {
+  if (!isOpen(view)) view = firstOpen()
   renderNav()
   const main = document.getElementById('main')
   const i = STEPS.findIndex((s) => s.id === view)
@@ -548,7 +554,7 @@ function render() {
   if (i < 0) {
     main.innerHTML = renderTasks()
     wireIntro(main)
-    document.getElementById('csv-tasks').onclick = () => download('lista-de-tareas.csv', toCSV(
+    document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
       [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'tipo', label: 'Tipo' }, { k: 'tuTxt', label: 'Sales tú' }, { k: 'compTxt', label: 'Sale tu competencia' }],
       tasks().map((t) => ({ ...t, tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
     return

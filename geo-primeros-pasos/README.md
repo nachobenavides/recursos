@@ -2,24 +2,23 @@
 
 Material de trabajo del webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Es un ejercicio para hacer con calma después de la charla, con tu propia marca.
 
-Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios, foros o vídeos. El ejercicio sirve para encontrar qué webs son en tu caso, ver cuáles citan a tu competencia y a ti no, y conseguir que hablen de ti.
+Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios, foros o vídeos. El ejercicio sirve para encontrar qué webs son en tu caso y ver cuáles citan a tu competencia y a ti no: ahí es donde te interesa aparecer.
 
 ## El ejercicio: dónde deberías estar
 
-Son 5 pasos y se hacen por partes, en unas horas en total.
+Son 4 pasos y se hacen por partes, en unas horas en total. Al final tienes la lista de webs en las que te interesa aparecer para potenciar ese producto.
 
 1. Elige un producto o servicio que quieras potenciar y apunta la URL de su página.
 2. Saca las preguntas de tu cliente a partir de tus consultas de Search Console.
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
 4. Analiza las webs que más se repiten.
-5. Dales un motivo para hablar de ti y contacta.
 
 Empieza por la [guía](guia.md).
 
 ## Qué hay en la carpeta
 
 ```
-guia.md                  La guía en 5 pasos
+guia.md                  La guía en 4 pasos
 prompts.md               Prompts de apoyo para los pasos 2 y 4
 herramienta/
   seguimiento.html       Herramienta para llevar el control del ejercicio
