@@ -75,6 +75,30 @@
   .help a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
+  /* Paso 3: una tarjeta por pregunta, con ChatGPT y el Modo IA lado a lado. */
+  .ask-hint { margin: 0; max-width: 720px; font-size: 14px; color: var(--fg-muted); }
+  .qhead--top { margin-top: 24px; }
+  .asks { margin: 0; padding: 0; list-style: none; }
+  .asks > li { padding: 18px 0 22px; }
+  .asks > li + li { border-top: 1px solid var(--border); }
+  .ask__q { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: baseline; }
+  .ask__q .n { font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.5); }
+  .is-done .ask__q .n { color: var(--success); }
+  .ask__q p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--fg-strong); }
+  .ask__engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; margin: 14px 0 0 40px; }
+  .eng { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
+  .eng__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .web { display: flex; align-items: center; gap: 6px; padding: 4px 0 4px 2px; }
+  .web__d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px var(--mono); color: var(--fg); }
+  .tog { all: unset; cursor: pointer; height: 24px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 12px; color: var(--fg-muted); transition: color 150ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease); }
+  .tog:hover { border-color: var(--border-strong); color: var(--fg); }
+  .tog.is-on { border-color: var(--fg-muted); background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
+  .web .x { width: 24px; height: 24px; }
+  /* Es un textarea para que, al pegar varias webs en líneas distintas, no se junten. */
+  .addweb { display: block; width: 100%; min-height: 34px; field-sizing: content; resize: none; margin-top: 6px; padding: 8px 10px; line-height: 1.3; border: 1px dashed var(--border-strong); border-radius: var(--r-md); background: transparent; color: var(--fg-strong); font: 13px var(--mono); }
+  .addweb::placeholder { font-family: var(--sans); color: rgba(163, 163, 163, 0.5); }
+  .addweb:focus { outline: none; border-style: solid; border-color: var(--fg-muted); }
+  @media (max-width: 860px) { .ask__engines { grid-template-columns: 1fr; margin-left: 0; } }
   /* Lista de preguntas del paso 2. */
   /* Es el resultado de todo el paso, no del último punto: va separado de borde a borde, con su propio título. */
   .qhead { display: flex; align-items: center; gap: 10px; margin: 8px -24px 8px; padding: 24px 24px 0; border-top: 1px solid var(--border); }
@@ -203,8 +227,6 @@
 
 <script>
 const KEY = 'geo-primeros-pasos/donde-deberias-estar'
-const YESNO = ['', 'Sí', 'No']
-const TIPOS = ['', 'Comparativa', 'Reseñas', 'Medio', 'Foro', 'Blog', 'Vídeo', 'Red social', 'Directorio', 'Web de un competidor', 'Otro']
 
 const STEPS = [
   {
@@ -224,9 +246,8 @@ const STEPS = [
   },
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
-    lead: 'Haz las preguntas en ChatGPT y en el Modo IA y apunta qué webs citan.',
-    help: ['Las fuentes están en las etiquetas junto a cada párrafo: en ChatGPT, al pasar el ratón; en Google, también en la lista del final.', 'Una fila por web citada. Escribe solo el dominio (por ejemplo, comparativa.com) para que se agrupe bien.', 'Repite este paso cada pocos meses con las mismas preguntas para ver si empiezas a salir.'],
-    cols: [{ k: 'pregunta', label: 'Pregunta', from: 'preguntas', field: 'pregunta' }, { k: 'buscador', label: 'Dónde', opts: ['', 'ChatGPT', 'Modo IA', 'AI Overview'] }, { k: 'web', label: 'Web citada' }, { k: 'tipo', label: 'Tipo', opts: TIPOS }, { k: 'tu', label: '¿Sales tú?', opts: YESNO }, { k: 'comp', label: '¿Tu competencia?', opts: YESNO }],
+    cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'web', label: 'Web citada' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
+    ask: true,
   },
   {
     id: 'analisis', title: 'Analiza las webs que más se repiten', short: 'Análisis',
@@ -473,6 +494,67 @@ function renderForm(step) {
     ${credit}`
 }
 
+// Paso 3, pregunta a pregunta: cada pregunta se abre ya enviada en ChatGPT y en el Modo IA, y debajo se apuntan las webs
+// que cita cada uno. Las filas siguen siendo las de data.fuentes, así que la lista final no cambia.
+const ENGINES = [
+  { k: 'ChatGPT', url: (q) => `https://chatgpt.com/?q=${encodeURIComponent(q)}&hints=search` },
+  { k: 'Modo IA', url: (q) => `https://www.google.com/search?udm=50&q=${encodeURIComponent(q)}` },
+]
+const webs = (q, e) => data.fuentes.map((r, i) => ({ ...r, i })).filter((r) => r.pregunta === q && r.buscador === e)
+const asked = (q) => ENGINES.every((e) => webs(q, e.k).length)
+
+function renderAsk(step) {
+  const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
+  const done = qs.filter(asked).length
+  return `
+    ${intro(step.title)}
+    <p class="ask-hint">Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada. Apunta cada web que sale en las etiquetas de cita junto a los párrafos: vale su nombre o su dirección. Después, marca si te nombra a ti o a tu competencia.</p>
+    <div class="qhead qhead--top"><h2>Tus preguntas</h2><span class="qcount">${done} de ${qs.length} hechas</span>
+      ${data.fuentes.length ? '<div class="qactions"><button class="link" id="csv">Exportar a CSV</button></div>' : ''}</div>
+    <ol class="asks">${qs.map((q, qi) => `
+      <li class="${asked(q) ? 'is-done' : ''}">
+        <div class="ask__q"><span class="n">${pad(qi + 1)}</span><p>${esc(q)}</p></div>
+        <div class="ask__engines">${ENGINES.map((e) => `
+          <div class="eng">
+            <div class="eng__head"><span class="mono">${e.k}</span><a class="btn btn--secondary btn--sm" href="${e.url(q)}" target="_blank" rel="noopener">Preguntar →</a></div>
+            ${webs(q, e.k).map((w) => `
+              <div class="web">
+                <span class="web__d">${esc(w.web)}</span>
+                <button class="tog ${w.tu === 'Sí' ? 'is-on' : ''}" data-tog="tu" data-row="${w.i}" title="Esta web te nombra a ti">Tú</button>
+                <button class="tog ${w.comp === 'Sí' ? 'is-on' : ''}" data-tog="comp" data-row="${w.i}" title="Esta web nombra a tu competencia">Competencia</button>
+                <button class="x" data-delweb="${w.i}" title="Quitar">${X}</button>
+              </div>`).join('')}
+            <textarea class="addweb" rows="1" data-q="${qi}" data-e="${e.k}" placeholder="Una web por línea y pulsa Intro" spellcheck="false"></textarea>
+          </div>`).join('')}
+        </div>
+      </li>`).join('')}</ol>
+    ${credit}`
+}
+function wireAsk(main) {
+  const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
+  const refocus = (qi, e) => main.querySelector(`.addweb[data-q="${qi}"][data-e="${e}"]`)?.focus()
+  const add = (el) => {
+    // Una web por línea o separadas por comas. Vale la URL, el dominio o el nombre que sale en la etiqueta de cita.
+    const found = [...new Set(el.value.split(/[\n,;]+/).map(domain).filter(Boolean))]
+    if (!found.length) return
+    const q = qs[+el.dataset.q], e = el.dataset.e
+    const have = webs(q, e).map((w) => w.web)
+    for (const d of found) if (!have.includes(d)) data.fuentes.push({ pregunta: q, buscador: e, web: d, tu: 'No', comp: 'No' })
+    save(); render(); refocus(el.dataset.q, e)
+  }
+  main.querySelectorAll('.addweb').forEach((el) => {
+    el.onkeydown = (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); add(el) } }
+    el.onpaste = () => setTimeout(() => add(el))
+  })
+  main.querySelectorAll('[data-tog]').forEach((b) => b.onclick = () => {
+    const row = data.fuentes[+b.dataset.row]
+    row[b.dataset.tog] = row[b.dataset.tog] === 'Sí' ? 'No' : 'Sí'
+    save()
+    b.classList.toggle('is-on', row[b.dataset.tog] === 'Sí')
+  })
+  main.querySelectorAll('[data-delweb]').forEach((b) => b.onclick = () => { data.fuentes.splice(+b.dataset.delweb, 1); save(); render() })
+}
+
 // Las preguntas del paso 2, como lista: cada una con su número, la pregunta en grande y su consulta de origen debajo.
 function renderQuestions(step) {
   const rows = data[step.id]
@@ -499,6 +581,7 @@ function renderQuestions(step) {
 function renderStep(step, i) {
   if (step.form) return renderForm(step)
   if (step.guide) return renderQuestions(step)
+  if (step.ask) return renderAsk(step)
   const rows = data[step.id]
   return `
     ${intro(step.title, step.lead, step.help)}
@@ -528,12 +611,12 @@ function renderTasks() {
       <div class="metric"><b>${t.filter((x) => x.tu).length}</b><span class="mono">En las que ya sales</span></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Web</th><th>Veces citada</th><th>Tipo</th><th>Tú</th><th>Tu competencia</th></tr></thead>
+      <thead><tr><th>Web</th><th>Veces citada</th><th>Te nombra</th><th>Nombra a tu competencia</th></tr></thead>
       <tbody>${t.length ? t.map((x) => {
-        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}</td><td class="static">${x.veces}</td><td class="static">${esc(x.tipo || '—')}</td>
-          <td class="static">${state(x.tu, 'Sales', 'No sales', 'dot--success')}</td>
-          <td class="static">${state(x.comp, 'Sale', 'No sale', 'dot--strong')}</td></tr>`
-      }).join('') : `<tr class="empty"><td colspan="5">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
+        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}</td><td class="static">${x.veces}</td>
+          <td class="static">${state(x.tu, 'Sí', 'No', 'dot--success')}</td>
+          <td class="static">${state(x.comp, 'Sí', 'No', 'dot--strong')}</td></tr>`
+      }).join('') : `<tr class="empty"><td colspan="4">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
     </table></div>
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
     <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
@@ -606,12 +689,18 @@ function render() {
     main.innerHTML = renderTasks()
     wireIntro(main)
     document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
-      [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'tipo', label: 'Tipo' }, { k: 'tuTxt', label: 'Sales tú' }, { k: 'compTxt', label: 'Sale tu competencia' }],
+      [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'tuTxt', label: 'Te nombra' }, { k: 'compTxt', label: 'Nombra a tu competencia' }],
       tasks().map((t) => ({ ...t, tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
     return
   }
   const step = STEPS[i]
   main.innerHTML = renderStep(step, i)
+  if (step.ask) {
+    wireAsk(main)
+    const c = document.getElementById('csv')
+    if (c) c.onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
+    return
+  }
   if (step.form) {
     wireIntro(main)
     main.querySelectorAll('[data-f]').forEach((el) => el.oninput = () => {

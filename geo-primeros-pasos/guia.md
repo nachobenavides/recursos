@@ -28,14 +28,12 @@ Revisa las preguntas y borra las que tu cliente nunca haría.
 
 ## Paso 3 · Haz las preguntas y apunta las fuentes
 
-- Ventana de **incógnito**, sin iniciar sesión.
-- Pregunta en **ChatGPT** con la búsqueda activada y en el **Modo IA de Google**.
-- Haz cada pregunta **dos o tres veces**, en chats nuevos: cada vez cita webs distintas.
-- Si vendes en una zona, añade tu ciudad a la pregunta.
+- Usa una ventana de **incógnito**, sin iniciar sesión, para que la respuesta no salga personalizada.
+- En la herramienta, cada pregunta tiene dos botones: **Preguntar en ChatGPT** y en el **Modo IA de Google**. Se abren con la pregunta ya enviada.
+- Apunta cada web que sale en las **etiquetas de cita** junto a los párrafos (vale su nombre o su dirección) y marca si te nombra a ti o a tu competencia.
+- Si quieres, repite la pregunta en un chat nuevo: cada vez cita webs distintas. Añade las nuevas en la misma casilla.
 
-Por cada web citada, apunta en la herramienta: la pregunta, dónde la hiciste, la web, qué tipo de web es, si sales tú y si sale tu competencia.
-
-Las fuentes se ven en las etiquetas que hay junto a cada párrafo: en ChatGPT, al pasar el ratón por encima, y en Google, también en la lista del final. Copiar la respuesta no copia las fuentes.
+No le pidas a la IA que te liste sus fuentes: lo hemos probado y se deja muchas. Copiar la respuesta tampoco copia las fuentes.
 
 ## Paso 4 · Analiza las webs que más se repiten
 
