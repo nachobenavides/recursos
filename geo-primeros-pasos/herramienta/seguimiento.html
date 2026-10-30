@@ -666,7 +666,7 @@ function renderTasks() {
   return `
     ${introPlain('Dónde deberías estar', ['Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.'])}
     <div class="rank-head">
-      <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${k ? engIcon(k) : ''}${l}</button>`).join('')}</div>
+      <div class="seg">${[['', 'Todos'], ...ENGINES.map((e) => [e.k, e.k])].map(([k, l]) => `<button class="${taskEngine === k ? 'is-on' : ''}" data-eng="${k}">${l}</button>`).join('')}</div>
       <span class="rank-sum">${list.length} webs · ${list.reduce((n, x) => n + x.urls.length, 0)} páginas</span>
       <button class="link" id="csv-tasks">Exportar a CSV</button>
     </div>
