@@ -11,7 +11,7 @@ Son 4 pasos y se hacen por partes, en unas horas en total. Al final tienes la li
 1. Elige un producto o servicio que quieras potenciar y apunta la URL de su página.
 2. Saca las preguntas de tu cliente a partir de tus consultas de Search Console.
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
-4. Analiza las webs que más se repiten.
+4. Mira la lista de webs donde deberías estar.
 
 Empieza por la [guía](guia.md).
 
@@ -19,14 +19,14 @@ Empieza por la [guía](guia.md).
 
 ```
 guia.md                  La guía en 4 pasos
-prompts.md               Prompts de apoyo para los pasos 2 y 4
+prompts.md               Prompt de apoyo para el paso 2
 herramienta/
   seguimiento.html       Herramienta para llevar el control del ejercicio
 ```
 
 ## Cómo usarlo
 
-La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/): desde ahí abres la herramienta, la guía y los prompts sin descargar nada.
+La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/): desde ahí abres la herramienta y la guía sin descargar nada.
 
 Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después **Download ZIP**. Descomprime la carpeta, lee los archivos `.md` en cualquier editor de texto y abre `herramienta/seguimiento.html` con doble clic: se abre en tu navegador y no necesita instalar nada.
 

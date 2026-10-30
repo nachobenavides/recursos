@@ -42,8 +42,6 @@
   .dot--error { background: var(--error); }
   .dot--strong { background: var(--fg-strong); }
   .dot--faint { background: rgba(163, 163, 163, 0.25); }
-  .nav--tasks { margin-top: 14px; }
-  .divider { height: 1px; margin: 14px 12px 0; background: var(--border); }
   .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
   .side-foot .btn { justify-content: flex-start; }
 
@@ -253,12 +251,6 @@ const STEPS = [
     help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente. Si una web sale varias veces, apunta solo su página más relevante.', 'Apunta solo las webs donde podrías aparecer: ni las de tu competencia ni las imposibles, como un vídeo ya publicado.'],
     ask: true,
   },
-  {
-    id: 'analisis', title: 'Analiza las webs que más se repiten', short: 'Análisis',
-    lead: 'Mira qué tienen las webs que más cita la IA.',
-    help: ['Qué tipo de contenido es, qué dice de tu competencia, a qué páginas suyas enlaza y quién lo firma.', 'Te ayuda el prompt de aquí abajo. Comprueba los enlaces abriendo la página.'],
-    cols: [{ k: 'web', label: 'Página', from: 'fuentes', field: 'url' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
-  },
 ]
 
 // Los mismos prompts que prompts.md, para copiarlos sin salir de aquí.
@@ -280,22 +272,13 @@ Reglas:
 
 Devuélveme solo un CSV separado por punto y coma, con esta cabecera exacta:
 Pregunta;Consulta de origen` },
-  { id: 'p2', step: 'analisis', title: 'Analizar una web citada', how: 'Con la búsqueda en la web activada. Comprueba los enlaces abriendo la página.', text: `Analiza esta página: [URL]
-
-Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
-1. Qué tipo de contenido es (comparativa, guía, reseña, lista de recomendados u otro) y de qué fecha.
-2. Qué marcas menciona y qué dice de cada una.
-3. A qué páginas de esas marcas enlaza, con la URL exacta.
-4. Quién lo firma.
-
-Si algo no aparece en la página, dilo. No lo supongas.` },
 ]
 
 const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {} })
 const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(KEY)) } } catch { return blank() } }
 let data = load()
 // Se puede entrar directamente a una vista desde un enlace: seguimiento.html#prompts
-let view = ['tareas', 'prompts', ...STEPS.map((s) => s.id)].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'productos'
+let view = ['tareas', ...STEPS.map((s) => s.id)].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'productos'
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)) } catch {} }
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
@@ -323,7 +306,6 @@ const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
 const isDone = (id) => id === 'productos' ? STEPS[0].cols.every((c) => (product()[c.k] || '').trim())
   : id === 'fuentes' ? data.fuentes.some((r) => domain(r.web)) : data[id].length > 0
 const isOpen = (id) => {
-  if (id === 'prompts') return true
   if (id === 'tareas') return isDone('fuentes')
   const i = STEPS.findIndex((s) => s.id === id)
   return i <= 0 || isDone(STEPS[i - 1].id)
@@ -341,12 +323,8 @@ function renderNav() {
       <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
       <span class="c">${!isOpen(s.id) ? LOCK : s.form ? (isDone(s.id) ? '<span class="dot dot--success"></span>' : '') : data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
     </button>`).join('') + `
-    <div class="divider"></div>
-    <button class="nav nav--tasks ${view === 'tareas' ? 'is-on' : ''} ${isOpen('tareas') ? '' : 'is-locked'}" data-v="tareas" ${isOpen('tareas') ? '' : `title="${lockedTitle('tareas')}"`}>
-      <span class="n">→</span><span>Dónde deberías estar</span><span class="c">${!isOpen('tareas') ? LOCK : pending || ''}</span>
-    </button>
-    <button class="nav ${view === 'prompts' ? 'is-on' : ''}" data-v="prompts">
-      <span class="n">→</span><span>Prompts</span><span class="c">${PROMPTS.length}</span>
+    <button class="nav ${view === 'tareas' ? 'is-on' : ''} ${isOpen('tareas') ? '' : 'is-locked'}" data-v="tareas" ${isOpen('tareas') ? '' : `title="${lockedTitle('tareas')}"`}>
+      <span class="n">${pad(STEPS.length + 1)}</span><span>Dónde deberías estar</span><span class="c">${!isOpen('tareas') ? LOCK : pending ? `${pending}<span class="dot dot--success"></span>` : ''}</span>
     </button>`
   nav.querySelectorAll('[data-v]').forEach((b) => b.onclick = () => { if (isOpen(b.dataset.v)) { view = b.dataset.v; render() } })
 }
@@ -425,13 +403,6 @@ function wireCopy(root) {
     b.textContent = ok ? 'Copiado' : 'No se ha podido copiar'
     setTimeout(() => (b.textContent = 'Copiar prompt'), 1800)
   })
-}
-
-function renderPrompts() {
-  return `
-    ${intro('Prompts', 'Cópialos y pégalos en la IA que uses.')}
-    ${PROMPTS.map((p) => `<div class="prompt-step mono">Paso ${pad(STEPS.findIndex((s) => s.id === p.step) + 1)} · ${STEPS.find((s) => s.id === p.step).short}</div>${promptCard(p)}`).join('')}
-    ${credit}`
 }
 
 const GSC = 'https://search.google.com/search-console/performance/search-analytics'
@@ -697,7 +668,6 @@ function render() {
   renderNav()
   const main = document.getElementById('main')
   const i = STEPS.findIndex((s) => s.id === view)
-  if (view === 'prompts') { main.innerHTML = renderPrompts(); wireCopy(main); wireIntro(main); return }
   if (i < 0) {
     main.innerHTML = renderTasks()
     wireIntro(main)
