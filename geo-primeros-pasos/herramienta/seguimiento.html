@@ -287,17 +287,19 @@ const isOpen = (id) => {
 const firstOpen = () => [...STEPS].reverse().find((s) => isOpen(s.id))?.id || 'productos'
 const lockedTitle = (id) => id === 'tareas' ? 'Se abre cuando apuntes webs citadas en el paso 3' : `Completa antes el paso ${STEPS.findIndex((s) => s.id === id)}`
 
+const LOCK = '<svg class="lock" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+
 function renderNav() {
   const nav = document.getElementById('nav')
   const pending = tasks().filter((t) => t.comp && !t.tu).length
   nav.innerHTML = STEPS.map((s, i) => `
     <button class="nav ${view === s.id ? 'is-on' : ''} ${isOpen(s.id) ? '' : 'is-locked'}" data-v="${s.id}" ${isOpen(s.id) ? '' : `title="${lockedTitle(s.id)}"`}>
       <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
-      <span class="c">${s.form ? (isDone(s.id) ? '<span class="dot dot--success"></span>' : '') : data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
+      <span class="c">${!isOpen(s.id) ? LOCK : s.form ? (isDone(s.id) ? '<span class="dot dot--success"></span>' : '') : data[s.id].length ? `${data[s.id].length}<span class="dot dot--success"></span>` : ''}</span>
     </button>`).join('') + `
     <div class="divider"></div>
     <button class="nav nav--tasks ${view === 'tareas' ? 'is-on' : ''} ${isOpen('tareas') ? '' : 'is-locked'}" data-v="tareas" ${isOpen('tareas') ? '' : `title="${lockedTitle('tareas')}"`}>
-      <span class="n">→</span><span>Dónde deberías estar</span><span class="c">${pending || ''}</span>
+      <span class="n">→</span><span>Dónde deberías estar</span><span class="c">${!isOpen('tareas') ? LOCK : pending || ''}</span>
     </button>
     <button class="nav ${view === 'prompts' ? 'is-on' : ''}" data-v="prompts">
       <span class="n">→</span><span>Prompts</span><span class="c">${PROMPTS.length}</span>
