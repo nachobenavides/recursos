@@ -184,8 +184,6 @@ const TIPOS = ['', 'Comparativa', 'Reseñas', 'Medio', 'Foro', 'Blog', 'Vídeo',
 const STEPS = [
   {
     id: 'productos', title: 'Qué quieres potenciar', short: 'A potenciar',
-    lead: 'Elige un producto o servicio que quieras potenciar y apunta a quién se lo vendes.',
-    help: ['Mejor uno que te deje margen o en el que creas que puedes destacar.', 'Con estos datos se rellena solo el prompt del paso siguiente.'],
     cols: [
       { k: 'nombre', label: 'Producto o servicio', ph: 'Por ejemplo, hosting WordPress', tag: '[PRODUCTO O SERVICIO]' },
       { k: 'url', label: 'URL de su página', ph: 'https://tuweb.com/hosting-wordpress', url: true, hint: 'La que filtrarás en Search Console.' },
@@ -302,18 +300,18 @@ const INTRO_KEY = 'geo-primeros-pasos/intro-plegada'
 let introClosed = (() => { try { return localStorage.getItem(INTRO_KEY) === '1' } catch { return false } })()
 const CHEVRON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
 // Plegada, la cabecera solo enseña la foto y el título; al desplegarla salen la entradilla y cómo hacerlo.
-// fixed: la explicación se ve siempre, sin botón para plegarla (el paso 1, que es corto).
-const intro = (title, lead, items = [], fixed = false) => `
-  <header class="intro ${fixed || !introClosed ? 'is-open' : ''}">
+// Sin lead, la cabecera es solo la foto y el título (el paso 1, que se entiende solo).
+const intro = (title, lead, items = []) => `
+  <header class="intro ${lead && !introClosed ? 'is-open' : ''}">
     <div class="intro__row">
       <img src="${AUTHOR.photo}" alt="${AUTHOR.name}">
       <div class="intro__text"><h1>${title}</h1></div>
-      ${fixed ? '' : `<button class="intro__toggle" id="intro-toggle">Cómo hacerlo ${CHEVRON}</button>`}
+      ${lead ? `<button class="intro__toggle" id="intro-toggle">Cómo hacerlo ${CHEVRON}</button>` : ''}
     </div>
-    <div class="intro__body"><div><div class="intro__card">
+    ${lead ? `<div class="intro__body"><div><div class="intro__card">
       <p class="lead">${lead}</p>
       ${items.length ? `<ul class="help">${items.map((h) => `<li>${h}</li>`).join('')}</ul>` : ''}
-    </div></div></div>
+    </div></div></div>` : ''}
   </header>`
 function wireIntro(root) {
   const b = root.querySelector('#intro-toggle')
@@ -438,7 +436,7 @@ function wireGuide(main) {
 function renderForm(step) {
   const pr = product()
   return `
-    ${intro(step.title, step.lead, step.help, true)}
+    ${intro(step.title)}
     <div class="form">${step.cols.map((c) => `<label><span class="mono">${c.label}</span><input data-f="${c.k}" value="${esc(pr[c.k] || '')}" placeholder="${esc(c.ph)}" ${c.url ? 'type="url" spellcheck="false"' : ''}>${c.hint ? `<small>${c.hint}</small>` : ''}</label>`).join('')}</div>
     <p class="note" style="margin-top:24px">Para hacerlo con otra URL, guarda una copia (abajo a la izquierda) y empieza de cero.</p>
     ${credit}`
