@@ -1,6 +1,6 @@
 # Prompts de apoyo
 
-Úsalos en ChatGPT, Gemini, Claude o la IA que uses. Sustituye lo que va entre corchetes.
+Úsalos en ChatGPT, Gemini, Claude o la IA que uses. Sustituye lo que va entre corchetes; en la herramienta, el prompt 1 sale ya relleno con tus datos.
 
 ## Prompt 1 · Sacar las preguntas de tu cliente
 
@@ -9,20 +9,23 @@ Para el [paso 2](guia.md#paso-2--saca-las-preguntas-de-tu-cliente). Adjunta el a
 ```text
 Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web, [WEB]. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].
 
-Con esas consultas, escribe las preguntas que haría una persona a ChatGPT antes de comprar: en lenguaje natural, en primera persona y con el contexto que daría alguien real (para qué lo quiere, su presupuesto, su situación).
+Con esas consultas, escribe las preguntas que una persona así le haría a ChatGPT cuando está eligiendo qué contratar o a quién comprar. En lenguaje natural y en primera persona, como las escribiría alguien real.
 
 Reglas:
 - Usa solo consultas del archivo. No te inventes temas.
-- Ignora las consultas que llevan el nombre de mi marca (la de [WEB]).
-- Junta las consultas que signifiquen lo mismo en una sola pregunta.
-- Da prioridad a las consultas con más clics e impresiones.
-- Como máximo, 15 preguntas.
+- Quédate con las consultas de alguien que está decidiendo qué comprar: mejor, barato, precio, opiniones, comparativas, alternativas o para un uso concreto. Descarta las de quien solo quiere aprender algo (qué es, cómo se hace).
+- Ignora las consultas con el nombre de mi marca, la de [WEB], aunque esté mal escrito. Las que nombran a otras marcas sí valen.
+- Junta en una sola pregunta las consultas que signifiquen lo mismo.
+- Una sola pregunta por fila.
+- Añade solo el contexto que se deduce de la consulta o de a quién vendo. No inventes detalles como un presupuesto concreto o el proveedor que tienen ahora.
+- Menciona [PAÍS O CIUDAD] cuando la respuesta pueda cambiar según dónde se compre.
+- Como máximo, 8 preguntas, de la más importante a la menos importante según los clics y las impresiones de sus consultas. Si hay pocas consultas que valgan, escribe menos preguntas.
 
-Devuélveme solo un CSV, sin texto antes ni después, separado por punto y coma, con esta cabecera exacta:
+Devuélveme solo un CSV separado por punto y coma, con esta cabecera exacta:
 Pregunta;Consulta de origen
 ```
 
-Guarda la respuesta como archivo `.csv`. Si la IA te la da como texto, cópiala en un archivo de texto y guárdalo con la extensión `.csv`. Después, cárgalo en la herramienta con *Importar CSV*.
+Guarda la respuesta como archivo `.csv`. Si la IA te la da como texto, cópiala en un archivo de texto y guárdalo con la extensión `.csv`; no hace falta quitar lo que escriba antes o después. Después, cárgalo en la herramienta con *Importar CSV*.
 
 ## Prompt 2 · Analizar una web citada
 
