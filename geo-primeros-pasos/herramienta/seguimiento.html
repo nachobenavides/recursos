@@ -75,8 +75,10 @@
   .help a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
+  .intro__notes { margin: 6px 0 2px 40px; max-width: 760px; }
+  .intro__notes p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--fg-muted); }
   /* Paso 3: una tarjeta por pregunta, con ChatGPT y el Modo IA lado a lado. */
-  .qhead--top { margin-top: 0; padding-top: 0; border-top: 0; }
+  .qhead.qhead--top { margin-top: 0; padding-top: 0; border-top: 0; }
   .asks { margin: 0; padding: 0; list-style: none; }
   .asks > li { padding: 18px 0 22px; }
   .asks > li + li { border-top: 1px solid var(--border); }
@@ -88,7 +90,13 @@
   .eng { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
   .eng__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .web { display: flex; align-items: center; gap: 6px; padding: 4px 0 4px 2px; }
-  .web__d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px var(--mono); color: var(--fg); }
+  .web__d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
+  .web__d b { font-weight: 400; color: var(--fg-strong); }
+  .web__d:hover b { text-decoration: underline; }
+  .addweb.is-bad { border-color: var(--error); }
+  .paths { display: flex; flex-direction: column; margin-top: 4px; }
+  .paths a { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
+  .paths a:hover { color: var(--fg); text-decoration: underline; }
   .tog { all: unset; cursor: pointer; height: 24px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 12px; color: var(--fg-muted); transition: color 150ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease); }
   .tog:hover { border-color: var(--border-strong); color: var(--fg); }
   .tog.is-on { border-color: var(--fg-muted); background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
@@ -245,16 +253,16 @@ const STEPS = [
   },
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
-    cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'web', label: 'Web citada' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
+    cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'url', label: 'URL citada' }, { k: 'web', label: 'Web' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
     lead: 'Haz cada pregunta y apunta las webs que cita la IA.',
-    help: ['Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada.', 'Apunta cada web que sale en las etiquetas de cita junto a los párrafos: vale su nombre o su dirección.', 'Después, marca si te nombra a ti o a tu competencia.'],
+    help: ['Usa una ventana privada, sin iniciar sesión, para que la respuesta no salga personalizada.', 'Copia la URL exacta de cada fuente: abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige «Copiar dirección del enlace».', 'Después, marca si te nombra a ti o a tu competencia.'],
     ask: true,
   },
   {
     id: 'analisis', title: 'Analiza las webs que más se repiten', short: 'Análisis',
     lead: 'Mira qué tienen las webs que citan a tu competencia y a ti no.',
     help: ['Qué tipo de contenido es, qué dice de tu competencia, a qué páginas suyas enlaza y quién lo firma.', 'Te ayuda el prompt de aquí abajo. Comprueba los enlaces abriendo la página.'],
-    cols: [{ k: 'web', label: 'Web', from: 'fuentes', field: 'web' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
+    cols: [{ k: 'web', label: 'Página', from: 'fuentes', field: 'url' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
   },
 ]
 
@@ -303,8 +311,9 @@ const tasks = () => {
   for (const r of data.fuentes) {
     const d = domain(r.web)
     if (!d) continue
-    const t = by.get(d) || { web: d, veces: 0, tipo: r.tipo, tu: false, comp: false }
+    const t = by.get(d) || { web: d, veces: 0, tipo: r.tipo, tu: false, comp: false, urls: [] }
     t.veces++
+    if (r.url && !t.urls.includes(r.url)) t.urls.push(r.url)
     t.tipo ||= r.tipo
     t.tu ||= r.tu === 'Sí'
     t.comp ||= r.comp === 'Sí'
@@ -368,6 +377,12 @@ const intro = (title, lead, items = []) => `
       ${items.length ? `<ul class="help">${items.map((h) => `<li>${h}</li>`).join('')}</ul>` : ''}
     </div></div></div>` : ''}
   </header>`
+// Cabecera con las indicaciones siempre a la vista, en texto discreto bajo el título, sin bocadillo ni botón para plegar.
+const introPlain = (title, lines = []) => `
+  <header class="intro intro--plain">
+    <div class="intro__row"><img src="${AUTHOR.photo}" alt="${AUTHOR.name}"><div class="intro__text"><h1>${title}</h1></div></div>
+    ${lines.length ? `<div class="intro__notes">${lines.map((l) => `<p>${l}</p>`).join('')}</div>` : ''}
+  </header>`
 function wireIntro(root) {
   const b = root.querySelector('#intro-toggle')
   if (b) b.onclick = () => {
@@ -383,7 +398,7 @@ function cell(step, col, row, i) {
   const attrs = `data-i="${i}" data-k="${col.k}"`
   let opts = col.opts
   if (col.from) {
-    const src = data[col.from].map((r) => (col.field ? r[col.field] : r.nombre)).map((x) => (col.from === 'fuentes' ? domain(x) : x)).filter(Boolean)
+    const src = data[col.from].map((r) => (col.field ? r[col.field] : r.nombre)).map((x) => (col.from === 'fuentes' && col.field === 'web' ? domain(x) : x)).filter(Boolean)
     opts = ['', ...new Set(src)]
     if (v && !opts.includes(v)) opts.push(v)
   }
@@ -501,6 +516,16 @@ const ENGINES = [
   { k: 'ChatGPT', url: (q) => `https://chatgpt.com/?q=${encodeURIComponent(q)}&hints=search` },
   { k: 'Modo IA', url: (q) => `https://www.google.com/search?udm=50&q=${encodeURIComponent(q)}` },
 ]
+// La URL tal como se copia del enlace, sin las marcas de seguimiento que añaden los buscadores (utm_…, #:~:text=…).
+const cleanUrl = (x) => {
+  try {
+    const u = new URL(/^https?:\/\//i.test(x) ? x : `https://${x}`)
+    if (!u.hostname.includes('.')) return ''
+    ;[...u.searchParams.keys()].filter((k) => /^utm_/i.test(k)).forEach((k) => u.searchParams.delete(k))
+    u.hash = ''
+    return u.toString().replace(/\/$/, '')
+  } catch { return '' }
+}
 const webs = (q, e) => data.fuentes.map((r, i) => ({ ...r, i })).filter((r) => r.pregunta === q && r.buscador === e)
 const asked = (q) => ENGINES.every((e) => webs(q, e.k).length)
 
@@ -508,7 +533,7 @@ function renderAsk(step) {
   const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
   const done = qs.filter(asked).length
   return `
-    ${intro(step.title, step.lead, step.help)}
+    ${introPlain(step.title, [step.lead, ...step.help])}
     <div class="qhead qhead--top"><h2>Tus preguntas</h2><span class="qcount">${done} de ${qs.length} hechas</span>
       ${data.fuentes.length ? '<div class="qactions"><button class="link" id="csv">Exportar a CSV</button></div>' : ''}</div>
     <ol class="asks">${qs.map((q, qi) => `
@@ -519,12 +544,12 @@ function renderAsk(step) {
             <div class="eng__head"><span class="mono">${e.k}</span><a class="btn btn--secondary btn--sm" href="${e.url(q)}" target="_blank" rel="noopener">Preguntar →</a></div>
             ${webs(q, e.k).map((w) => `
               <div class="web">
-                <span class="web__d">${esc(w.web)}</span>
+                <a class="web__d" href="${esc(w.url || 'https://' + w.web)}" target="_blank" rel="noopener" title="${esc(w.url || w.web)}"><b>${esc(w.web)}</b>${esc((w.url || '').replace(/^https?:\/\/[^/]+/, ''))}</a>
                 <button class="tog ${w.tu === 'Sí' ? 'is-on' : ''}" data-tog="tu" data-row="${w.i}" title="Esta web te nombra a ti">Tú</button>
                 <button class="tog ${w.comp === 'Sí' ? 'is-on' : ''}" data-tog="comp" data-row="${w.i}" title="Esta web nombra a tu competencia">Competencia</button>
                 <button class="x" data-delweb="${w.i}" title="Quitar">${X}</button>
               </div>`).join('')}
-            <textarea class="addweb" rows="1" data-q="${qi}" data-e="${e.k}" placeholder="Una web por línea y pulsa Intro" spellcheck="false"></textarea>
+            <textarea class="addweb" rows="1" data-q="${qi}" data-e="${e.k}" placeholder="Pega la URL de cada fuente y pulsa Intro" spellcheck="false"></textarea>
           </div>`).join('')}
         </div>
       </li>`).join('')}</ol>
@@ -534,17 +559,22 @@ function wireAsk(main) {
   const qs = data.preguntas.map((r) => (r.pregunta || '').trim()).filter(Boolean)
   const refocus = (qi, e) => main.querySelector(`.addweb[data-q="${qi}"][data-e="${e}"]`)?.focus()
   const add = (el) => {
-    // Una web por línea o separadas por comas. Vale la URL, el dominio o el nombre que sale en la etiqueta de cita.
-    const found = [...new Set(el.value.split(/[\n,;]+/).map(domain).filter(Boolean))]
-    if (!found.length) return
+    // Una URL por línea o separadas por espacios o comas. Lo que no es una dirección (un nombre suelto) no entra.
+    const parts = el.value.split(/[\s,;]+/).filter(Boolean)
+    const found = [...new Set(parts.map(cleanUrl).filter(Boolean))]
+    const bad = parts.length - parts.filter((x) => cleanUrl(x)).length
     const q = qs[+el.dataset.q], e = el.dataset.e
-    const have = webs(q, e).map((w) => w.web)
-    for (const d of found) if (!have.includes(d)) data.fuentes.push({ pregunta: q, buscador: e, web: d, tu: 'No', comp: 'No' })
-    save(); render(); refocus(el.dataset.q, e)
+    const have = webs(q, e).map((w) => w.url)
+    for (const u of found) if (!have.includes(u)) data.fuentes.push({ pregunta: q, buscador: e, url: u, web: domain(u), tu: 'No', comp: 'No' })
+    if (found.length) { save(); render() }
+    const box = main.querySelector(`.addweb[data-q="${el.dataset.q}"][data-e="${e}"]`)
+    if (bad) { box.value = parts.filter((x) => !cleanUrl(x)).join('\n'); box.classList.add('is-bad'); box.title = 'Esto no es una URL. Copia la dirección del enlace de la fuente.' }
+    box.focus()
   }
   main.querySelectorAll('.addweb').forEach((el) => {
     el.onkeydown = (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); add(el) } }
     el.onpaste = () => setTimeout(() => add(el))
+    el.oninput = () => el.classList.remove('is-bad')
   })
   main.querySelectorAll('[data-tog]').forEach((b) => b.onclick = () => {
     const row = data.fuentes[+b.dataset.row]
@@ -613,7 +643,7 @@ function renderTasks() {
     <div class="table-wrap"><table>
       <thead><tr><th>Web</th><th>Veces citada</th><th>Te nombra</th><th>Nombra a tu competencia</th></tr></thead>
       <tbody>${t.length ? t.map((x) => {
-        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}</td><td class="static">${x.veces}</td>
+        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''}</td><td class="static">${x.veces}</td>
           <td class="static">${state(x.tu, 'Sí', 'No', 'dot--success')}</td>
           <td class="static">${state(x.comp, 'Sí', 'No', 'dot--strong')}</td></tr>`
       }).join('') : `<tr class="empty"><td colspan="4">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
@@ -689,8 +719,8 @@ function render() {
     main.innerHTML = renderTasks()
     wireIntro(main)
     document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
-      [{ k: 'web', label: 'Web' }, { k: 'veces', label: 'Veces citada' }, { k: 'tuTxt', label: 'Te nombra' }, { k: 'compTxt', label: 'Nombra a tu competencia' }],
-      tasks().map((t) => ({ ...t, tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
+      [{ k: 'web', label: 'Web' }, { k: 'pages', label: 'Páginas citadas' }, { k: 'veces', label: 'Veces citada' }, { k: 'tuTxt', label: 'Te nombra' }, { k: 'compTxt', label: 'Nombra a tu competencia' }],
+      tasks().map((t) => ({ ...t, pages: t.urls.join(' '), tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
     return
   }
   const step = STEPS[i]
