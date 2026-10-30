@@ -90,9 +90,8 @@
   .eng { min-width: 0; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
   .eng__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .web { display: flex; align-items: center; gap: 6px; padding: 4px 0 4px 2px; }
-  .web__d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
-  .web__d b { font-weight: 400; color: var(--fg-strong); }
-  .web__d:hover b { text-decoration: underline; }
+  .web__d { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); text-decoration: none; }
+  .web__d:hover { color: var(--fg-strong); text-decoration: underline; }
   .addweb.is-bad { border-color: var(--error); }
   .paths { display: flex; flex-direction: column; margin-top: 4px; }
   .paths a { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
@@ -539,7 +538,7 @@ function renderAsk(step) {
             <div class="eng__head"><span class="mono">${e.k}</span><a class="btn btn--secondary btn--sm" href="${e.url(q)}" target="_blank" rel="noopener">Preguntar →</a></div>
             ${webs(q, e.k).map((w) => `
               <div class="web">
-                <a class="web__d" href="${esc(w.url || 'https://' + w.web)}" target="_blank" rel="noopener" title="${esc(w.url || w.web)}"><b>${esc(w.web)}</b>${esc((w.url || '').replace(/^https?:\/\/[^/]+/, ''))}</a>
+                <a class="web__d" href="${esc(w.url || 'https://' + w.web)}" target="_blank" rel="noopener" title="${esc(w.url || w.web)}">${esc(w.url || w.web)}</a>
                 <button class="x" data-delweb="${w.i}" title="Quitar">${X}</button>
               </div>`).join('')}
             <textarea class="addweb" rows="1" data-q="${qi}" data-e="${e.k}" placeholder="Pega la URL de cada fuente y pulsa Intro" spellcheck="false"></textarea>
@@ -619,7 +618,7 @@ function renderStep(step, i) {
 function renderTasks() {
   const t = tasks()
   const list = t.filter((x) => !x.tu)
-  const paths = (x) => x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''
+  const paths = (x) => x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u)}</a>`).join('')}</div>` : ''
   return `
     ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.')}
     <div class="metrics">
