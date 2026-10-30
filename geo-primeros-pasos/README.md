@@ -2,7 +2,7 @@
 
 Material de trabajo del webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Es un ejercicio para hacer con calma después de la charla, con tu propia marca.
 
-Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios, foros o vídeos. El ejercicio sirve para encontrar qué webs son en tu caso y ver cuáles citan a tu competencia y a ti no: ahí es donde te interesa aparecer.
+Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios, foros o vídeos. El ejercicio sirve para sacar la lista de las que cita la IA cuando preguntan por lo que vendes: ahí es donde te interesa aparecer.
 
 ## El ejercicio: dónde deberías estar
 

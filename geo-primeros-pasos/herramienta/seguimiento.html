@@ -97,9 +97,6 @@
   .paths { display: flex; flex-direction: column; margin-top: 4px; }
   .paths a { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-muted); text-decoration: none; }
   .paths a:hover { color: var(--fg); text-decoration: underline; }
-  .tog { all: unset; cursor: pointer; height: 24px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 12px; color: var(--fg-muted); transition: color 150ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease); }
-  .tog:hover { border-color: var(--border-strong); color: var(--fg); }
-  .tog.is-on { border-color: var(--fg-muted); background: rgba(255, 255, 255, 0.08); color: var(--fg-strong); }
   .web .x { width: 24px; height: 24px; }
   /* Es un textarea para que, al pegar varias webs en líneas distintas, no se junten. */
   .addweb { display: block; width: 100%; min-height: 34px; field-sizing: content; resize: none; margin-top: 6px; padding: 8px 10px; line-height: 1.3; border: 1px dashed var(--border-strong); border-radius: var(--r-md); background: transparent; color: var(--fg-strong); font: 13px var(--mono); }
@@ -253,13 +250,13 @@ const STEPS = [
   },
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
-    cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'url', label: 'URL citada' }, { k: 'web', label: 'Web' }, { k: 'tu', label: 'Te nombra' }, { k: 'comp', label: 'Nombra a tu competencia' }],
-    help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente: botón derecho sobre el enlace de la cita → Copiar dirección del enlace.', 'Marca si esa página te nombra a ti o a tu competencia.'],
+    cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'url', label: 'URL citada' }, { k: 'web', label: 'Web' }],
+    help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente: botón derecho sobre el enlace de la cita → Copiar dirección del enlace.'],
     ask: true,
   },
   {
     id: 'analisis', title: 'Analiza las webs que más se repiten', short: 'Análisis',
-    lead: 'Mira qué tienen las webs que citan a tu competencia y a ti no.',
+    lead: 'Mira qué tienen las webs que más cita la IA.',
     help: ['Qué tipo de contenido es, qué dice de tu competencia, a qué páginas suyas enlaza y quién lo firma.', 'Te ayuda el prompt de aquí abajo. Comprueba los enlaces abriendo la página.'],
     cols: [{ k: 'web', label: 'Página', from: 'fuentes', field: 'url' }, { k: 'contenido', label: 'Qué contenido es', area: true }, { k: 'enlaza', label: 'A qué enlaza de tu competencia', area: true }, { k: 'autor', label: 'Quién lo firma' }],
   },
@@ -304,22 +301,19 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)) } cat
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 const domain = (s) => String(s || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
 
-// Lista de tareas: una fila por web citada, con cuántas veces sale y si sales tú o tu competencia.
+// Lista final: una fila por web citada, con sus páginas, de la que más se repite a la que menos. Tu propia web se marca sola.
 const tasks = () => {
   const by = new Map()
+  const mine = domain(product().url)
   for (const r of data.fuentes) {
     const d = domain(r.web)
     if (!d) continue
-    const t = by.get(d) || { web: d, veces: 0, tipo: r.tipo, tu: false, comp: false, urls: [] }
+    const t = by.get(d) || { web: d, veces: 0, urls: [], tu: !!mine && d === mine }
     t.veces++
     if (r.url && !t.urls.includes(r.url)) t.urls.push(r.url)
-    t.tipo ||= r.tipo
-    t.tu ||= r.tu === 'Sí'
-    t.comp ||= r.comp === 'Sí'
     by.set(d, t)
   }
-  const prio = (t) => (t.comp && !t.tu ? 2 : !t.tu ? 1 : 0)
-  return [...by.values()].sort((a, b) => prio(b) - prio(a) || b.veces - a.veces)
+  return [...by.values()].sort((a, b) => a.tu - b.tu || b.veces - a.veces)
 }
 
 const pad = (n) => String(n).padStart(2, '0')
@@ -341,7 +335,7 @@ const LOCK = '<svg class="lock" viewBox="0 0 24 24" width="12" height="12" fill=
 
 function renderNav() {
   const nav = document.getElementById('nav')
-  const pending = tasks().filter((t) => t.comp && !t.tu).length
+  const pending = tasks().filter((t) => !t.tu).length
   nav.innerHTML = STEPS.map((s, i) => `
     <button class="nav ${view === s.id ? 'is-on' : ''} ${isOpen(s.id) ? '' : 'is-locked'}" data-v="${s.id}" ${isOpen(s.id) ? '' : `title="${lockedTitle(s.id)}"`}>
       <span class="n">${pad(i + 1)}</span><span>${s.short}</span>
@@ -544,8 +538,6 @@ function renderAsk(step) {
             ${webs(q, e.k).map((w) => `
               <div class="web">
                 <a class="web__d" href="${esc(w.url || 'https://' + w.web)}" target="_blank" rel="noopener" title="${esc(w.url || w.web)}"><b>${esc(w.web)}</b>${esc((w.url || '').replace(/^https?:\/\/[^/]+/, ''))}</a>
-                <button class="tog ${w.tu === 'Sí' ? 'is-on' : ''}" data-tog="tu" data-row="${w.i}" title="Esta web te nombra a ti">Tú</button>
-                <button class="tog ${w.comp === 'Sí' ? 'is-on' : ''}" data-tog="comp" data-row="${w.i}" title="Esta web nombra a tu competencia">Competencia</button>
                 <button class="x" data-delweb="${w.i}" title="Quitar">${X}</button>
               </div>`).join('')}
             <textarea class="addweb" rows="1" data-q="${qi}" data-e="${e.k}" placeholder="Pega la URL de cada fuente y pulsa Intro" spellcheck="false"></textarea>
@@ -564,7 +556,7 @@ function wireAsk(main) {
     const bad = parts.length - parts.filter((x) => cleanUrl(x)).length
     const q = qs[+el.dataset.q], e = el.dataset.e
     const have = webs(q, e).map((w) => w.url)
-    for (const u of found) if (!have.includes(u)) data.fuentes.push({ pregunta: q, buscador: e, url: u, web: domain(u), tu: 'No', comp: 'No' })
+    for (const u of found) if (!have.includes(u)) data.fuentes.push({ pregunta: q, buscador: e, url: u, web: domain(u) })
     if (found.length) { save(); render() }
     const box = main.querySelector(`.addweb[data-q="${el.dataset.q}"][data-e="${e}"]`)
     if (bad) { box.value = parts.filter((x) => !cleanUrl(x)).join('\n'); box.classList.add('is-bad'); box.title = 'Esto no es una URL. Copia la dirección del enlace de la fuente.' }
@@ -574,12 +566,6 @@ function wireAsk(main) {
     el.onkeydown = (ev) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); add(el) } }
     el.onpaste = () => setTimeout(() => add(el))
     el.oninput = () => el.classList.remove('is-bad')
-  })
-  main.querySelectorAll('[data-tog]').forEach((b) => b.onclick = () => {
-    const row = data.fuentes[+b.dataset.row]
-    row[b.dataset.tog] = row[b.dataset.tog] === 'Sí' ? 'No' : 'Sí'
-    save()
-    b.classList.toggle('is-on', row[b.dataset.tog] === 'Sí')
   })
   main.querySelectorAll('[data-delweb]').forEach((b) => b.onclick = () => { data.fuentes.splice(+b.dataset.delweb, 1); save(); render() })
 }
@@ -630,22 +616,18 @@ function renderStep(step, i) {
 
 function renderTasks() {
   const t = tasks()
-  const todo = t.filter((x) => x.comp && !x.tu)
-  const state = (on, yes, no, tone) => `<span class="state"><span class="dot ${on ? tone : 'dot--faint'}"></span>${on ? yes : no}</span>`
+  const others = t.filter((x) => !x.tu)
   return `
-    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes. Primero, las que citan a tu competencia y a ti no: ahí es donde te interesa aparecer.')}
+    ${intro('Dónde deberías estar', 'Las webs que cita la IA cuando preguntan por lo que vendes, de la que más se repite a la que menos: ahí es donde te interesa aparecer.')}
     <div class="metrics">
-      <div class="metric"><b>${t.length}</b><span class="mono">Webs citadas</span></div>
-      <div class="metric"><b>${todo.length}</b><span class="mono">Con tu competencia y sin ti</span></div>
-      <div class="metric"><b>${t.filter((x) => x.tu).length}</b><span class="mono">En las que ya sales</span></div>
+      <div class="metric"><b>${others.length}</b><span class="mono">Webs citadas</span></div>
+      <div class="metric"><b>${others.reduce((n, x) => n + x.urls.length, 0)}</b><span class="mono">Páginas citadas</span></div>
+      <div class="metric"><b>${others.filter((x) => x.veces > 1).length}</b><span class="mono">Citadas más de una vez</span></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Web</th><th>Veces citada</th><th>Te nombra</th><th>Nombra a tu competencia</th></tr></thead>
-      <tbody>${t.length ? t.map((x) => {
-        return `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''}</td><td class="static">${x.veces}</td>
-          <td class="static">${state(x.tu, 'Sí', 'No', 'dot--success')}</td>
-          <td class="static">${state(x.comp, 'Sí', 'No', 'dot--strong')}</td></tr>`
-      }).join('') : `<tr class="empty"><td colspan="4">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
+      <thead><tr><th>Web</th><th>Veces citada</th></tr></thead>
+      <tbody>${t.length ? t.map((x) => `<tr><td class="static" style="color:var(--fg-strong)">${esc(x.web)}${x.tu ? ' <span class="qcount">Tu web</span>' : ''}${x.urls.length ? `<div class="paths">${x.urls.map((u) => `<a href="${esc(u)}" target="_blank" rel="noopener" title="${esc(u)}">${esc(u.replace(/^https?:\/\/[^/]+/, '') || '/')}</a>`).join('')}</div>` : ''}</td><td class="static">${x.veces}</td></tr>`).join('')
+        : `<tr class="empty"><td colspan="2">Aparecerá cuando apuntes webs citadas en el paso 03.</td></tr>`}</tbody>
     </table></div>
     <p class="note">Repite el paso 03 cada pocos meses con las mismas preguntas para ver si empiezas a salir.</p>
     <div class="actions"><button class="btn btn--secondary" id="csv-tasks">Exportar a CSV</button></div>
@@ -718,8 +700,8 @@ function render() {
     main.innerHTML = renderTasks()
     wireIntro(main)
     document.getElementById('csv-tasks').onclick = () => download('donde-deberias-estar.csv', toCSV(
-      [{ k: 'web', label: 'Web' }, { k: 'pages', label: 'Páginas citadas' }, { k: 'veces', label: 'Veces citada' }, { k: 'tuTxt', label: 'Te nombra' }, { k: 'compTxt', label: 'Nombra a tu competencia' }],
-      tasks().map((t) => ({ ...t, pages: t.urls.join(' '), tuTxt: t.tu ? 'Sí' : 'No', compTxt: t.comp ? 'Sí' : 'No' }))))
+      [{ k: 'web', label: 'Web' }, { k: 'pages', label: 'Páginas citadas' }, { k: 'veces', label: 'Veces citada' }],
+      tasks().filter((t) => !t.tu).map((t) => ({ ...t, pages: t.urls.join(' ') }))))
     return
   }
   const step = STEPS[i]
