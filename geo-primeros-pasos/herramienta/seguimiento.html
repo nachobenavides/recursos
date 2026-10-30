@@ -76,7 +76,9 @@
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
   /* Lista de preguntas del paso 2. */
-  .qhead { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); }
+  /* Es el resultado de todo el paso, no del último punto: va separado de borde a borde, con su propio título. */
+  .qhead { display: flex; align-items: center; gap: 10px; margin: 8px -24px 8px; padding: 24px 24px 0; border-top: 1px solid var(--border); }
+  .qhead h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .qcount { font: 11px var(--mono); color: var(--fg-muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: var(--r-full); }
   .qactions { margin-left: auto; display: flex; gap: 20px; }
   .qlist { margin: 0; padding: 0; list-style: none; }
@@ -478,7 +480,7 @@ function renderQuestions(step) {
     ${intro(step.title, step.lead, step.help)}
     ${renderGuide()}
     <div class="qhead">
-      <span class="mono">Tus preguntas</span>${rows.length ? `<span class="qcount">${rows.length}</span>` : ''}
+      <h2>Tus preguntas</h2>${rows.length ? `<span class="qcount">${rows.length}</span>` : ''}
       <div class="qactions"><button class="link" id="add">Añadir pregunta</button>${rows.length ? '<button class="link" id="csv">Exportar a CSV</button>' : ''}</div>
     </div>
     ${rows.length ? `<ol class="qlist">${rows.map((r, ri) => `
@@ -637,6 +639,8 @@ function render() {
     const added = fromCSV(step.cols, rows)
     if (!added.length) { alert('No he encontrado columnas que encajen. La primera fila del CSV tiene que ser la cabecera: ' + step.cols.map((c) => c.label).join(';')); return }
     data[step.id].push(...added)
+    // Importar es el último punto de la lista del paso 2: se marca solo.
+    if (step.guide) { const list = data.checks.preguntas ||= []; if (!list.includes(4)) list.push(4) }
     save()
     render()
   }))
