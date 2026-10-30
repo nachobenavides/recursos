@@ -75,6 +75,23 @@
   .help a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
   .help a:hover { text-decoration-color: var(--fg-strong); }
   .intro + * { margin-top: 28px !important; }
+  /* Lista de preguntas del paso 2. */
+  .qhead { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .qcount { font: 11px var(--mono); color: var(--fg-muted); padding: 2px 8px; border: 1px solid var(--border); border-radius: var(--r-full); }
+  .qactions { margin-left: auto; display: flex; gap: 20px; }
+  .qlist { margin: 0; padding: 0; list-style: none; }
+  .qlist li { display: grid; grid-template-columns: 28px 1fr 28px; gap: 12px; align-items: start; padding: 12px 0; }
+  .qlist li + li { border-top: 1px solid var(--border); }
+  .qlist .n { padding-top: 9px; font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.5); }
+  .qbody { display: flex; flex-direction: column; min-width: 0; }
+  .qbody textarea, .qbody input { width: 100%; margin: 0 0 0 -8px; padding: 6px 8px; border: 1px solid transparent; border-radius: var(--r-sm); background: transparent; font: inherit; resize: none; transition: border-color 150ms var(--ease); }
+  .qbody .q { field-sizing: content; min-height: 34px; font-size: 15px; line-height: 1.5; color: var(--fg-strong); }
+  .qbody .o { font: 12px var(--mono); color: var(--fg-muted); }
+  .qbody textarea:hover, .qbody input:hover { border-color: var(--border); }
+  .qbody textarea:focus, .qbody input:focus { outline: none; border-color: var(--border-strong); }
+  .qlist .x { margin-top: 4px; opacity: 0; transition: opacity 150ms var(--ease); }
+  .qlist li:hover .x, .qlist .x:focus { opacity: 1; }
+  .qempty { margin: 0; padding: 24px 0; color: var(--fg-muted); font-size: 14px; }
 
   /* Las tablas van un punto más claras que la tarjeta, como el comentario de la cabecera. */
   .table-wrap { border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: rgba(255, 255, 255, 0.03); }
@@ -454,8 +471,32 @@ function renderForm(step) {
     ${credit}`
 }
 
+// Las preguntas del paso 2, como lista: cada una con su número, la pregunta en grande y su consulta de origen debajo.
+function renderQuestions(step) {
+  const rows = data[step.id]
+  return `
+    ${intro(step.title, step.lead, step.help)}
+    ${renderGuide()}
+    <div class="qhead">
+      <span class="mono">Tus preguntas</span>${rows.length ? `<span class="qcount">${rows.length}</span>` : ''}
+      <div class="qactions"><button class="link" id="add">Añadir pregunta</button>${rows.length ? '<button class="link" id="csv">Exportar a CSV</button>' : ''}</div>
+    </div>
+    ${rows.length ? `<ol class="qlist">${rows.map((r, ri) => `
+      <li>
+        <span class="n">${pad(ri + 1)}</span>
+        <div class="qbody">
+          <textarea class="q" rows="1" data-i="${ri}" data-k="pregunta" placeholder="Escribe la pregunta">${esc(r.pregunta)}</textarea>
+          <input class="o" data-i="${ri}" data-k="origen" value="${esc(r.origen)}" placeholder="Consulta de origen">
+        </div>
+        <button class="x" data-del="${ri}" title="Borrar pregunta">${X}</button>
+      </li>`).join('')}</ol>`
+      : '<p class="qempty">Cuando importes el CSV, aquí aparecerán tus preguntas.</p>'}
+    ${credit}`
+}
+
 function renderStep(step, i) {
   if (step.form) return renderForm(step)
+  if (step.guide) return renderQuestions(step)
   const rows = data[step.id]
   return `
     ${intro(step.title, step.lead, step.help)}
@@ -586,7 +627,7 @@ function render() {
     data[step.id].push({})
     save()
     render()
-    const inputs = main.querySelectorAll('tbody tr:last-child [data-k]')
+    const inputs = main.querySelectorAll('tbody tr:last-child [data-k], .qlist li:last-child [data-k]')
     inputs[0]?.focus()
   }
   wireCopy(main)
@@ -599,7 +640,8 @@ function render() {
     save()
     render()
   }))
-  document.getElementById('csv').onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
+  const csv = document.getElementById('csv')
+  if (csv) csv.onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
 }
 
 document.getElementById('export-json').onclick = () => download('seguimiento-donde-deberias-estar.json', JSON.stringify(data, null, 2), 'application/json')
