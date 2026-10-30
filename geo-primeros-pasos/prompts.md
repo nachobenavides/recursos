@@ -19,9 +19,7 @@ Reglas:
 - Como máximo, 15 preguntas.
 
 Devuélveme solo un CSV, sin texto antes ni después, separado por punto y coma, con esta cabecera exacta:
-Pregunta;Producto;Consulta de origen
-
-En la columna Producto pon siempre: [PRODUCTO O SERVICIO]
+Pregunta;Consulta de origen
 ```
 
 Guarda la respuesta como archivo `.csv`. Si la IA te la da como texto, cópiala en un archivo de texto y guárdalo con la extensión `.csv`. Después, cárgalo en la herramienta con *Importar CSV*.

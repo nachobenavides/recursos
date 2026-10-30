@@ -8,7 +8,7 @@ Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respu
 
 Son 5 pasos y se hacen por partes, en unas horas en total.
 
-1. Elige dos o tres productos o servicios que quieras potenciar y apunta la URL de su página.
+1. Elige un producto o servicio que quieras potenciar y apunta la URL de su página.
 2. Saca las preguntas de tu cliente a partir de tus consultas de Search Console.
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
 4. Analiza las webs que más se repiten.
