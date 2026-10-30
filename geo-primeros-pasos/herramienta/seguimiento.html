@@ -120,6 +120,38 @@
   .prompt pre { margin: 0; padding: 18px 20px; max-height: 168px; overflow: auto; background: var(--bg); font: 13px/1.6 var(--mono); color: var(--fg); white-space: pre-wrap; }
   .prompt-step { margin: 28px 0 10px; }
   .note { margin-top: 14px; font-size: 13px; color: var(--fg-muted); }
+  /* Paso 2 guiado: una lista de comprobación con lo que hay que hacer, en orden, antes de la tabla. */
+  .guide { margin: 0 0 28px; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.03); }
+  .guide > li { display: grid; grid-template-columns: 22px 1fr; gap: 0 14px; padding: 18px 20px; }
+  .guide > li + li { border-top: 1px solid var(--border); }
+  .check { all: unset; box-sizing: border-box; width: 20px; height: 20px; margin-top: 1px; display: grid; place-items: center; border: 1px solid var(--border-strong); border-radius: var(--r-full); cursor: pointer; color: transparent; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+  .check:hover { border-color: var(--fg-muted); }
+  .check svg { width: 12px; height: 12px; }
+  .is-done .check { background: var(--success); border-color: var(--success); color: var(--bg); }
+  .guide h3 { margin: 0; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .guide h3 .n { margin-right: 8px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--fg-muted); }
+  .is-done h3 { color: var(--fg-muted); }
+  .guide .sub { margin: 4px 0 0; font-size: 14px; color: var(--fg-muted); }
+  .guide .do { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .btn--sm { height: 30px; padding: 0 14px; font-size: 13px; align-self: flex-start; text-decoration: none; }
+  .urls { border: 1px solid var(--border); border-radius: var(--r-md); }
+  .urls > div { display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 14px; }
+  .urls > div + div { border-top: 1px solid var(--border); }
+  .urls b { flex: none; min-width: 140px; font-weight: 500; font-size: 14px; color: var(--fg-strong); }
+  .urls code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 13px var(--mono); color: var(--fg); }
+  .vars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .vars label { display: flex; flex-direction: column; gap: 6px; }
+  .vars input, .vars select { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-sm); background: transparent; color: var(--fg-strong); font: 14px var(--sans); transition: border-color 150ms var(--ease); }
+  .vars input::placeholder { color: rgba(163, 163, 163, 0.35); }
+  .vars input:hover, .vars select:hover { border-color: var(--border-strong); }
+  .vars input:focus, .vars select:focus { outline: none; border-color: var(--fg-muted); }
+  .vars select option { background: var(--bg); }
+  .filled { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+  .filled pre { margin: 0; padding: 14px 16px; max-height: 180px; overflow: auto; background: var(--bg); font: 13px/1.6 var(--mono); color: var(--fg-muted); white-space: pre-wrap; }
+  .filled mark { background: none; color: var(--fg-strong); }
+  .filled mark.empty { color: var(--error); }
+  .filled-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 10px 10px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--fg-muted); }
+  @media (max-width: 860px) { .vars { grid-template-columns: 1fr; } .urls b { min-width: 0; } }
   /* Pie siempre abajo: al final de la tarjeta si cabe todo, y pegado al borde inferior al hacer scroll. */
   .spacer { flex: 1 0 48px; }
   footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
@@ -160,9 +192,9 @@ const STEPS = [
   {
     id: 'preguntas', title: 'Saca las preguntas de tu cliente', short: 'Preguntas',
     lead: 'Convierte lo que ya buscan en Google en preguntas para la IA.',
-    help: ['Entra en <a href="https://search.google.com/search-console/performance/search-analytics" target="_blank" rel="noopener">Google Search Console → Rendimiento</a>, elige tu web y filtra por la URL del producto que apuntaste en el paso anterior (+ Nuevo → Página).', 'Exportar → Descargar CSV. Dentro del ZIP está el archivo de Consultas.', 'Adjúntalo a tu IA con el prompt de aquí abajo. Guarda su respuesta como .csv y cárgala con Importar CSV.', 'Repite con cada producto y borra las preguntas que tu cliente nunca haría.'],
+    help: ['Sigue la lista de aquí abajo con cada producto.', 'Después, borra las preguntas que tu cliente nunca haría.'],
     cols: [{ k: 'pregunta', label: 'Pregunta', area: true }, { k: 'producto', label: 'Producto', from: 'productos' }, { k: 'origen', label: 'Consulta de origen' }],
-    importable: true,
+    importable: true, guide: true,
   },
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
@@ -213,7 +245,7 @@ Vendo [PRODUCTO O SERVICIO] y mi competencia es [COMPETIDORES]. Dime:
 Si algo no aparece en la página, dilo. No lo supongas.` },
 ]
 
-const blank = () => Object.fromEntries(STEPS.map((s) => [s.id, []]))
+const blank = () => ({ ...Object.fromEntries(STEPS.map((s) => [s.id, []])), checks: {}, vars: {} })
 const load = () => { try { return { ...blank(), ...JSON.parse(localStorage.getItem(KEY)) } } catch { return blank() } }
 let data = load()
 // Se puede entrar directamente a una vista desde un enlace: seguimiento.html#prompts
@@ -337,11 +369,88 @@ function renderPrompts() {
     ${credit}`
 }
 
+const GSC = 'https://search.google.com/search-console/performance/search-analytics'
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
+const VARS = [
+  { k: 'producto', tag: '[PRODUCTO O SERVICIO]', label: 'Producto o servicio' },
+  { k: 'cliente', tag: '[TIPO DE CLIENTE]', label: 'Tipo de cliente', ph: 'Por ejemplo, agencias pequeñas' },
+  { k: 'lugar', tag: '[PAÍS O CIUDAD]', label: 'País o ciudad', ph: 'Por ejemplo, España' },
+]
+// El prompt 1 con las variables puestas; en pantalla, lo que falta por rellenar se marca.
+const filledPrompt = (html) => {
+  const p = PROMPTS.find((x) => x.id === 'p1')
+  let t = html ? esc(p.text) : p.text
+  for (const v of VARS) {
+    const val = (data.vars[v.k] || '').trim()
+    t = t.split(v.tag).join(html ? `<mark class="${val ? '' : 'empty'}">${esc(val || v.tag)}</mark>` : val || v.tag)
+  }
+  return t
+}
+const products = () => data.productos.filter((r) => (r.nombre || '').trim() || (r.url || '').trim())
+
+function renderGuide() {
+  const done = data.checks.preguntas || []
+  const prods = products()
+  const names = prods.map((r) => r.nombre).filter(Boolean)
+  if (names.length && !names.includes(data.vars.producto)) data.vars.producto = names[0]
+  const items = [
+    { t: 'Abre Search Console', sub: 'Entra en Rendimiento y elige tu web.',
+      do: `<a class="btn btn--secondary btn--sm" href="${GSC}" target="_blank" rel="noopener">Abrir Search Console →</a>` },
+    { t: 'Filtra por la URL del producto', sub: 'Pulsa + Nuevo → Página y pega la URL.',
+      do: prods.length ? `<div class="urls">${prods.map((r, j) => `<div><b>${esc(r.nombre || '—')}</b><code>${esc(r.url || 'Falta la URL en el paso 1')}</code>${r.url ? `<button class="btn btn--secondary btn--sm" data-copyurl="${j}">Copiar URL</button>` : ''}</div>`).join('')}</div>`
+        : '<p class="sub">Apunta antes tus productos y sus URL en el paso 1.</p>' },
+    { t: 'Exporta las consultas', sub: 'Exportar → Descargar CSV. Descomprime el ZIP: necesitas el archivo Consultas.' },
+    { t: 'Rellena el prompt y pásaselo a tu IA', sub: 'Pégalo en ChatGPT, Gemini o Claude y adjunta el archivo Consultas. Guarda su respuesta como archivo .csv.',
+      do: `<div class="vars">${VARS.map((v) => `<label><span class="mono">${v.label}</span>${v.k === 'producto' && names.length
+          ? `<select data-var="${v.k}">${names.map((n) => `<option ${n === data.vars.producto ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>`
+          : `<input data-var="${v.k}" value="${esc(data.vars[v.k] || '')}" placeholder="${esc(v.ph || 'Escríbelo aquí')}">`}</label>`).join('')}</div>
+        <div class="filled"><pre id="filled">${filledPrompt(true)}</pre><div class="filled-foot"><span id="filled-state"></span><button class="btn btn--primary btn--sm" id="copy-filled">Copiar prompt</button></div></div>` },
+    { t: 'Importa el CSV que te ha dado la IA', sub: 'Las preguntas aparecerán en la tabla de aquí abajo.',
+      do: '<button class="btn btn--secondary btn--sm" data-import>Importar CSV</button>' },
+  ]
+  return `<ol class="guide">${items.map((it, j) => `
+    <li class="${done.includes(j) ? 'is-done' : ''}">
+      <button class="check" data-check="${j}" title="Marcar como hecho">${CHECK}</button>
+      <div><h3><span class="n">${pad(j + 1)}</span>${it.t}</h3><p class="sub">${it.sub}</p>${it.do ? `<div class="do">${it.do}</div>` : ''}</div>
+    </li>`).join('')}</ol>`
+}
+function wireGuide(main) {
+  main.querySelectorAll('[data-check]').forEach((b) => b.onclick = () => {
+    const list = data.checks.preguntas ||= []
+    const j = +b.dataset.check
+    list.includes(j) ? list.splice(list.indexOf(j), 1) : list.push(j)
+    save()
+    b.closest('li').classList.toggle('is-done', list.includes(j))
+  })
+  main.querySelectorAll('[data-copyurl]').forEach((b) => b.onclick = async () => {
+    const ok = await copyText(products()[+b.dataset.copyurl].url.trim())
+    b.textContent = ok ? 'Copiada' : 'No se ha podido copiar'
+    setTimeout(() => (b.textContent = 'Copiar URL'), 1800)
+  })
+  const state = () => {
+    const missing = VARS.filter((v) => !(data.vars[v.k] || '').trim()).length
+    main.querySelector('#filled-state').textContent = missing ? (missing === 1 ? 'Falta 1 dato por rellenar' : `Faltan ${missing} datos por rellenar`) : 'Listo para copiar'
+  }
+  main.querySelectorAll('[data-var]').forEach((el) => el.oninput = el.onchange = () => {
+    data.vars[el.dataset.var] = el.value
+    save()
+    main.querySelector('#filled').innerHTML = filledPrompt(true)
+    state()
+  })
+  state()
+  const c = main.querySelector('#copy-filled')
+  c.onclick = async () => {
+    const ok = await copyText(filledPrompt(false))
+    c.textContent = ok ? 'Copiado' : 'No se ha podido copiar'
+    setTimeout(() => (c.textContent = 'Copiar prompt'), 1800)
+  }
+}
+
 function renderStep(step, i) {
   const rows = data[step.id]
   return `
     ${intro(step.title, step.lead, step.help)}
-    ${PROMPTS.filter((p) => p.step === step.id).map(promptCard).join('')}
+    ${step.guide ? renderGuide() : PROMPTS.filter((p) => p.step === step.id).map(promptCard).join('')}
     <div class="table-wrap"><table>
       <thead><tr>${step.cols.map((c) => `<th>${c.label}</th>`).join('')}<th></th></tr></thead>
       <tbody>${rows.length ? rows.map((r, ri) => `<tr>${step.cols.map((c) => `<td>${cell(step, c, r, ri)}</td>`).join('')}<td class="del"><button class="x" data-del="${ri}" title="Borrar fila">${X}</button></td></tr>`).join('')
@@ -349,7 +458,7 @@ function renderStep(step, i) {
     </table></div>
     <div class="actions">
       <button class="btn btn--primary" id="add">Añadir fila</button>
-      ${step.importable ? '<button class="btn btn--secondary" id="import-csv">Importar CSV</button>' : ''}
+      ${step.importable ? '<button class="btn btn--secondary" data-import>Importar CSV</button>' : ''}
       <button class="btn btn--secondary" id="csv">Exportar a CSV</button>
     </div>
     ${credit}`
@@ -458,14 +567,14 @@ function render() {
   }
   wireCopy(main)
   wireIntro(main)
-  const imp = document.getElementById('import-csv')
-  if (imp) imp.onclick = () => pickCSV((rows) => {
+  if (step.guide) wireGuide(main)
+  main.querySelectorAll('[data-import]').forEach((imp) => imp.onclick = () => pickCSV((rows) => {
     const added = fromCSV(step.cols, rows)
     if (!added.length) { alert('No he encontrado columnas que encajen. La primera fila del CSV tiene que ser la cabecera: ' + step.cols.map((c) => c.label).join(';')); return }
     data[step.id].push(...added)
     save()
     render()
-  })
+  }))
   document.getElementById('csv').onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
 }
 
