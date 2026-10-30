@@ -30,7 +30,7 @@ Revisa las preguntas y borra las que tu cliente nunca haría.
 
 - Usa una ventana de **incógnito**, sin iniciar sesión, para que la respuesta no salga personalizada.
 - En la herramienta, cada pregunta tiene dos botones: **Preguntar en ChatGPT** y en el **Modo IA de Google**. Se abren con la pregunta ya enviada.
-- Copia la **URL exacta** de cada fuente: abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige *Copiar dirección del enlace*. Pégala en la herramienta. No apuntes las webs de tu competencia: ahí no vas a aparecer.
+- Copia la **URL exacta** de cada fuente. En ChatGPT, abre la etiqueta de cita que hay junto al párrafo, pulsa con el botón derecho sobre el enlace y elige *Copiar dirección del enlace*. En el Modo IA eso copia un enlace de Google, no el de la fuente: abre la fuente y copia la dirección de la barra del navegador. Pégala en la herramienta. No apuntes las webs de tu competencia: ahí no vas a aparecer.
 - Si quieres, repite la pregunta en un chat nuevo: cada vez cita webs distintas. Añade las nuevas en la misma casilla.
 
 No le pidas a la IA que te liste sus fuentes: lo hemos probado y se deja muchas. Copiar la respuesta tampoco copia las fuentes.

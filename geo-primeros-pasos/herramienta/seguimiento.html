@@ -251,7 +251,7 @@ const STEPS = [
   {
     id: 'fuentes', title: 'Haz las preguntas y apunta las fuentes', short: 'Webs citadas',
     cols: [{ k: 'pregunta', label: 'Pregunta' }, { k: 'buscador', label: 'Dónde' }, { k: 'url', label: 'URL citada' }, { k: 'web', label: 'Web' }],
-    help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente: botón derecho sobre el enlace de la cita → Copiar dirección del enlace.', 'No apuntes las webs de tu competencia: ahí no vas a aparecer.'],
+    help: ['En una ventana privada, sin iniciar sesión.', 'Pega la URL de cada fuente. En ChatGPT: botón derecho sobre el enlace de la cita → Copiar dirección del enlace. En el Modo IA: abre la fuente y copia la dirección de la barra.', 'No apuntes las webs de tu competencia: ahí no vas a aparecer.'],
     ask: true,
   },
   {
@@ -514,7 +514,8 @@ const ENGINES = [
 const cleanUrl = (x) => {
   try {
     const u = new URL(/^https?:\/\//i.test(x) ? x : `https://${x}`)
-    if (!u.hostname.includes('.')) return ''
+    // Un enlace de Google (el que se copia en el Modo IA) no es la fuente: hay que abrirla y copiar su dirección.
+    if (!u.hostname.includes('.') || /(^|\.)google\./.test(u.hostname)) return ''
     ;[...u.searchParams.keys()].filter((k) => /^utm_/i.test(k)).forEach((k) => u.searchParams.delete(k))
     u.hash = ''
     return u.toString().replace(/\/$/, '')
@@ -560,7 +561,7 @@ function wireAsk(main) {
     for (const u of found) if (!have.includes(u)) data.fuentes.push({ pregunta: q, buscador: e, url: u, web: domain(u) })
     if (found.length) { save(); render() }
     const box = main.querySelector(`.addweb[data-q="${el.dataset.q}"][data-e="${e}"]`)
-    if (bad) { box.value = parts.filter((x) => !cleanUrl(x)).join('\n'); box.classList.add('is-bad'); box.title = 'Esto no es una URL. Copia la dirección del enlace de la fuente.' }
+    if (bad) { box.value = parts.filter((x) => !cleanUrl(x)).join('\n'); box.classList.add('is-bad'); box.title = 'Esto no es la URL de la fuente. En el Modo IA, abre la fuente y copia la dirección de la barra del navegador.' }
     box.focus()
   }
   main.querySelectorAll('.addweb').forEach((el) => {
