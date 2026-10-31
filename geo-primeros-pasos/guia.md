@@ -1,8 +1,8 @@
 # Dónde deberías estar
 
-Cuando alguien pregunta por tu sector, la IA cita sobre todo webs de otros: comparativas, reseñas, medios, foros. Esta guía sirve para encontrar cuáles son en tu caso y conseguir que hablen de ti.
+Cuando alguien pregunta por tu sector, la IA cita sobre todo webs de otros: comparativas, reseñas, medios, foros. Esta guía sirve para encontrar cuáles son en tu caso.
 
-Son 4 pasos y al final tendrás la lista de webs en las que te interesa aparecer para potenciar ese producto. Lleva el control con la [herramienta de seguimiento](herramienta/seguimiento.html): descárgala y ábrela en el navegador.
+Son 4 pasos y al final tendrás la lista de webs en las que te interesa aparecer para potenciar ese producto. Lleva el control con la [herramienta de seguimiento](herramienta/seguimiento.html): ábrela desde la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/) o descárgala y ábrela en tu navegador.
 
 ## Paso 1 · Elige qué quieres potenciar
 

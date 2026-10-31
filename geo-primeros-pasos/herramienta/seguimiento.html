@@ -22,7 +22,7 @@
   body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
   a { color: var(--fg-strong); }
   .mono { font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
-  .app { display: grid; grid-template-columns: 272px 1fr; min-height: 100vh; }
+  .app { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; }
 
   aside { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 28px 16px 24px; }
   .brand { display: flex; align-items: center; gap: 12px; padding: 0 12px 28px; }
@@ -197,7 +197,7 @@
   .rank__more a:hover { color: var(--fg-strong); text-decoration: underline; }
   .rank__more p { margin: 0; min-width: 0; font-size: 13px; line-height: 1.45; color: var(--fg); }
   .rank--mine { opacity: 0.6; }
-  @media (max-width: 860px) { .rank__row { grid-template-columns: 28px minmax(0, 1fr) 0 64px 20px; } .rank__bar, .rank__eng, .rank-cols { display: none; } .rank__more { grid-template-columns: 1fr; margin-left: 4px; } }
+  @media (max-width: 860px) { .qhead { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; flex-wrap: wrap; } .qactions { gap: 14px; } .rank__row { grid-template-columns: 28px minmax(0, 1fr) 0 64px 20px; } .rank__bar, .rank__eng, .rank-cols { display: none; } .rank__more { grid-template-columns: 1fr; margin-left: 4px; } }
   .prompt { margin: 0 0 28px; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .prompt__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
   .prompt__head strong { display: block; margin-top: 6px; font-size: 16px; font-weight: 500; color: var(--fg-strong); }
@@ -207,7 +207,7 @@
   .note { margin-top: 14px; font-size: 13px; color: var(--fg-muted); }
   /* Paso 2 guiado: una línea de tiempo discreta, sin cajas; cada punto lleva su número y se vuelve un check al marcarlo. */
   .guide { margin: 0 0 36px; padding: 0; list-style: none; }
-  .guide > li { position: relative; display: grid; grid-template-columns: 24px 1fr; gap: 0 16px; padding-bottom: 28px; }
+  .guide > li { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 0 16px; padding-bottom: 28px; }
   .guide > li:last-child { padding-bottom: 0; }
   .guide > li:not(:last-child)::before { content: ""; position: absolute; left: 11.5px; top: 30px; bottom: 6px; width: 1px; background: var(--border); }
   .check { all: unset; box-sizing: border-box; width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid var(--border-strong); border-radius: var(--r-full); cursor: pointer; font-family: var(--mono); font-size: 10px; color: var(--fg-muted); transition: background-color 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease); }
@@ -244,7 +244,7 @@
   .spacer { flex: 1 0 48px; }
   footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
   @media (max-width: 860px) {
-    .app { grid-template-columns: 1fr; } aside { position: static; height: auto; }
+    .app { grid-template-columns: minmax(0, 1fr); } aside { position: static; height: auto; } .side-foot { margin-top: 20px; } footer.credit { flex-direction: column; gap: 6px; } .rank-head { flex-wrap: wrap; } .seg button { white-space: nowrap; }
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; } .intro__card { margin-left: 0; } .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
   }
 </style>

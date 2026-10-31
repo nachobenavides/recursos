@@ -2,7 +2,7 @@
 
 Material de trabajo del webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Es un ejercicio para hacer con calma después de la charla, con tu propia marca.
 
-Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios, foros o vídeos. El ejercicio sirve para sacar la lista de las que cita la IA cuando preguntan por lo que vendes: ahí es donde te interesa aparecer.
+Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios o foros. El ejercicio sirve para sacar la lista de las que cita la IA cuando preguntan por lo que vendes: ahí es donde te interesa aparecer.
 
 ## El ejercicio: dónde deberías estar
 
@@ -30,7 +30,7 @@ La forma más sencilla es la [versión web](https://nachobenavides.github.io/rec
 
 Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después **Download ZIP**. Descomprime la carpeta, lee los archivos `.md` en cualquier editor de texto y abre `herramienta/seguimiento.html` con doble clic: se abre en tu navegador y no necesita instalar nada.
 
-Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. Guarda una copia de vez en cuando para no perderlo.
+Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. Pulsa «Descargar mi trabajo» de vez en cuando para no perderlo.
 
 ## Una regla antes de empezar
 
