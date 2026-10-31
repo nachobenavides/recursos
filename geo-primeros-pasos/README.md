@@ -32,6 +32,10 @@ Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después 
 
 Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. Pulsa «Descargar mi trabajo» de vez en cuando para no perderlo.
 
+## Aviso
+
+Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener. El webinar está en [YouTube](https://www.youtube.com/watch?v=6g-6_lXTBE4).
+
 ## Una regla antes de empezar
 
 **No compres enlaces.** Google lo considera spam. Si alguna aparición es de pago, tiene que ir marcada como patrocinada.
