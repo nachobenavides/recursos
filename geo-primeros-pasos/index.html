@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dónde deberías estar · #RaiolaWebinar</title>
+<title>Primeros pasos para salir en ChatGPT y en la IA de Google · #RaiolaWebinar</title>
 <meta name="description" content="Ejercicio del webinar de Raiola Networks para encontrar las webs que cita la IA en tu sector y conseguir que hablen de ti.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -63,7 +63,13 @@
   .steps h3 { margin: 10px 0 6px; font-size: 17px; font-weight: 500; color: var(--fg-strong); }
   .steps p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg-muted); }
 
-  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  /* Los ejercicios de la charla, una tarjeta por ejercicio. */
+  .exercises { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .exercises a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 22px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.02); text-decoration: none; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
+  .exercises a:hover { border-color: var(--border-strong); background: rgba(255, 255, 255, 0.04); }
+  .exercises strong { font-size: 18px; font-weight: 500; color: var(--fg-strong); }
+  .exercises span:not(.mono) { font-size: 14px; color: var(--fg-muted); }
+  .exercises em { margin-top: 8px; font-style: normal; font-size: 14px; color: var(--fg-strong); }
 
   /* Aviso: qué es y qué no es esta herramienta. */
   .notice { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); }
@@ -87,7 +93,7 @@
     .hero { padding: 24px 0 40px; }
     .lead { font-size: 17px; }
     .actions .btn { flex: 1 1 100%; }
-    .steps { grid-template-columns: 1fr; }
+    .steps, .exercises { grid-template-columns: 1fr; }
     .notice { grid-template-columns: 1fr; gap: 6px; }
   }
 </style>
@@ -105,10 +111,10 @@
   <div class="hero">
     <span class="mono">#RaiolaWebinar</span>
     <h1>Primeros pasos para salir en ChatGPT y en la IA de Google</h1>
-    <p class="lead">Un ejercicio para después de la charla, con una microherramienta gratuita.</p>
+    <p class="lead">El webinar completo y los ejercicios para ponerlo en práctica después.</p>
     <div class="actions">
-      <a class="btn btn--primary" href="herramienta/seguimiento.html">Abrir la microherramienta</a>
-      <a class="btn btn--secondary" href="#webinar"><svg width="20" height="14" viewBox="0 0 28 20" aria-hidden="true"><path fill="#FF0000" d="M27.4 3.1A3.5 3.5 0 0 0 24.9.6C22.7 0 14 0 14 0S5.3 0 3.1.6A3.5 3.5 0 0 0 .6 3.1C0 5.3 0 10 0 10s0 4.7.6 6.9a3.5 3.5 0 0 0 2.5 2.5C5.3 20 14 20 14 20s8.7 0 10.9-.6a3.5 3.5 0 0 0 2.5-2.5C28 14.7 28 10 28 10s0-4.7-.6-6.9z"/><path fill="#fff" d="m11.2 14.3 7.3-4.3-7.3-4.3z"/></svg>Ver el webinar</a>
+      <a class="btn btn--primary" href="#webinar"><svg width="20" height="14" viewBox="0 0 28 20" aria-hidden="true"><path fill="#FF0000" d="M27.4 3.1A3.5 3.5 0 0 0 24.9.6C22.7 0 14 0 14 0S5.3 0 3.1.6A3.5 3.5 0 0 0 .6 3.1C0 5.3 0 10 0 10s0 4.7.6 6.9a3.5 3.5 0 0 0 2.5 2.5C5.3 20 14 20 14 20s8.7 0 10.9-.6a3.5 3.5 0 0 0 2.5-2.5C28 14.7 28 10 28 10s0-4.7-.6-6.9z"/><path fill="#fff" d="m11.2 14.3 7.3-4.3-7.3-4.3z"/></svg>Ver el webinar</a>
+      <a class="btn btn--secondary" href="#ejercicios">Ver los ejercicios</a>
     </div>
     <div class="orgs">
       <span class="mono">Un webinar de</span>
@@ -118,40 +124,23 @@
     </div>
   </div>
 
-  <section>
-    <span class="mono">El ejercicio</span>
-    <h2>Cuatro pasos</h2>
-    <ol class="steps">
-      <li><span class="n">01</span><h3>A potenciar</h3><p>Elige un producto y la URL de su página.</p></li>
-      <li><span class="n">02</span><h3>Preguntas</h3><p>Convierte lo que busca tu cliente en Google en preguntas para la IA.</p></li>
-      <li><span class="n">03</span><h3>Webs citadas</h3><p>Hazlas en ChatGPT y en el Modo IA y apunta qué webs citan.</p></li>
-      <li><span class="n">04</span><h3>Dónde deberías estar</h3><p>Las webs que más cita la IA: ahí te interesa aparecer.</p></li>
-    </ol>
-  </section>
-
   <section id="webinar">
     <span class="mono">El webinar</span>
-    <h2>Primeros pasos para salir en ChatGPT y en la IA de Google</h2>
+    <h2>Míralo entero</h2>
     <div class="video"><iframe src="https://www.youtube-nocookie.com/embed/6g-6_lXTBE4" title="Webinar: Primeros pasos para salir en ChatGPT y en la IA de Google" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
   </section>
 
-  <section>
-    <span class="mono">Material</span>
-    <h2>Si prefieres leerlo o tenerlo en tu ordenador</h2>
-    <div class="links">
-      <a class="btn btn--secondary" href="https://github.com/nachobenavides/recursos/blob/main/geo-primeros-pasos/guia.md">Guía paso a paso</a>
-      <a class="btn btn--secondary" href="https://github.com/nachobenavides/recursos/archive/refs/heads/main.zip">Descargar todo (ZIP)</a>
-    </div>
-  </section>
-
-  <section>
-    <div class="notice">
-      <span class="mono">Aviso</span>
-      <div>
-        <p>Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener.</p>
-        <p>Lo que apuntas se guarda solo en tu navegador. Usa «Descargar mi trabajo» para no perderlo. Y si vas a por esas webs, no compres enlaces.</p>
-      </div>
-    </div>
+  <section id="ejercicios">
+    <span class="mono">Ejercicios</span>
+    <h2>Para practicar después</h2>
+    <ul class="exercises">
+      <li><a href="donde-deberias-estar/">
+        <span class="mono">Microherramienta</span>
+        <strong>Dónde deberías estar</strong>
+        <span>Saca la lista de webs que cita la IA cuando preguntan por lo que vendes.</span>
+        <em>Ver el ejercicio →</em>
+      </a></li>
+    </ul>
   </section>
 
   <footer>
