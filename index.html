@@ -83,11 +83,13 @@
   section { padding: 0; border-bottom: 0; }
   .list { margin: 0; padding: 0; list-style: none; }
   section { padding-bottom: 56px; }
-  .list a { display: grid; grid-template-columns: 1fr auto; gap: 6px 24px; align-items: baseline; padding: 22px 4px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background-color 200ms var(--ease); }
-  .list a:hover { background: var(--bg-elevated); }
-  .list strong { font-size: 18px; font-weight: 500; color: var(--fg-strong); }
-  .list .mono { grid-column: 2; grid-row: 1; }
-  .list span:last-child { grid-column: 1 / -1; font-size: 14px; color: var(--fg-muted); }
+  /* Cada charla en una sola línea: el título, dónde fue y qué hay (vídeo, diapositivas o ejercicios). */
+  .list a { display: grid; grid-template-columns: minmax(0, 1fr) auto 104px; align-items: baseline; gap: 20px; padding: 15px 4px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background-color 150ms var(--ease); }
+  .list a:hover { background: rgba(255, 255, 255, 0.03); }
+  .list strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .list .ev { font-size: 13px; color: var(--fg-muted); white-space: nowrap; }
+  .list .tp { font-size: 12px; color: rgba(163, 163, 163, 0.6); text-align: right; white-space: nowrap; }
+  @media (max-width: 640px) { .list a { grid-template-columns: minmax(0, 1fr) auto; } .list .ev { display: none; } .list strong { white-space: normal; } }
   /* Cabecera única: marca, quién da las charlas, de qué va la página y sus perfiles. */
   .head { padding: 48px 0 40px; border-bottom: 1px solid var(--border); }
   .head__me { display: flex; align-items: center; gap: 18px; }
@@ -181,21 +183,21 @@
   <section>
     <h2 class="list-title">Charlas</h2>
     <ul class="list">
-      <li><a href="geo-primeros-pasos/"><strong>Primeros pasos para salir en ChatGPT y en la IA de Google</strong><span class="mono">Vídeo y ejercicios</span><span>Webinar de Raiola Networks · #RaiolaWebinar</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=nx92nCa2xGU" target="_blank" rel="noopener"><strong>Programar herramientas con IA: Vibe Coding, de la idea al producto en 30 días</strong><span class="mono">Vídeo</span><span>IKAUE</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=bpOIuwBDFNw" target="_blank" rel="noopener"><strong>SEO e IA para eCommerce: las claves para optimizar tu tienda online</strong><span class="mono">Vídeo</span><span>Campamento Web · #301</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/optimizando-la-autoria-de-los-contenidos-en-el-e-commerce/269720826" target="_blank" rel="noopener"><strong>Optimizando la autoría de los contenidos en el e-commerce</strong><span class="mono">Diapositivas</span><span>AndaluSEO</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/como-optimizar-la-calidad-y-relevancia-de-los-contenidos-de-tu-e-commerce/269720610" target="_blank" rel="noopener"><strong>Cómo optimizar la calidad y relevancia de los contenidos de tu e-commerce</strong><span class="mono">Diapositivas</span><span>SEOnthebeach</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/estrategia-de-enlazado-interno-en-ecommerce/252028870" target="_blank" rel="noopener"><strong>Estrategia de enlazado interno en e-commerce</strong><span class="mono">Diapositivas</span><span>SEOnthebeach</span></a></li>
-      <li><a href="https://www.youtube.com/live/pYX_qF9UMII?t=5355" target="_blank" rel="noopener"><strong>Ponencia en RMC20 Online</strong><span class="mono">Vídeo</span><span>Raiola Marketing Conference</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=X-58v5oIACg" target="_blank" rel="noopener"><strong>Controlando un proyecto SEO desde la Dirección o Dpto. Marketing</strong><span class="mono">Vídeo</span><span>Almería Digital Day</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=0smWM9TeboA" target="_blank" rel="noopener"><strong>Arquitectura y estructura web</strong><span class="mono">Vídeo</span><span>Webpositer Academy · #DoYouSEO</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=10RoG0gB2lk" target="_blank" rel="noopener"><strong>Enlazado interno para eCommerce</strong><span class="mono">Vídeo</span><span>TOP SEO</span></a></li>
-      <li><a href="https://www.youtube.com/watch?v=U4uO6MaH2Ec" target="_blank" rel="noopener"><strong>Cómo hacer enlazado interno como un PRO</strong><span class="mono">Vídeo</span><span>Campamento Web · #178</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/adapta-tu-ecommerce-al-nuevo-algoritmo-psdspain/238796680" target="_blank" rel="noopener"><strong>Adapta tu e-commerce al nuevo algoritmo</strong><span class="mono">Diapositivas</span><span>PrestaShop Day Spain</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/seo-para-ecommerce-en-tiempos-de-covid19/239079804" target="_blank" rel="noopener"><strong>SEO para e-commerce en tiempos de COVID-19</strong><span class="mono">Diapositivas</span><span>&nbsp;</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/enlazado-interno-para-ecommerce/234757032" target="_blank" rel="noopener"><strong>Enlazado interno para e-commerce</strong><span class="mono">Diapositivas</span><span>&nbsp;</span></a></li>
-      <li><a href="https://es.slideshare.net/slideshow/kpis-para-seo/138243331" target="_blank" rel="noopener"><strong>KPIs para SEO</strong><span class="mono">Diapositivas</span><span>Meetup</span></a></li>
+      <li><a href="geo-primeros-pasos/"><strong>Primeros pasos para salir en ChatGPT y en la IA de Google</strong><span class="ev">Raiola Networks</span><span class="tp">Vídeo y ejercicios</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=nx92nCa2xGU" target="_blank" rel="noopener"><strong>Programar herramientas con IA: Vibe Coding</strong><span class="ev">IKAUE</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=bpOIuwBDFNw" target="_blank" rel="noopener"><strong>SEO e IA para eCommerce</strong><span class="ev">Campamento Web</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/optimizando-la-autoria-de-los-contenidos-en-el-e-commerce/269720826" target="_blank" rel="noopener"><strong>Optimizando la autoría de los contenidos en el e-commerce</strong><span class="ev">AndaluSEO</span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/como-optimizar-la-calidad-y-relevancia-de-los-contenidos-de-tu-e-commerce/269720610" target="_blank" rel="noopener"><strong>Calidad y relevancia de los contenidos de un e-commerce</strong><span class="ev">SEOnthebeach</span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/estrategia-de-enlazado-interno-en-ecommerce/252028870" target="_blank" rel="noopener"><strong>Estrategia de enlazado interno en e-commerce</strong><span class="ev">SEOnthebeach</span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://www.youtube.com/live/pYX_qF9UMII?t=5355" target="_blank" rel="noopener"><strong>Ponencia en RMC20 Online</strong><span class="ev">Raiola Marketing Conference</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=X-58v5oIACg" target="_blank" rel="noopener"><strong>Controlar un proyecto SEO desde dirección o marketing</strong><span class="ev">Almería Digital Day</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=0smWM9TeboA" target="_blank" rel="noopener"><strong>Arquitectura y estructura web</strong><span class="ev">Webpositer Academy</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=10RoG0gB2lk" target="_blank" rel="noopener"><strong>Enlazado interno para eCommerce</strong><span class="ev">TOP SEO</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://www.youtube.com/watch?v=U4uO6MaH2Ec" target="_blank" rel="noopener"><strong>Cómo hacer enlazado interno como un PRO</strong><span class="ev">Campamento Web</span><span class="tp">Vídeo</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/adapta-tu-ecommerce-al-nuevo-algoritmo-psdspain/238796680" target="_blank" rel="noopener"><strong>Adapta tu e-commerce al nuevo algoritmo</strong><span class="ev">PrestaShop Day Spain</span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/seo-para-ecommerce-en-tiempos-de-covid19/239079804" target="_blank" rel="noopener"><strong>SEO para e-commerce en tiempos de COVID-19</strong><span class="ev"></span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/enlazado-interno-para-ecommerce/234757032" target="_blank" rel="noopener"><strong>Enlazado interno para e-commerce</strong><span class="ev"></span><span class="tp">Diapositivas</span></a></li>
+      <li><a href="https://es.slideshare.net/slideshow/kpis-para-seo/138243331" target="_blank" rel="noopener"><strong>KPIs para SEO</strong><span class="ev">Meetup</span><span class="tp">Diapositivas</span></a></li>
     </ul>
     <p class="more-link"><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Más charlas y entrevistas en mi perfil de Blinders <span aria-hidden="true">→</span></a></p>
   </section>
