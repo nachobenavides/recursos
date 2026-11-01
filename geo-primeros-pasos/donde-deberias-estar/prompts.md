@@ -4,7 +4,7 @@
 
 ## Sacar las preguntas de tu cliente
 
-Para el [paso 2](guia.md#paso-2--saca-las-preguntas-de-tu-cliente). Adjunta el archivo de **Consultas** que exportaste de Search Console.
+Para el paso 2 de la microherramienta. Adjunta el archivo de **Consultas** que exportaste de Search Console.
 
 ```text
 Te adjunto las consultas de Google Search Console de la página de [PRODUCTO O SERVICIO] de mi web, [WEB]. Vendo a [TIPO DE CLIENTE] en [PAÍS O CIUDAD].

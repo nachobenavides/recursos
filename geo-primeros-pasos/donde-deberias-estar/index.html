@@ -68,10 +68,11 @@
   .links { display: flex; flex-wrap: wrap; gap: 10px; }
 
   /* Aviso: qué es y qué no es esta herramienta. */
-  .notice { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); }
-  .notice .mono { padding-top: 3px; }
+  /* Aviso destacado bajo la cabecera: qué es y qué no es, antes de abrir la herramienta. */
+  .notice { max-width: 620px; margin-top: 32px; padding: 18px 20px; border: 1px solid var(--border-strong); border-left: 2px solid var(--fg-strong); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.04); }
+  .notice strong { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
   .notice p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--fg); }
-  .notice p + p { margin-top: 8px; color: var(--fg-muted); }
+  .notice p + p { margin-top: 4px; color: var(--fg-muted); }
 
   footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 32px 0 48px; border-top: 1px solid var(--border); }
   .author { display: flex; align-items: center; gap: 14px; text-decoration: none; }
@@ -90,7 +91,6 @@
     .lead { font-size: 17px; }
     .actions .btn { flex: 1 1 100%; }
     .steps { grid-template-columns: 1fr; }
-    .notice { grid-template-columns: 1fr; gap: 6px; }
   }
 </style>
 </head>
@@ -112,7 +112,12 @@
     <p class="lead">Saca la lista de webs que cita la IA cuando preguntan por lo que vendes, con una microherramienta gratuita.</p>
     <div class="actions">
       <a class="btn btn--primary" href="herramienta.html">Abrir la microherramienta</a>
-      <a class="btn btn--secondary" href="https://github.com/nachobenavides/recursos/blob/main/geo-primeros-pasos/donde-deberias-estar/guia.md" target="_blank" rel="noopener">Guía paso a paso</a>
+      <a class="btn btn--secondary" href="../#webinar">Ver el webinar</a>
+    </div>
+    <div class="notice">
+      <strong>Antes de empezar</strong>
+      <p>Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener.</p>
+      <p>Lo que apuntas se guarda solo en tu navegador. Usa «Descargar mi trabajo» para no perderlo.</p>
     </div>
   </div>
 
@@ -125,16 +130,6 @@
       <li><span class="n">03</span><h3>Webs citadas</h3><p>Hazlas en ChatGPT y en el Modo IA y apunta qué webs citan.</p></li>
       <li><span class="n">04</span><h3>Dónde deberías estar</h3><p>Las webs que más cita la IA: ahí te interesa aparecer.</p></li>
     </ol>
-  </section>
-
-  <section>
-    <div class="notice">
-      <span class="mono">Aviso</span>
-      <div>
-        <p>Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener.</p>
-        <p>Lo que apuntas se guarda solo en tu navegador. Usa «Descargar mi trabajo» para no perderlo. Y si vas a por esas webs, no compres enlaces. Si prefieres tenerlo todo en tu ordenador, <a href="https://github.com/nachobenavides/recursos/archive/refs/heads/main.zip">descárgalo en un ZIP</a>.</p>
-      </div>
-    </div>
   </section>
 
 </div>

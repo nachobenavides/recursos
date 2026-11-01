@@ -13,21 +13,20 @@ Son 4 pasos y se hacen por partes, en unas horas en total. Al final tienes la li
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
 4. Mira la lista de webs donde deberías estar.
 
-Empieza por la [guía](guia.md).
+Abre la [microherramienta](herramienta.html): cada paso te dice qué hacer. Si quieres verlo explicado, está en el [webinar](https://www.youtube.com/watch?v=6g-6_lXTBE4).
 
 ## Qué hay en la carpeta
 
 ```
-guia.md                  La guía en 4 pasos
 prompts.md               Prompt de apoyo para el paso 2
 herramienta.html         Microherramienta para llevar el control del ejercicio
 ```
 
 ## Cómo usarlo
 
-La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/donde-deberias-estar/): desde ahí abres la microherramienta y la guía sin descargar nada.
+La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/donde-deberias-estar/): desde ahí abres la microherramienta sin descargar nada.
 
-Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después **Download ZIP**. Descomprime la carpeta, lee los archivos `.md` en cualquier editor de texto y abre `herramienta.html` con doble clic: se abre en tu navegador y no necesita instalar nada.
+Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después **Download ZIP**. Descomprime la carpeta y abre `herramienta.html` con doble clic: se abre en tu navegador y no necesita instalar nada.
 
 Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. Pulsa «Descargar mi trabajo» de vez en cuando para no perderlo.
 
