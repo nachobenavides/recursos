@@ -63,13 +63,18 @@
   .steps h3 { margin: 10px 0 6px; font-size: 17px; font-weight: 500; color: var(--fg-strong); }
   .steps p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg-muted); }
 
-  /* Los ejercicios de la charla, una tarjeta por ejercicio. */
-  .exercises { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .exercises a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 22px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.02); text-decoration: none; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
-  .exercises a:hover { border-color: var(--border-strong); background: rgba(255, 255, 255, 0.04); }
-  .exercises strong { font-size: 18px; font-weight: 500; color: var(--fg-strong); }
-  .exercises span:not(.mono) { font-size: 14px; color: var(--fg-muted); }
-  .exercises em { margin-top: 8px; font-style: normal; font-size: 14px; color: var(--fg-strong); }
+  /* Los ejercicios de la charla: una fila fina por ejercicio, como un listado. */
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 72px; }
+  .exercises { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .exercises a { display: grid; grid-template-columns: 32px auto minmax(0, 1fr) auto 20px; align-items: center; gap: 16px; padding: 18px 8px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background-color 150ms var(--ease); }
+  .exercises a:hover { background: rgba(255, 255, 255, 0.03); }
+  .ex__n { font: 11px var(--mono); letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.6); }
+  .exercises strong { font-size: 16px; font-weight: 500; color: var(--fg-strong); white-space: nowrap; }
+  .ex__d { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: var(--fg-muted); }
+  .ex__tag { height: 24px; display: inline-flex; align-items: center; padding: 0 10px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 12px; color: var(--fg-muted); }
+  .ex__go { color: var(--fg-muted); transition: transform 150ms var(--ease), color 150ms var(--ease); }
+  .exercises a:hover .ex__go { color: var(--fg-strong); transform: translateX(3px); }
 
   /* Aviso: qué es y qué no es esta herramienta. */
   .notice { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-lg); }
@@ -93,7 +98,8 @@
     .hero { padding: 24px 0 40px; }
     .lead { font-size: 17px; }
     .actions .btn { flex: 1 1 100%; }
-    .steps, .exercises { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .exercises a { grid-template-columns: 28px minmax(0, 1fr) 20px; } .ex__d, .ex__tag { display: none; }
     .notice { grid-template-columns: 1fr; gap: 6px; }
   }
 </style>
@@ -135,10 +141,11 @@
     <h2>Para practicar después</h2>
     <ul class="exercises">
       <li><a href="donde-deberias-estar/">
-        <span class="mono">Microherramienta</span>
+        <span class="ex__n">01</span>
         <strong>Dónde deberías estar</strong>
-        <span>Saca la lista de webs que cita la IA cuando preguntan por lo que vendes.</span>
-        <em>Ver el ejercicio →</em>
+        <span class="ex__d">Las webs que cita la IA sobre lo que vendes</span>
+        <span class="ex__tag">Microherramienta</span>
+        <span class="ex__go" aria-hidden="true">→</span>
       </a></li>
     </ul>
   </section>
