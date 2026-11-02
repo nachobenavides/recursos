@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../../favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="../../favicon-192.png">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<title>¿Está bien tu feed? · Microherramienta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b0b; --bg-elevated: #111111; --border: #2b2b2b; --border-strong: #404040;
+    --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
+    --success: #10b981; --error: #ef4444;
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-full: 9999px;
+    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.18);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--fg-strong); }
+  code { font: 12.5px var(--mono); color: var(--fg-strong); }
+  .mono { font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
+
+  /* La misma carcasa que «Dónde deberías estar»: menú a la izquierda y el contenido en una tarjeta. */
+  .app { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; }
+  aside { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 28px 16px 24px; }
+  .side-brand { display: inline-flex; align-items: center; gap: 8px; margin: 0 12px 28px; color: var(--fg-muted); text-decoration: none; font-size: 13px; }
+  .side-brand img { width: 22px; height: 22px; object-fit: contain; }
+  .side-brand:hover { color: var(--fg-strong); }
+  .side-title { padding: 0 12px 10px; }
+  .nav { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 14px; padding: 9px 12px; border-radius: var(--r-md); cursor: pointer; font-size: 14px; color: var(--fg-muted); transition: background-color 200ms var(--ease), color 200ms var(--ease); }
+  .nav:hover { color: var(--fg-strong); background: rgba(17, 17, 17, 0.6); }
+  .nav .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.4); }
+  .nav.is-locked { opacity: 0.35; cursor: not-allowed; }
+  .nav.is-locked:hover { color: var(--fg-muted); background: none; }
+  .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-muted); white-space: nowrap; }
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot--success { background: var(--success); }
+  .dot--error { background: var(--error); }
+  .dot--faint { background: rgba(163, 163, 163, 0.35); }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+
+  main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 24px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
+  .intro { margin: 0 -24px; padding: 16px 24px; border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  .intro__row { display: flex; align-items: center; gap: 14px; }
+  .intro__row img { flex: none; width: 26px; height: 26px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
+  h1 { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.4; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+
+  .spacer { flex: 1 0 48px; }
+  footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
+  footer.credit { align-items: center; }
+  .credit__sig { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); text-decoration: none; }
+  .credit__sig img { width: 18px; height: 18px; object-fit: contain; opacity: 0.85; }
+  .credit__sig strong { font-weight: 500; color: var(--fg); }
+  .credit__sig:hover strong, .credit__talk:hover { color: var(--fg-strong); }
+  .credit__talk { text-decoration: none; }
+
+  /* Entrada: un área para soltar o elegir los archivos de logs. */
+  form { margin-top: 28px; max-width: 760px; display: grid; gap: 10px; }
+  .drop { position: relative; display: grid; place-items: center; gap: 6px; min-height: 180px; padding: 24px; border: 1px dashed var(--border-strong); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.03); text-align: center; cursor: pointer; transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
+  .drop:hover, .drop.is-over { border-color: var(--fg-muted); background: rgba(255, 255, 255, 0.05); }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop strong { font-weight: 500; color: var(--fg-strong); }
+  .drop span { font-size: 13px; color: var(--fg-muted); }
+  form small { font-size: 13px; color: var(--fg-muted); }
+  .msg { margin: 0; font-size: 13px; color: var(--fg-muted); }
+  .msg.is-bad { color: var(--error); }
+
+  /* Resultado */
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 760px; border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
+  .metric { padding: 20px 22px; }
+  .metric + .metric { border-left: 1px solid var(--border); }
+  .metric b { display: block; margin-bottom: 6px; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .metric span { font-size: 13px; color: var(--fg-muted); }
+  .kind { margin-top: 32px; scroll-margin-top: 16px; }
+  .kind h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .kind > p { margin: 2px 0 12px; font-size: 13px; color: var(--fg-muted); }
+  /* Filas: una columna por dato, con su cabecera, como el ranking de «Dónde deberías estar». */
+  .cols, .bot__row { display: grid; grid-template-columns: 180px minmax(120px, 1fr) 130px 80px 80px 90px 16px; gap: 16px; align-items: center; }
+  .cols { padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); }
+  .cols .r, .bot__n { text-align: right; }
+  .bots { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .bot { border-bottom: 1px solid var(--border); }
+  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 180px minmax(120px, 1fr) 130px 80px 80px 90px 16px; gap: 16px; align-items: center; padding: 12px 4px; }
+  .bot__row:hover { background: rgba(255, 255, 255, 0.02); }
+  .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
+  .bot__who { font-size: 13px; color: var(--fg); min-width: 0; }
+  .bot__n { font: 13px var(--mono); color: var(--fg); }
+  .bot__n.is-bad { color: #fca5a5; }
+  .bot__n.is-none { color: rgba(163, 163, 163, 0.4); }
+  .state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg-strong); }
+  .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
+  .bot.is-open .chev { transform: rotate(180deg); }
+  /* Desplegable: respuestas y páginas, lado a lado, en una tarjeta bajo la fila. */
+  .bot__more { display: none; margin: 0 4px 14px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.02); }
+  .bot.is-open .bot__more { display: block; }
+  .more__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 28px; }
+  .more__title { margin: 0 0 10px; }
+  .codes, .pages { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .codes li { display: grid; grid-template-columns: 40px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font: 12px var(--mono); color: var(--fg); }
+  .codes li span:last-child, .pages li span:last-child { text-align: right; color: var(--fg-muted); }
+  .bar { height: 6px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: inherit; background: var(--success); }
+  .codes li.is-bad { color: #fca5a5; }
+  .codes li.is-bad .bar i { background: var(--error); }
+  .codes li.is-gone .bar i { background: var(--fg-muted); }
+  .pages li { display: flex; justify-content: space-between; gap: 16px; font: 12px var(--mono); color: var(--fg); }
+  .pages li span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pages li span:last-child { flex: none; }
+  .more__foot { margin: 14px 0 0; font-size: 13px; color: var(--fg-muted); }
+  .more__foot a { color: var(--fg); }
+  .warn { margin: 16px 0 0; max-width: 760px; font-size: 13px; color: var(--fg-muted); }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: minmax(0, 1fr); } aside { position: static; height: auto; padding-bottom: 12px; } .side-foot { margin-top: 20px; }
+    main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; }
+    .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
+    .cols { display: none; }
+    .bot__row { grid-template-columns: 1fr auto 16px; row-gap: 4px; }
+    .bot__who { grid-column: 1; grid-row: 2; }
+    .bot__row .state { grid-column: 2; grid-row: 1; }
+    .bot__n { grid-row: 3; text-align: left; }
+    .bot__n::before { content: attr(data-l) ' '; color: var(--fg-muted); }
+    .bot__n[data-k="v"] { grid-column: 1; } .bot__n[data-k="e"] { grid-column: 2; } .bot__n[data-k="u"] { display: none; }
+    .chev { grid-column: 3; grid-row: 1; }
+    .more__grid { grid-template-columns: 1fr; gap: 18px; }
+  }
+
+  /* Comprobaciones: nombre, atributo, estado y productos afectados. */
+  .cols, .bot__row { grid-template-columns: minmax(200px, 1fr) 190px 120px 90px 16px; }
+  .bot__row { grid-template-columns: minmax(200px, 1fr) 190px 120px 90px 16px; }
+  .bot__name { font-size: 14px; color: var(--fg-strong); }
+  .bot__attr { font: 12.5px var(--mono); color: var(--fg-muted); overflow-wrap: anywhere; }
+  .more__rule { margin: 0 0 12px; font-size: 13px; color: var(--fg); }
+  .more__rule a { color: var(--fg); }
+  .examples li span:first-child { color: var(--fg-strong); }
+  .examples li span:last-child { max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fca5a5; }
+  .ex__head { display: flex; justify-content: space-between; margin: 0 0 8px; }
+  .more__rule code { padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.04); }
+  @media (max-width: 860px) {
+    .bot__row { grid-template-columns: 1fr auto 16px; }
+    .bot__name { grid-column: 1; grid-row: 1; }
+    .bot__attr { grid-column: 1; grid-row: 2; }
+    .bot__n[data-k="n"] { grid-column: 1; grid-row: 3; }
+  }
+</style>
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <a class="side-brand" href="./"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Volver al ejercicio</a>
+    <div class="side-title mono">Comprobaciones</div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="side-title mono">Tu feed</div>
+      <button class="nav" id="reset">Subir otro feed</button>
+    </div>
+  </aside>
+  <main>
+    <header class="intro">
+      <div class="intro__row"><img src="data:image/jpeg;base64,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" alt="Nacho Benavides"><h1>¿Está bien tu feed?</h1></div>
+    </header>
+
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <label class="drop">
+        <input id="files" type="file" accept=".xml,.txt,.tsv,.csv,.gz,text/plain,text/xml,application/xml,application/gzip">
+        <strong>Suelta aquí tu feed o pulsa para elegirlo</strong>
+        <span>El archivo de productos que envías a Google Merchant Center: XML o texto con tabuladores, también en .gz.</span>
+      </label>
+      <p class="msg" id="msg" hidden></p>
+    </form>
+
+    <div id="result" hidden>
+      <div class="metrics" id="metrics"></div>
+      <p class="warn" id="warn" hidden></p>
+      <div id="kinds"></div>
+    </div>
+
+    <div class="spacer"></div>
+    <footer class="credit"><a class="credit__sig" href="https://blindersgroup.com/" target="_blank" rel="noopener"><img src="data:image/png;base64,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" alt="" width="18" height="18"><span>Una microherramienta de <strong>Blinders</strong></span></a><a class="mono credit__talk" href="../">#RaiolaWebinar</a></footer>
+  </main>
+</div>
+
+<script>
+// ---------- Lector de feeds ----------
+// Lee el feed por trozos y entrega cada producto como { atributo: [valores] }.
+// Formatos: texto separado por tabuladores o por comas (con cabecera) y XML (RSS 2.0 con <item> o Atom con <entry>).
+
+const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+const unxml = s => s
+  .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, c) => c.replace(/&/g, '\u0000amp;'))
+  .replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (m, e) => e[0] === '#' ? String.fromCodePoint(e[1].toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : +e.slice(1)) : ENT[e] ?? m)
+  .replace(/\u0000amp;/g, '&')
+  .trim();
+
+// Un <item> o <entry>: cada etiqueta hija es un atributo; las repetidas se acumulan.
+// Las que llevan subetiquetas (shipping, product_detail…) se guardan como texto «sub:valor».
+function readXmlItem(xml) {
+  const p = {};
+  const re = /<(?:g:)?([A-Za-z_]+)(?:\s[^>]*)?>([\s\S]*?)<\/(?:g:)?\1>|<(?:g:)?([A-Za-z_]+)(?:\s[^>]*?)?\/>/g;
+  let m;
+  while ((m = re.exec(xml))) {
+    const k = (m[1] || m[3]).toLowerCase();
+    let v = m[2] ?? '';
+    if (/<(?:g:)?[A-Za-z_]+[\s>]/.test(v)) {
+      const parts = [];
+      v.replace(/<(?:g:)?([A-Za-z_]+)(?:\s[^>]*)?>([\s\S]*?)<\/(?:g:)?\1>/g, (_, sk, sv) => { parts.push(sk.toLowerCase() + ':' + unxml(sv)); });
+      v = parts.join(':');
+    } else v = unxml(v);
+    // En Atom el enlace va en <link href="…"/>
+    if (k === 'link' && !v) { const h = /href="([^"]*)"/.exec(m[0]); if (h) v = unxml(h[1]); }
+    (p[k] = p[k] || []).push(v);
+  }
+  return p;
+}
+
+// Una línea de texto separado: respeta las comillas dobles (y las dobles dobles dentro).
+function splitRow(line, sep) {
+  if (!line.includes('"')) return line.split(sep);
+  const out = []; let cur = '', q = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (q) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"' && cur === '') q = true;
+    else if (c === sep) { out.push(cur); cur = ''; }
+    else cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+
+// Nombres de columna: «g:price», «Price» o «price [precio]» valen como «price».
+const colName = h => h.trim().replace(/^\uFEFF/, '').replace(/^g:/i, '').replace(/\s*\[.*\]$/, '').toLowerCase();
+
+async function readFeed(file, onProduct, onProgress) {
+  let stream = file.stream();
+  if (/\.gz$/i.test(file.name) || await isGzip(file)) stream = stream.pipeThrough(new DecompressionStream('gzip'));
+  const reader = stream.pipeThrough(new TextDecoderStream()).getReader();
+  let mode = null, buf = '', header = null, sep = '\t', n = 0, pending = '';
+  const emit = p => { n++; onProduct(p); };
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (value) buf += value;
+    if (!mode) {
+      const head = buf.replace(/^\uFEFF/, '').trimStart();
+      if (!head && !done) continue;
+      mode = head[0] === '<' ? 'xml' : 'text';
+    }
+    if (mode === 'xml') {
+      // Saca cada <item>…</item> o <entry>…</entry> completo y deja el resto en el búfer
+      const re = /<(item|entry)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/g;
+      let m, last = 0;
+      while ((m = re.exec(buf))) { emit(readXmlItem(m[2])); last = re.lastIndex; }
+      buf = buf.slice(last);
+      if (buf.length > 1e6 && !/<(item|entry)[\s>]/.test(buf)) buf = buf.slice(-2000);
+    } else {
+      const lines = (pending + buf).split(/\r?\n/);
+      buf = '';
+      pending = done ? '' : lines.pop();
+      for (const l of lines) {
+        if (!l.trim()) continue;
+        if (!header) {
+          sep = l.includes('\t') ? '\t' : l.includes(';') && !l.includes(',') ? ';' : ',';
+          header = splitRow(l, sep).map(colName);
+          continue;
+        }
+        const v = splitRow(l, sep), p = {};
+        header.forEach((h, i) => { const x = (v[i] ?? '').trim(); if (h) (p[h] = p[h] || []).push(...(x ? [x] : [])); });
+        emit(p);
+      }
+    }
+    onProgress(n);
+    if (done) break;
+  }
+  return { mode, sep, header, count: n };
+}
+
+async function isGzip(file) {
+  const b = new Uint8Array(await file.slice(0, 2).arrayBuffer());
+  return b[0] === 0x1f && b[1] === 0x8b;
+}
+
+// ---------- Comprobaciones ----------
+// Cada una sale de la especificación de datos de producto de Google Merchant Center, revisada el 2 de noviembre de 2026.
+const SPEC = 'https://support.google.com/merchants/answer/7052112';
+const val = (p, k) => (p[k] || []).find(x => x !== '') ?? null;
+const vals = (p, k) => (p[k] || []).filter(x => x !== '');
+const isUrl = v => /^https?:\/\/\S+$/i.test(v) && v.length <= 2000;
+
+// Dígito de control de GS1, para GTIN de 8, 12, 13 y 14 cifras.
+function gtinOk(d) {
+  const n = d.split('').map(Number), check = n.pop();
+  const sum = n.reverse().reduce((s, x, i) => s + x * (i % 2 ? 1 : 3), 0);
+  return (10 - sum % 10) % 10 === check;
+}
+// Prefijos que Google no acepta: los de uso restringido (02, 04, 2) y los de cupones (05, 98, 99).
+function gtinProblem(raw) {
+  const d = raw.replace(/[\s-]/g, '');
+  if (!/^\d+$/.test(d) || ![8, 12, 13, 14].includes(d.length)) return 'no tiene 8, 12, 13 o 14 cifras';
+  if (!gtinOk(d)) return 'el dígito de control no cuadra';
+  const core = d.padStart(14, '0').slice(1);
+  if (d.length > 8 && /^(2|02|04|05|98|99)/.test(core)) return 'empieza por un prefijo que Google no acepta';
+  return null;
+}
+
+const CHECKS = [
+  // Obligatorios: sin ellos, Google no muestra el producto
+  { id: 'id', rule: 'Obligatorio. Único y estable, de hasta 50 caracteres.', group: 'req', attr: 'id', name: 'Identificador', test: p => !val(p, 'id') && 'Falta' },
+  { id: 'title', rule: 'Obligatorio. Hasta 150 caracteres.', group: 'req', attr: 'title', name: 'Título', test: p => !val(p, 'title') && 'Falta' },
+  { id: 'description', rule: 'Obligatoria. Hasta 5000 caracteres.', group: 'req', attr: 'description', name: 'Descripción', test: p => !val(p, 'description') && 'Falta' },
+  { id: 'link', rule: 'Obligatorio. Empieza por http o https.', group: 'req', attr: 'link', name: 'Enlace a la página', test: p => !val(p, 'link') && 'Falta' },
+  { id: 'image_link', rule: 'Obligatorio. Empieza por http o https.', group: 'req', attr: 'image_link', name: 'Imagen principal', test: p => !val(p, 'image_link') && 'Falta' },
+  { id: 'availability', rule: 'Obligatoria: in_stock, out_of_stock, preorder o backorder.', group: 'req', attr: 'availability', name: 'Disponibilidad', test: p => !val(p, 'availability') && 'Falta' },
+  { id: 'price', rule: 'Obligatorio: número y moneda ISO 4217, como «89.95 EUR».', group: 'req', attr: 'price', name: 'Precio', test: p => !val(p, 'price') && 'Falta' },
+  { id: 'brand', rule: 'Obligatoria en productos nuevos, salvo películas, libros y música.', group: 'cond', attr: 'brand', name: 'Marca (productos nuevos)', test: p => { const c = (val(p, 'condition') || 'new').toLowerCase(); return c === 'new' && !val(p, 'brand') && 'Falta'; } },
+  { id: 'availability_date', rule: 'Obligatoria si la disponibilidad es preorder o backorder.', group: 'cond', attr: 'availability_date', name: 'Fecha de disponibilidad (preventa y bajo pedido)', test: p => /^(preorder|backorder)$/i.test(val(p, 'availability') || '') && !val(p, 'availability_date') && 'Falta' },
+
+  // Formato: valores que Google no acepta como están
+  { id: 'id_dup', expect: 'un id distinto en cada producto', rule: 'Cada producto necesita un identificador único.', group: 'fmt', attr: 'id', name: 'Identificador repetido', test: (p, st) => { const v = val(p, 'id'); if (!v) return false; if (st.ids.has(v)) return 'Falta'; st.ids.add(v); return false; } },
+  { id: 'id_len', expect: '50 caracteres como máximo', rule: 'Hasta 50 caracteres.', group: 'fmt', attr: 'id', name: 'Identificador, largo', test: p => (val(p, 'id') || '').length > 50 && val(p, 'id') },
+  { id: 'title_len', expect: '150 caracteres como máximo', rule: 'Hasta 150 caracteres.', group: 'fmt', attr: 'title', name: 'Título, largo', test: p => (val(p, 'title') || '').length > 150 && `${val(p, 'title').length} caracteres` },
+  { id: 'desc_len', expect: '5000 caracteres como máximo', rule: 'Hasta 5000 caracteres.', group: 'fmt', attr: 'description', name: 'Descripción, larga', test: p => (val(p, 'description') || '').length > 5000 && `${val(p, 'description').length} caracteres` },
+  { id: 'link_fmt', expect: 'https://… sin espacios', rule: 'Empieza por http o https, sin espacios y con hasta 2000 caracteres.', group: 'fmt', attr: 'link', name: 'Enlace a la página', test: p => { const v = val(p, 'link'); return v && !isUrl(v) && v; } },
+  { id: 'img_fmt', expect: 'https://… sin espacios', rule: 'Empieza por http o https, sin espacios y con hasta 2000 caracteres.', group: 'fmt', attr: 'image_link', name: 'Imagen principal', test: p => { const v = val(p, 'image_link'); return v && !isUrl(v) && v; } },
+  { id: 'avail_val', expect: 'in_stock · out_of_stock · preorder · backorder', rule: 'Valores: in_stock, out_of_stock, preorder o backorder.', group: 'fmt', attr: 'availability', name: 'Disponibilidad', test: p => { const v = val(p, 'availability'); return v && !/^(in_stock|out_of_stock|preorder|backorder)$/.test(v) && v; } },
+  { id: 'price_fmt', expect: '89.95 EUR', rule: 'Número con punto decimal y moneda ISO 4217, mayor que 0: «89.95 EUR».', group: 'fmt', attr: 'price', name: 'Precio', test: p => { const v = val(p, 'price'); if (!v) return false; const m = /^(\d+(?:\.\d+)?)\s+[A-Z]{3}$/.exec(v); return (!m || +m[1] <= 0) && v; } },
+  { id: 'sale_fmt', expect: '79.95 EUR', rule: 'Mismo formato que el precio: «79.95 EUR».', group: 'fmt', attr: 'sale_price', name: 'Precio rebajado', test: p => { const v = val(p, 'sale_price'); return v && !/^\d+(?:\.\d+)?\s+[A-Z]{3}$/.test(v) && v; } },
+  { id: 'cond_val', expect: 'new · refurbished · used', rule: 'Valores: new, refurbished o used.', group: 'fmt', attr: 'condition', name: 'Estado del producto', test: p => { const v = val(p, 'condition'); return v && !/^(new|refurbished|used)$/.test(v) && v; } },
+  { id: 'gtin_val', expect: '8, 12, 13 o 14 cifras, con su dígito de control y sin prefijos restringidos (02, 04, 2) ni de cupones', rule: '8, 12, 13 o 14 cifras, con su dígito de control, y sin prefijos restringidos (02, 04, 2) ni de cupones.', group: 'fmt', attr: 'gtin', name: 'GTIN', test: p => { const v = val(p, 'gtin'); if (!v) return false; const why = gtinProblem(v); return why && `${v}: ${why}`; } },
+  { id: 'brand_val', expect: 'la marca real, o vacío si no tiene', rule: 'Google pide no poner «N/A», «Generic», «No brand» ni «Does not exist». Si no tiene marca, déjala vacía.', group: 'fmt', attr: 'brand', name: 'Marca de relleno', test: p => { const v = val(p, 'brand'); return v && /^(n\/a|generic|no brand|does not exist)$/i.test(v.trim()) && v; } },
+  { id: 'idex_val', expect: 'yes · no · true · false', rule: 'Valores: yes, no, true o false.', group: 'fmt', attr: 'identifier_exists', name: 'Sin identificador', test: p => { const v = val(p, 'identifier_exists'); return v && !/^(yes|no|true|false)$/.test(v) && v; } },
+  { id: 'gender_val', expect: 'male · female · unisex', rule: 'Valores: male, female o unisex.', group: 'fmt', attr: 'gender', name: 'Género', test: p => { const v = val(p, 'gender'); return v && !/^(male|female|unisex)$/.test(v) && v; } },
+  { id: 'hl_val', expect: 'de 2 a 100 puntos, de hasta 150 caracteres', rule: 'Entre 2 y 100 puntos, de hasta 150 caracteres cada uno.', group: 'fmt', attr: 'product_highlight', name: 'Puntos destacados', test: p => { const v = vals(p, 'product_highlight'); if (!v.length) return false; if (v.length < 2) return 'solo 1'; const l = v.find(x => x.length > 150); return l ? `${l.length} caracteres` : false; } },
+  { id: 'age_val', expect: 'newborn · infant · toddler · kids · adult', rule: 'Valores: newborn, infant, toddler, kids o adult.', group: 'fmt', attr: 'age_group', name: 'Edad', test: p => { const v = val(p, 'age_group'); return v && !/^(newborn|infant|toddler|kids|adult)$/.test(v) && v; } },
+
+  // Recomendados: no son obligatorios en España, pero ayudan a que Google entienda y muestre el producto
+  { id: 'gtin', rule: 'Si el fabricante le asignó un GTIN, hay que enviarlo; si no, el MPN. Solo con el archivo no sabemos si lo tiene: revísalo.', warn: true, group: 'cond', attr: 'gtin', name: 'GTIN o MPN', test: p => !val(p, 'gtin') && !val(p, 'mpn') && !/^(no|false)$/.test(val(p, 'identifier_exists') || '') && 'Falta' },
+
+  // Más allá del mínimo: no son obligatorios, pero explican mejor tu producto
+  { id: 'ctx_product_type', group: 'more', attr: 'product_type', name: 'Tipo de producto', rule: 'Tu categoría, con su ruta completa.', test: p => !val(p, 'product_type') && 'Falta' },
+  { id: 'ctx_google_product_category', group: 'more', attr: 'google_product_category', name: 'Categoría de Google', rule: 'Un número o una ruta de la taxonomía de Google.', test: p => !val(p, 'google_product_category') && 'Falta' },
+  { id: 'ctx_product_detail', group: 'more', attr: 'product_detail', name: 'Ficha técnica', rule: 'Pares de dato y valor, como «Peso: 250 g».', test: p => !val(p, 'product_detail') && 'Falta' },
+  { id: 'ctx_product_highlight', group: 'more', attr: 'product_highlight', name: 'Puntos destacados', rule: 'De 2 a 100 frases cortas sobre el producto.', test: p => !val(p, 'product_highlight') && 'Falta' },
+];
+
+const GROUPS = {
+  req: { title: 'Obligatorios', short: 'Obligatorios', text: 'Siempre. Sin ellos, Google no muestra el producto.' },
+  cond: { title: 'Condicionales', short: 'Condicionales', text: 'Obligatorios en algunos casos.' },
+  fmt: { title: 'Formato', short: 'Formato', text: 'Valores que Google no acepta tal como están.' },
+  more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto.' },
+};
+
+const isErr = c => c.group !== 'more' && !c.warn;
+
+function emptyStats() {
+  return { products: 0, bad: 0, ids: new Set(), checks: CHECKS.map(() => ({ n: 0, ex: [] })) };
+}
+
+function checkProduct(st, p) {
+  st.products++;
+  let bad = false;
+  const pid = val(p, 'id') || `(fila ${st.products})`;
+  CHECKS.forEach((c, i) => {
+    const r = c.test(p, st);
+    if (!r) return;
+    const s = st.checks[i];
+    s.n++;
+    if (s.ex.length < 10) s.ex.push([pid, r === 'Falta' ? '' : String(r)]);
+    if (isErr(c)) bad = true;
+  });
+  if (bad) st.bad++;
+}
+
+// ---------- Interfaz ----------
+// Cuenta el uso de la herramienta en GoatCounter: solo el nombre del evento, nunca el feed.
+const track = name => { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) {} };
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = n => n.toLocaleString('es-ES');
+let results = null, busy = false;
+
+function say(text, bad) { const el = $('#msg'); el.textContent = text; el.hidden = !text; el.classList.toggle('is-bad', !!bad); }
+
+const drop = $('.drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('is-over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('is-over')));
+drop.addEventListener('drop', e => { e.preventDefault(); run([...e.dataTransfer.files]); });
+$('#files').addEventListener('change', e => run([...e.target.files]));
+$('#reset').addEventListener('click', () => { $('#files').value = ''; say(''); results = null; $('#result').hidden = true; renderNav(); window.scrollTo({ top: 0 }); });
+
+async function run(files) {
+  if (!files.length || busy) return;
+  busy = true;
+  results = null; $('#result').hidden = true; renderNav();
+  const st = emptyStats();
+  const f = files[0];
+  try {
+    say(`Leyendo ${f.name}…`);
+    const info = await readFeed(f, p => checkProduct(st, p), n => say(`Leyendo ${f.name}… ${num(n)} productos`));
+    if (!st.products) return say('No encontramos productos en ese archivo. Tiene que ser un feed en XML o en texto con tabuladores, con una fila de cabecera.', true);
+    say('');
+    render(st, info);
+    track('feed-comprobar');
+  } catch (err) {
+    say('No hemos podido leer el archivo. Tiene que ser XML o texto, o uno de los dos comprimido en .gz.', true);
+  } finally { busy = false; $('#files').value = ''; }
+}
+
+function stateOf(c, s) {
+  if (!s.n) return ['dot--success', 'Bien'];
+  if (c.group === 'fmt') return ['dot--error', 'Incorrecto'];
+  return [isErr(c) ? 'dot--error' : 'dot--faint', 'Falta'];
+}
+
+function render(st, info) {
+  results = CHECKS.map((c, i) => ({ ...c, ...st.checks[i] }));
+  const fmt = info.mode === 'xml' ? 'XML' : info.sep === '\t' ? 'Texto con tabuladores' : info.sep === ',' ? 'Texto con comas' : 'Texto con punto y coma';
+  $('#metrics').innerHTML =
+    `<div class="metric"><b>${num(st.products)}</b><span>${st.products === 1 ? 'producto' : 'productos'}</span></div>` +
+    `<div class="metric"><b>${num(st.bad)}</b><span>con algún error</span></div>` +
+    `<div class="metric"><b>${esc(fmt)}</b><span>formato del archivo</span></div>`;
+  const warn = [];
+  if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
+  if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
+  $('#warn').innerHTML = warn.map(esc).join(' ');
+  $('#warn').hidden = !warn.length;
+  $('#kinds').innerHTML = Object.entries(GROUPS).map(([k, g]) => `
+    <section class="kind" id="k-${k}"><h2>${g.title}</h2><p>${g.text}</p>
+      <div class="cols"><span>Comprobación</span><span>Atributo</span><span>Estado</span><span class="r">Productos</span><span></span></div>
+      <ul class="bots">${results.filter(r => r.group === k).map(row).join('')}</ul></section>`).join('');
+  $('#result').hidden = false;
+  renderNav();
+}
+
+function row(r) {
+  const [dot, label] = stateOf(r, r);
+  const link = `<a href="${SPEC}" target="_blank" rel="noopener">Especificación de Google</a>`;
+  const missing = r.group !== 'fmt';
+  const ex = r.ex.map(([id, v]) => `<li><span title="${esc(id)}">${esc(id)}</span>${missing ? '' : `<span title="${esc(v)}">${esc(v)}</span>`}</li>`).join('');
+  const head = r.n > r.ex.length ? `Primeros ${r.ex.length} de ${num(r.n)}` : r.n === 1 ? 'El producto' : 'Los productos';
+  const rule = r.expect ? `<p class="more__rule">Tiene que ser: <code>${esc(r.expect)}</code>. ${link}.</p>` : `<p class="more__rule">${esc(r.rule)} ${link}.</p>`;
+  const more = rule + (r.n ? `<div class="ex__head mono"><span>${missing ? head + ' sin este dato' : head}</span>${missing ? '' : '<span>Tiene</span>'}</div><ul class="pages examples">${ex}</ul>` : '');
+  return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
+      <span class="bot__name">${esc(r.name)}</span>
+      <span class="bot__attr">${esc(r.attr)}</span>
+      <span class="state"><span class="dot ${dot}"></span>${label}</span>
+      <span class="bot__n ${r.n ? (isErr(r) ? 'is-bad' : '') : 'is-none'}" data-k="n" data-l="Productos">${r.n ? num(r.n) : '—'}</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+    <div class="bot__more">${more}</div></li>`;
+}
+
+// Menú: un punto por grupo; rojo si hay errores, gris si faltan recomendados y verde si todo está bien.
+function renderNav() {
+  $('#nav').innerHTML = Object.entries(GROUPS).map(([k, g], i) => {
+    const rows = results ? results.filter(r => r.group === k) : [];
+    const n = rows.reduce((s, r) => s + (r.n ? 1 : 0), 0);
+    const dot = !n ? 'dot--success' : rows.some(r => r.n && isErr(r)) ? 'dot--error' : 'dot--faint';
+    const tip = !n ? 'Todo bien' : `${n} ${n === 1 ? 'comprobación' : 'comprobaciones'} con problemas`;
+    return `<button class="nav ${results ? '' : 'is-locked'}" data-k="${k}" title="${results ? tip : 'Sube primero tu feed'}"><span class="n">0${i + 1}</span><span>${g.short}</span><span class="c">${results ? `<span class="dot ${dot}"></span>` : ''}</span></button>`;
+  }).join('');
+}
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('[data-k]');
+  if (b && results) document.getElementById('k-' + b.dataset.k).scrollIntoView({ behavior: 'smooth' });
+});
+$('#kinds').addEventListener('click', e => {
+  const r = e.target.closest('.bot__row');
+  if (!r) return;
+  const li = r.parentElement;
+  li.classList.toggle('is-open');
+  r.setAttribute('aria-expanded', li.classList.contains('is-open'));
+});
+
+renderNav();
+</script>
+</body>
+</html>
