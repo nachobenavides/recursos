@@ -41,7 +41,7 @@
   .nav .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.4); }
   .nav.is-locked { opacity: 0.35; cursor: not-allowed; }
   .nav.is-locked:hover { color: var(--fg-muted); background: none; }
-  .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
+  .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--fg-muted); white-space: nowrap; }
   .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
   .dot--success { background: var(--success); }
   .dot--error { background: var(--error); }
@@ -110,6 +110,8 @@
     .chev { grid-column: 3; grid-row: 1; }
   }
 </style>
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="app">
@@ -268,7 +270,7 @@ const BOTS = [
   {
     "token": "meta-externalfetcher",
     "company": "Meta",
-    "product": "Meta AI",
+    "product": "Sus productos de IA",
     "kind": "user",
     "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers",
     "note": "Su empresa avisa de que puede no respetar el robots.txt."
@@ -322,7 +324,7 @@ const BOTS = [
   {
     "token": "meta-externalagent",
     "company": "Meta",
-    "product": "Entrenar sus modelos",
+    "product": "Entrenar modelos y mejorar productos",
     "kind": "train",
     "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers"
   },
@@ -337,7 +339,7 @@ const BOTS = [
 
 const KINDS = {
   search: { title: 'Buscadores', short: 'Buscadores', text: 'Rastrean tu web para que su buscador o su IA puedan mostrarte.' },
-  user: { title: 'Visitas que pide una persona', short: 'Visitas a petición', text: 'Entran cuando alguien le pide a la IA que lea una página.' },
+  user: { title: 'Visitas que pide una persona', short: 'A petición', text: 'Entran cuando alguien le pide a la IA que lea una página.' },
   train: { title: 'Entrenamiento de modelos', short: 'Entrenamiento', text: 'Recogen contenido para entrenar modelos de IA.' },
 };
 
@@ -400,6 +402,8 @@ function evaluate(parsed, token, path) {
 }
 
 // ---------- Interfaz ----------
+// Cuenta el uso de la herramienta en GoatCounter: solo el nombre del evento, nunca lo que se pega o se sube.
+const track = name => { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) {} };
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 let lastText = null, results = null;
@@ -416,8 +420,10 @@ function renderNav() {
   $('#nav').innerHTML = Object.entries(KINDS).map(([k, info], i) => {
     const rows = results ? results.filter(r => r.kind === k) : [];
     const no = rows.filter(r => r.allowed === false).length;
-    const c = !results ? '' : no ? `${no}<span class="dot dot--error"></span>` : '<span class="dot dot--success"></span>';
-    return `<button class="nav ${results ? '' : 'is-locked'}" data-k="${k}" ${results ? '' : 'title="Comprueba primero tu robots.txt"'}><span class="n">0${i + 1}</span><span>${info.short}</span><span class="c">${c}</span></button>`;
+    // Solo un punto: rojo si hay alguno bloqueado; el detalle, al pasar el ratón
+    const tip = no ? `${no} ${no === 1 ? 'bloqueado' : 'bloqueados'}` : 'Todos entran';
+    const c = results ? `<span class="dot ${no ? 'dot--error' : 'dot--success'}"></span>` : '';
+    return `<button class="nav ${results ? '' : 'is-locked'}" data-k="${k}" title="${results ? tip : 'Comprueba primero tu robots.txt'}"><span class="n">0${i + 1}</span><span>${info.short}</span><span class="c">${c}</span></button>`;
   }).join('');
 }
 $('#nav').addEventListener('click', e => {
@@ -432,6 +438,7 @@ $('#form').addEventListener('submit', e => {
   if (!txt.trim()) { $('#msg').textContent = 'Pega el contenido de tu robots.txt.'; return reset(false); }
   lastText = txt;
   render();
+  track('robots-comprobar');
 });
 $('#path').addEventListener('change', () => { if (lastText !== null) render(); });
 $('#reset').addEventListener('click', () => { $('#text').value = ''; $('#path').value = '/'; $('#msg').hidden = true; reset(true); });
@@ -457,8 +464,8 @@ function render() {
   const ok = results.filter(r => r.allowed === true).length;
   const no = results.filter(r => r.allowed === false).length;
   $('#metrics').innerHTML =
-    `<div class="metric"><b>${ok}</b><span>permitidos en <code>${esc(path)}</code></span></div>` +
-    `<div class="metric"><b>${no}</b><span>bloqueados</span></div>`;
+    `<div class="metric"><b>${ok}</b><span>${ok === 1 ? 'permitido' : 'permitidos'} en <code>${esc(path)}</code></span></div>` +
+    `<div class="metric"><b>${no}</b><span>${no === 1 ? 'bloqueado' : 'bloqueados'}</span></div>`;
   $('#kinds').innerHTML = Object.entries(KINDS).map(([k, info]) => `
     <section class="kind" id="k-${k}"><h2>${info.title}</h2><p>${info.text}</p>
       <ul class="bots">${results.filter(r => r.kind === k).map(botRow).join('')}</ul></section>`).join('');

@@ -258,6 +258,8 @@
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; } .intro__card { margin-left: 0; } .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
   }
 </style>
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 <div class="app">
@@ -277,6 +279,8 @@
 </div>
 
 <script>
+// Cuenta el uso de la herramienta en GoatCounter: solo el nombre del evento, nunca lo que se pega o se sube.
+const track = name => { try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) {} };
 const KEY = 'geo-primeros-pasos/donde-deberias-estar'
 
 const STEPS = [
@@ -815,7 +819,7 @@ function render() {
   if (csv) csv.onclick = () => download(`paso-${i + 1}-${step.id}.csv`, toCSV(step.cols, data[step.id]))
 }
 
-document.getElementById('export-json').onclick = () => download(`donde-deberias-estar-${domain(product().url) || 'trabajo'}.json`, JSON.stringify(data, null, 2), 'application/json')
+document.getElementById('export-json').onclick = () => track('dde-descargar') || download(`donde-deberias-estar-${domain(product().url) || 'trabajo'}.json`, JSON.stringify(data, null, 2), 'application/json')
 document.getElementById('import-json').onclick = () => document.getElementById('file').click()
 document.getElementById('file').onchange = async (e) => {
   const f = e.target.files[0]

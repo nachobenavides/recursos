@@ -11,3 +11,4 @@ Webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Aquí están el vídeo
 |---|---|
 | [Dónde deberías estar](donde-deberias-estar/) | Sacar la lista de webs que cita la IA cuando preguntan por lo que vendes. |
 | [¿Pueden entrar los bots de IA?](pueden-entrar-los-bots/) | Comprobar, bot por bot, qué le dice tu robots.txt a cada bot de IA. |
+| [¿Quién te visita?](quien-te-visita/) | Ver en tus logs qué bots de IA entran en tu web, a qué páginas y qué les respondes. |
