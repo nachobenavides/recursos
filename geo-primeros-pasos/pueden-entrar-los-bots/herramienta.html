@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../../favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="../../favicon-192.png">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<title>¿Pueden entrar los bots de IA? · Microherramienta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b0b; --bg-elevated: #111111; --border: #2b2b2b; --border-strong: #404040;
+    --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
+    --success: #10b981; --error: #ef4444;
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-full: 9999px;
+    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.18);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--fg-strong); }
+  code { font: 12.5px var(--mono); color: var(--fg-strong); }
+  .mono { font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
+
+  /* La misma carcasa que «Dónde deberías estar»: menú a la izquierda y el contenido en una tarjeta. */
+  .app { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; }
+  aside { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 28px 16px 24px; }
+  .side-brand { display: inline-flex; align-items: center; gap: 8px; margin: 0 12px 28px; color: var(--fg-muted); text-decoration: none; font-size: 13px; }
+  .side-brand img { width: 22px; height: 22px; object-fit: contain; }
+  .side-brand:hover { color: var(--fg-strong); }
+  .side-title { padding: 0 12px 10px; }
+  .nav { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 14px; padding: 9px 12px; border-radius: var(--r-md); cursor: pointer; font-size: 14px; color: var(--fg-muted); transition: background-color 200ms var(--ease), color 200ms var(--ease); }
+  .nav:hover { color: var(--fg-strong); background: rgba(17, 17, 17, 0.6); }
+  .nav .n { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: rgba(163, 163, 163, 0.4); }
+  .nav.is-locked { opacity: 0.35; cursor: not-allowed; }
+  .nav.is-locked:hover { color: var(--fg-muted); background: none; }
+  .nav .c { margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
+  .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot--success { background: var(--success); }
+  .dot--error { background: var(--error); }
+  .dot--faint { background: rgba(163, 163, 163, 0.35); }
+  .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+
+  main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 24px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
+  .intro { margin: 0 -24px; padding: 16px 24px; border-bottom: 1px solid var(--border); border-radius: var(--r-lg) var(--r-lg) 0 0; }
+  .intro__row { display: flex; align-items: center; gap: 14px; }
+  .intro__row img { flex: none; width: 26px; height: 26px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
+  h1 { margin: 0; font-size: 15px; font-weight: 500; line-height: 1.4; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+
+  .spacer { flex: 1 0 48px; }
+  footer.credit { position: sticky; bottom: 0; margin: 0 -24px; padding: 16px 24px 18px; border-radius: 0 0 var(--r-lg) var(--r-lg); border-top: 1px solid var(--border); background: var(--bg-elevated); display: flex; justify-content: space-between; }
+  footer.credit { align-items: center; }
+  .credit__sig { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); text-decoration: none; }
+  .credit__sig img { width: 18px; height: 18px; object-fit: contain; opacity: 0.85; }
+  .credit__sig strong { font-weight: 500; color: var(--fg); }
+  .credit__sig:hover strong, .credit__talk:hover { color: var(--fg-strong); }
+  .credit__talk { text-decoration: none; }
+
+  /* Entrada: los mismos campos que el formulario de «Dónde deberías estar». */
+  form { margin-top: 28px; max-width: 760px; display: grid; gap: 22px; }
+  form label { display: flex; flex-direction: column; gap: 8px; }
+  form small { font-size: 13px; color: var(--fg-muted); }
+  textarea, .field { width: 100%; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.03); color: var(--fg-strong); transition: border-color 150ms var(--ease); }
+  textarea { display: block; min-height: 220px; resize: vertical; padding: 12px 14px; font: 13px/1.6 var(--mono); }
+  .field { height: 40px; padding: 0 12px; font: 13px var(--mono); }
+  textarea:hover, .field:hover { border-color: var(--border-strong); }
+  textarea:focus, .field:focus { outline: none; border-color: var(--fg-muted); }
+  textarea::placeholder, .field::placeholder { color: rgba(163, 163, 163, 0.35); }
+  .btn { all: unset; cursor: pointer; justify-self: start; display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 22px; border-radius: var(--r-full); font-size: 14px; font-weight: 500; white-space: nowrap; background: var(--fg-strong); color: var(--bg); box-shadow: var(--shadow-key); transition: background-color 150ms var(--ease); }
+  .btn:hover { background: var(--fg); }
+  .msg { margin: -10px 0 0; font-size: 13px; color: var(--error); }
+
+  /* Resultado */
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); max-width: 760px; border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
+  .metric { padding: 20px 22px; }
+  .metric + .metric { border-left: 1px solid var(--border); }
+  .metric b { display: block; margin-bottom: 6px; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .metric span { font-size: 13px; color: var(--fg-muted); }
+  .kind { margin-top: 32px; scroll-margin-top: 16px; }
+  .kind h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .kind > p { margin: 2px 0 12px; font-size: 13px; color: var(--fg-muted); }
+  .bots { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .bot { border-bottom: 1px solid var(--border); }
+  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 190px 230px 120px minmax(0, 1fr) 16px; gap: 16px; align-items: center; padding: 12px 4px; }
+  .bot__row:hover { background: rgba(255, 255, 255, 0.02); }
+  .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
+  .bot__who, .bot__why { font-size: 13px; color: var(--fg-muted); min-width: 0; }
+  .state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg-strong); }
+  .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
+  .bot.is-open .chev { transform: rotate(180deg); }
+  .bot__more { display: none; padding: 0 4px 14px; }
+  .bot.is-open .bot__more { display: block; }
+  .bot__more p { margin: 0; max-width: 720px; font-size: 13px; color: var(--fg); }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: minmax(0, 1fr); } aside { position: static; height: auto; padding-bottom: 12px; } .side-foot { margin-top: 20px; }
+    main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .bot__row { grid-template-columns: 1fr auto 16px; row-gap: 4px; }
+    .bot__who { grid-column: 1; grid-row: 2; }
+    .bot__row .state { grid-column: 2; grid-row: 1; }
+    .bot__why { grid-column: 1 / -1; grid-row: 3; }
+    .chev { grid-column: 3; grid-row: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <a class="side-brand" href="./"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Volver al ejercicio</a>
+    <div class="side-title mono">Bots</div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="side-title mono">Tu robots.txt</div>
+      <button class="nav" id="reset">Pegar otro robots.txt</button>
+    </div>
+  </aside>
+  <main>
+    <header class="intro">
+      <div class="intro__row"><img src="data:image/jpeg;base64,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" alt="Nacho Benavides"><h1>¿Pueden entrar los bots de IA?</h1></div>
+    </header>
+
+    <form id="form" autocomplete="off">
+      <label>
+        <span class="mono">Tu robots.txt</span>
+        <textarea id="text" spellcheck="false" placeholder="User-agent: *&#10;Disallow: /carrito/"></textarea>
+        <small>Ábrelo en <code>tudominio.com/robots.txt</code>, cópialo entero y pégalo aquí.</small>
+      </label>
+      <label>
+        <span class="mono">Página que comprobar</span>
+        <input class="field" id="path" type="text" value="/" spellcheck="false">
+        <small>La portada por defecto. Puedes pegar la URL entera.</small>
+      </label>
+      <button class="btn" type="submit">Comprobar</button>
+      <p class="msg" id="msg" hidden></p>
+    </form>
+
+    <div id="result" hidden>
+      <div class="metrics" id="metrics"></div>
+      <div id="kinds"></div>
+    </div>
+
+    <div class="spacer"></div>
+    <footer class="credit"><a class="credit__sig" href="https://blindersgroup.com/" target="_blank" rel="noopener"><img src="data:image/png;base64,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" alt="" width="18" height="18"><span>Una microherramienta de <strong>Blinders</strong></span></a><a class="mono credit__talk" href="../">#RaiolaWebinar</a></footer>
+  </main>
+</div>
+
+<script>
+// Bots, tal y como los documenta cada empresa. kind: search | user | train
+const BOTS = [
+  {
+    "token": "OAI-SearchBot",
+    "company": "OpenAI",
+    "product": "Búsqueda de ChatGPT",
+    "kind": "search",
+    "source": "https://developers.openai.com/api/docs/bots",
+    "note": "Si lo bloqueas, no sales en las respuestas de búsqueda de ChatGPT, aunque puedes salir como enlace de navegación."
+  },
+  {
+    "token": "Googlebot",
+    "company": "Google",
+    "product": "Búsqueda de Google",
+    "kind": "search",
+    "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
+    "note": "Para salir en AI Overviews y en el Modo IA, tu página tiene que poder salir en la Búsqueda.",
+    "noteSource": "https://developers.google.com/search/docs/appearance/ai-features"
+  },
+  {
+    "token": "bingbot",
+    "company": "Microsoft",
+    "product": "Bing y Copilot",
+    "kind": "search",
+    "source": "https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0",
+    "note": "Lo que rastrea también sirve para las respuestas de Copilot.",
+    "noteSource": "https://blogs.bing.com/search/2026/10/your-content-your-choice-clearer-preferences-for-training-and-grounding/"
+  },
+  {
+    "token": "Claude-SearchBot",
+    "company": "Anthropic",
+    "product": "Búsqueda de Claude",
+    "kind": "search",
+    "source": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler"
+  },
+  {
+    "token": "PerplexityBot",
+    "company": "Perplexity",
+    "product": "Búsqueda de Perplexity",
+    "kind": "search",
+    "source": "https://docs.perplexity.ai/guides/bots"
+  },
+  {
+    "token": "Applebot",
+    "company": "Apple",
+    "product": "Siri, Spotlight y Safari",
+    "kind": "search",
+    "source": "https://support.apple.com/en-us/119829",
+    "fallback": "Googlebot",
+    "note": "Lo que rastrea puede usarse para entrenar los modelos de Apple, salvo que bloquees Applebot-Extended."
+  },
+  {
+    "token": "meta-webindexer",
+    "company": "Meta",
+    "product": "Búsqueda de Meta AI",
+    "kind": "search",
+    "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers"
+  },
+  {
+    "token": "DuckAssistBot",
+    "company": "DuckDuckGo",
+    "product": "Respuestas con IA",
+    "kind": "search",
+    "source": "https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot"
+  },
+  {
+    "token": "Amzn-SearchBot",
+    "company": "Amazon",
+    "product": "Búsquedas de Amazon, como Alexa",
+    "kind": "search",
+    "source": "https://developer.amazon.com/amazonbot",
+    "unnamedRule": "Si no lo nombras, Amazon dice que sigue las reglas que des a otros buscadores."
+  },
+  {
+    "token": "MistralAI-Index",
+    "company": "Mistral",
+    "product": "Búsqueda de Vibe",
+    "kind": "search",
+    "source": "https://docs.mistral.ai/robots"
+  },
+  {
+    "token": "ChatGPT-User",
+    "company": "OpenAI",
+    "product": "ChatGPT",
+    "kind": "user",
+    "source": "https://developers.openai.com/api/docs/bots",
+    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+  },
+  {
+    "token": "Claude-User",
+    "company": "Anthropic",
+    "product": "Claude",
+    "kind": "user",
+    "source": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
+    "note": "Si lo bloqueas, Claude no lee tu web cuando se lo piden."
+  },
+  {
+    "token": "Google-Agent",
+    "company": "Google",
+    "product": "Agentes de Google",
+    "kind": "user",
+    "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers",
+    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+  },
+  {
+    "token": "Perplexity-User",
+    "company": "Perplexity",
+    "product": "Perplexity",
+    "kind": "user",
+    "source": "https://docs.perplexity.ai/guides/bots",
+    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+  },
+  {
+    "token": "meta-externalfetcher",
+    "company": "Meta",
+    "product": "Meta AI",
+    "kind": "user",
+    "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers",
+    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+  },
+  {
+    "token": "Amzn-User",
+    "company": "Amazon",
+    "product": "Alexa",
+    "kind": "user",
+    "source": "https://developer.amazon.com/amazonbot",
+    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+  },
+  {
+    "token": "MistralAI-User",
+    "company": "Mistral",
+    "product": "Vibe",
+    "kind": "user",
+    "source": "https://docs.mistral.ai/robots"
+  },
+  {
+    "token": "GPTBot",
+    "company": "OpenAI",
+    "product": "Entrenar sus modelos",
+    "kind": "train",
+    "source": "https://developers.openai.com/api/docs/bots",
+    "note": "Bloquearlo no te saca de la búsqueda de ChatGPT: cada bot se controla por separado."
+  },
+  {
+    "token": "ClaudeBot",
+    "company": "Anthropic",
+    "product": "Entrenar sus modelos",
+    "kind": "train",
+    "source": "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler"
+  },
+  {
+    "token": "Google-Extended",
+    "company": "Google",
+    "product": "Gemini",
+    "kind": "train",
+    "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
+    "note": "No entra en tu web: decide si Google usa lo que rastrea para entrenar Gemini y para sus respuestas. No afecta a la Búsqueda de Google."
+  },
+  {
+    "token": "Applebot-Extended",
+    "company": "Apple",
+    "product": "Entrenar sus modelos",
+    "kind": "train",
+    "source": "https://support.apple.com/en-us/119829",
+    "note": "No entra en tu web: decide si Apple usa lo que rastrea Applebot para entrenar sus modelos. No afecta a su búsqueda."
+  },
+  {
+    "token": "meta-externalagent",
+    "company": "Meta",
+    "product": "Entrenar sus modelos",
+    "kind": "train",
+    "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers"
+  },
+  {
+    "token": "MistralAI-Training",
+    "company": "Mistral",
+    "product": "Entrenar sus modelos",
+    "kind": "train",
+    "source": "https://docs.mistral.ai/robots"
+  }
+];
+
+const KINDS = {
+  search: { title: 'Buscadores', short: 'Buscadores', text: 'Rastrean tu web para que su buscador o su IA puedan mostrarte.' },
+  user: { title: 'Visitas que pide una persona', short: 'Visitas a petición', text: 'Entran cuando alguien le pide a la IA que lea una página.' },
+  train: { title: 'Entrenamiento de modelos', short: 'Entrenamiento', text: 'Recogen contenido para entrenar modelos de IA.' },
+};
+
+// ---------- Intérprete: reglas de Google para el robots.txt (RFC 9309) ----------
+// Rutas en su forma codificada (%XX), como las compara Google.
+const pct = s => s.replace(/%[0-9a-fA-F]{2}|[^%]+|%/g, m => m.length === 3 && m[0] === '%' ? m.toUpperCase() : encodeURI(m).replace(/%25/g, '%'));
+// Del valor de User-agent solo cuenta el nombre: «googlebot/1.2» y «googlebot*» son «googlebot».
+const agentName = v => v === '*' ? '*' : ((v.match(/^[A-Za-z_-]+/) || [''])[0]).toLowerCase();
+
+function parse(text) {
+  const groups = [], lines = [];
+  let cur = null, lastWasAgent = false;
+  text.replace(/^﻿/, '').split(/\r\n|\r|\n/).forEach((raw, i) => {
+    lines.push(raw);
+    const line = raw.replace(/#.*$/, '').trim();
+    if (!line) return;
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    const n = i + 1;
+    if (!m) return;
+    const key = m[1].toLowerCase(), value = m[2].trim();
+    if (key === 'user-agent') {
+      if (!cur || !lastWasAgent) { cur = { agents: [], rules: [] }; groups.push(cur); }
+      cur.agents.push({ name: agentName(value), line: n });
+      lastWasAgent = true;
+    } else if (key === 'allow' || key === 'disallow') {
+      // Fuera de un grupo no se aplican; una ruta que no empieza por / o * no coincide con ninguna página
+      if (cur && (!value || /^[/*]/.test(value))) cur.rules.push({ type: key, path: value, line: n });
+      lastWasAgent = false;
+    }
+    // Google ignora los demás campos (sitemap, crawl-delay…) y no cortan el grupo
+  });
+  return { groups, lines };
+}
+
+function groupsFor(parsed, token) {
+  const t = token.toLowerCase();
+  const named = parsed.groups.filter(g => g.agents.some(a => a.name === t));
+  if (named.length) return { kind: 'named', groups: named };
+  const star = parsed.groups.filter(g => g.agents.some(a => a.name === '*'));
+  return star.length ? { kind: 'star', groups: star } : { kind: 'none', groups: [] };
+}
+
+function toRegex(p) {
+  const end = p.endsWith('$');
+  const body = pct(end ? p.slice(0, -1) : p).split('*').map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+  return new RegExp('^' + body + (end ? '$' : ''));
+}
+
+// Gana la regla más larga que encaja; si empatan, la menos restrictiva (Allow).
+function evaluate(parsed, token, path) {
+  const g = groupsFor(parsed, token);
+  const rules = g.groups.flatMap(x => x.rules);
+  const p = pct(path);
+  let best = null;
+  for (const r of rules) {
+    if (r.path === '' || !toRegex(r.path).test(p)) continue;
+    if (!best || r.path.length > best.path.length || (r.path.length === best.path.length && r.type === 'allow' && best.type !== 'allow')) best = r;
+  }
+  return { allowed: !best || best.type === 'allow', via: g.kind, groups: g.groups, rule: best };
+}
+
+// ---------- Interfaz ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let lastText = null, results = null;
+
+function normPath(v) {
+  v = (v || '/').trim();
+  try { if (/^https?:\/\//i.test(v)) { const u = new URL(v); v = u.pathname + u.search; } } catch (e) {}
+  v = v.replace(/#.*$/, '');
+  return v.startsWith('/') ? v : '/' + v;
+}
+
+// Menú: un grupo de bots por línea; tras comprobar, cuántos están bloqueados en cada uno.
+function renderNav() {
+  $('#nav').innerHTML = Object.entries(KINDS).map(([k, info], i) => {
+    const rows = results ? results.filter(r => r.kind === k) : [];
+    const no = rows.filter(r => r.allowed === false).length;
+    const c = !results ? '' : no ? `${no}<span class="dot dot--error"></span>` : '<span class="dot dot--success"></span>';
+    return `<button class="nav ${results ? '' : 'is-locked'}" data-k="${k}" ${results ? '' : 'title="Comprueba primero tu robots.txt"'}><span class="n">0${i + 1}</span><span>${info.short}</span><span class="c">${c}</span></button>`;
+  }).join('');
+}
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('[data-k]');
+  if (b && results) document.getElementById('k-' + b.dataset.k).scrollIntoView({ behavior: 'smooth' });
+});
+
+$('#form').addEventListener('submit', e => {
+  e.preventDefault();
+  const txt = $('#text').value;
+  $('#msg').hidden = !!txt.trim();
+  if (!txt.trim()) { $('#msg').textContent = 'Pega el contenido de tu robots.txt.'; return reset(false); }
+  lastText = txt;
+  render();
+});
+$('#path').addEventListener('change', () => { if (lastText !== null) render(); });
+$('#reset').addEventListener('click', () => { $('#text').value = ''; $('#path').value = '/'; $('#msg').hidden = true; reset(true); });
+
+function reset(focus) {
+  lastText = null; results = null;
+  $('#result').hidden = true;
+  renderNav();
+  if (focus) { window.scrollTo({ top: 0 }); $('#text').focus(); }
+}
+
+function render() {
+  const path = normPath($('#path').value);
+  $('#path').value = path;
+  const parsed = parse(lastText);
+  results = BOTS.map(b => {
+    let r = evaluate(parsed, b.token, path);
+    // Amazon no dice qué buscadores toma como referencia: sin grupo propio, no se puede saber
+    if (r.via !== 'named' && b.unnamedRule && parsed.groups.length) r = { ...r, allowed: null, rule: null };
+    if (r.via !== 'named' && b.fallback && groupsFor(parsed, b.fallback).kind === 'named') r = { ...evaluate(parsed, b.fallback, path), via: 'fallback' };
+    return { ...b, ...r };
+  });
+  const ok = results.filter(r => r.allowed === true).length;
+  const no = results.filter(r => r.allowed === false).length;
+  $('#metrics').innerHTML =
+    `<div class="metric"><b>${ok}</b><span>permitidos en <code>${esc(path)}</code></span></div>` +
+    `<div class="metric"><b>${no}</b><span>bloqueados</span></div>`;
+  $('#kinds').innerHTML = Object.entries(KINDS).map(([k, info]) => `
+    <section class="kind" id="k-${k}"><h2>${info.title}</h2><p>${info.text}</p>
+      <ul class="bots">${results.filter(r => r.kind === k).map(botRow).join('')}</ul></section>`).join('');
+  $('#result').hidden = false;
+  renderNav();
+}
+
+function botRow(r) {
+  const link = (txt, url) => `<a href="${esc(url)}" target="_blank" rel="noopener">${txt}</a>`;
+  const why = r.allowed === null ? 'Depende de otros buscadores'
+    : r.rule ? `Línea ${r.rule.line}: <code>${r.rule.type === 'allow' ? 'Allow' : 'Disallow'}: ${esc(r.rule.path)}</code>`
+    : 'Ninguna regla cierra esta página';
+  const scope = r.via === 'named' ? 'Tiene su propio grupo en tu robots.txt.'
+    : r.via === 'fallback' ? `No tiene grupo propio: Apple sigue el de <code>${esc(r.fallback)}</code>.`
+    : r.allowed === null ? esc(r.unnamedRule)
+    : r.via === 'star' ? 'No tiene grupo propio: le aplica <code>User-agent: *</code>.'
+    : 'No tiene grupo propio y no hay <code>User-agent: *</code>.';
+  const note = r.note ? ' ' + (r.noteSource ? link(esc(r.note), r.noteSource) : esc(r.note)) : '';
+  const state = r.allowed === null ? ['dot--faint', 'Sin saber'] : r.allowed ? ['dot--success', 'Permitido'] : ['dot--error', 'Bloqueado'];
+  return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
+      <span class="bot__token">${esc(r.token)}</span>
+      <span class="bot__who">${esc(r.company)} · ${esc(r.product)}</span>
+      <span class="state"><span class="dot ${state[0]}"></span>${state[1]}</span>
+      <span class="bot__why">${why}</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    </button>
+    <div class="bot__more"><p>${scope}${note} ${link('Documentación de ' + esc(r.company), r.source)}.</p></div></li>`;
+}
+
+$('#kinds').addEventListener('click', e => {
+  const row = e.target.closest('.bot__row');
+  if (!row) return;
+  const li = row.parentElement;
+  li.classList.toggle('is-open');
+  row.setAttribute('aria-expanded', li.classList.contains('is-open'));
+});
+
+renderNav();
+</script>
+</body>
+</html>

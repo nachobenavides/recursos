@@ -10,3 +10,4 @@ Webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Aquí están el vídeo
 | Ejercicio | Para qué |
 |---|---|
 | [Dónde deberías estar](donde-deberias-estar/) | Sacar la lista de webs que cita la IA cuando preguntan por lo que vendes. |
+| [¿Pueden entrar los bots de IA?](pueden-entrar-los-bots/) | Comprobar, bot por bot, qué le dice tu robots.txt a cada bot de IA. |
