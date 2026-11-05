@@ -424,7 +424,7 @@ const drop = $('.drop');
 ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('is-over')));
 drop.addEventListener('drop', e => { e.preventDefault(); run([...e.dataTransfer.files]); });
 $('#files').addEventListener('change', e => run([...e.target.files]));
-$('#reset').addEventListener('click', () => { $('#files').value = ''; say(''); results = null; $('#result').hidden = true; renderNav(); window.scrollTo({ top: 0 }); });
+$('#reset').addEventListener('click', () => { $('#files').value = ''; say(''); results = null; $('#result').hidden = true; $('#form').hidden = false; renderNav(); window.scrollTo({ top: 0 }); });
 
 async function run(files) {
   if (!files.length || busy) return;
@@ -469,6 +469,7 @@ function render(st, info) {
       <div class="cols"><span>Comprobación</span><span>Atributo</span><span>Estado</span><span class="r">Productos</span><span></span></div>
       <ul class="bots">${results.filter(r => r.group === k).map(row).join('')}</ul></section>`).join('');
   $('#result').hidden = false;
+  $('#form').hidden = true; window.scrollTo({ top: 0 });
   renderNav();
 }
 

@@ -379,7 +379,7 @@ const drop = $('.drop');
 ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('is-over')));
 drop.addEventListener('drop', e => { e.preventDefault(); run([...e.dataTransfer.files]); });
 $('#files').addEventListener('change', e => run([...e.target.files]));
-$('#reset').addEventListener('click', () => { $('#files').value = ''; say(''); results = null; $('#result').hidden = true; renderNav(); window.scrollTo({ top: 0 }); });
+$('#reset').addEventListener('click', () => { $('#files').value = ''; say(''); results = null; $('#result').hidden = true; $('#form').hidden = false; renderNav(); window.scrollTo({ top: 0 }); });
 
 async function run(files) {
   if (!files.length || busy) return;
@@ -431,6 +431,7 @@ function render(st, files) {
   $('#warn').innerHTML = warn.join(' ');
   $('#warn').hidden = !warn.length;
   $('#result').hidden = false;
+  $('#form').hidden = true; window.scrollTo({ top: 0 });
   renderNav();
 }
 
