@@ -455,6 +455,9 @@ async function run(files) {
     say(`Leyendo ${f.name}…`);
     const info = await readFeed(f, p => checkProduct(st, p), n => say(`Leyendo ${f.name}… ${num(n)} productos`));
     if (!st.products) return say('No encontramos productos en ese archivo. Tiene que ser un feed en XML o en texto con tabuladores, con una fila de cabecera.', true);
+    // Un feed tiene que traer al menos alguno de los atributos básicos; si no, no es un feed (por ejemplo, un log)
+    const basics = ['id', 'title', 'link', 'price', 'availability', 'image_link'];
+    if (info.mode === 'text' && !(info.header || []).some(h => basics.includes(h))) return say('Esto no parece un feed de productos: la primera fila no trae ninguno de sus atributos, como id, title o price. Sube el archivo que envías a Google Merchant Center.', true);
     say('');
     render(st, info);
     track('feed-comprobar');
