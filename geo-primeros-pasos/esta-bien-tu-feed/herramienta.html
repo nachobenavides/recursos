@@ -341,7 +341,7 @@ async function isGzip(file) {
 // Cada una sale de la especificación de datos de producto de Google Merchant Center y de la ayuda de cada atributo, revisadas el 5 de noviembre de 2026.
 const SPEC = 'https://support.google.com/merchants/answer/7052112';
 // La página de ayuda de cada atributo, comprobadas una a una el 5 de noviembre de 2026
-const HELP = { id: 6324405, title: 6324415, description: 6324468, link: 6324416, image_link: 6324350, availability: 6324448, price: 6324371, brand: 6324351, availability_date: 6324470, sale_price: 6324471, condition: 6324469, gtin: 6324461, mpn: 6324482, identifier_exists: 6324478, gender: 6324479, age_group: 6324463, product_highlight: 9216100, product_detail: 9218260, product_type: 6324406, google_product_category: 6324436 };
+const HELP = { id: 6324405, title: 6324415, description: 6324468, link: 6324416, image_link: 6324350, availability: 6324448, price: 6324371, brand: 6324351, availability_date: 6324470, sale_price: 6324471, condition: 6324469, gtin: 6324461, mpn: 6324482, identifier_exists: 6324478, gender: 6324479, age_group: 6324463, product_highlight: 9216100, product_detail: 9218260, product_type: 6324406, google_product_category: 6324436, additional_image_link: 12472826, product_weight: 12472549, question_and_answer: 17085211 };
 const helpUrl = attr => HELP[attr] ? `https://support.google.com/merchants/answer/${HELP[attr]}?hl=es` : SPEC;
 const val = (p, k) => (p[k] || []).find(x => x !== '') ?? null;
 const vals = (p, k) => (p[k] || []).filter(x => x !== '');
@@ -401,6 +401,9 @@ const CHECKS = [
   { id: 'ctx_google_product_category', group: 'more', attr: 'google_product_category', name: 'Categoría de Google', rule: 'Un número o una ruta de la taxonomía de Google.', test: p => !val(p, 'google_product_category') && 'Falta' },
   { id: 'ctx_product_detail', group: 'more', attr: 'product_detail', name: 'Ficha técnica', rule: 'Pares de dato y valor, como «Peso: 250 g».', test: p => !val(p, 'product_detail') && 'Falta' },
   { id: 'ctx_product_highlight', group: 'more', attr: 'product_highlight', name: 'Puntos destacados', rule: 'De 2 a 100 frases cortas sobre el producto.', test: p => !val(p, 'product_highlight') && 'Falta' },
+  { id: 'ctx_additional_image_link', group: 'more', attr: 'additional_image_link', name: 'Imágenes adicionales', rule: 'Hasta 10 imágenes más del producto. Google lo recomienda para cada producto.', test: p => !val(p, 'additional_image_link') && 'Falta' },
+  { id: 'ctx_product_weight', group: 'more', attr: 'product_weight', name: 'Peso y medidas', rule: 'Peso, largo, ancho y alto del producto, con su unidad, como «3.5 kg» o «20 cm».', test: p => !['product_weight', 'product_length', 'product_width', 'product_height'].some(k => val(p, k)) && 'Falta' },
+  { id: 'ctx_question_and_answer', group: 'more', attr: 'question_and_answer', name: 'Preguntas y respuestas', rule: 'Hasta 30 preguntas frecuentes con su respuesta. Google lo pensó sobre todo para experiencias conversacionales, como el Modo IA de la Búsqueda.', test: p => !val(p, 'question_and_answer') && 'Falta' },
 ];
 
 const GROUPS = {
@@ -408,7 +411,7 @@ const GROUPS = {
   cond: { title: 'Condicionales', short: 'Condicionales', text: 'Obligatorios según el producto: la marca, si la tiene; la fecha de disponibilidad, si es preventa o bajo pedido.' },
   fmt: { title: 'Formato', short: 'Formato', text: 'Valores que Google no acepta tal como están.' },
   rec: { title: 'Recomendados', short: 'Recomendados', text: 'Google los recomienda: sin ellos, el producto puede tener visibilidad limitada.' },
-  more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto. Estos son cuatro; hay muchos más, como el color, la talla o el material, en la <a href="https://support.google.com/merchants/answer/7052112?hl=es" target="_blank" rel="noopener">especificación de Google</a>.' },
+  more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto. Estos son siete; hay muchos más, como el color, la talla o el material, en la <a href="https://support.google.com/merchants/answer/7052112?hl=es" target="_blank" rel="noopener">especificación de Google</a>.' },
 };
 
 const isErr = c => c.group !== 'more' && !c.warn;
