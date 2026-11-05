@@ -77,6 +77,17 @@
   .btn:hover { background: var(--fg); }
   .msg { margin: -10px 0 0; font-size: 13px; color: var(--error); }
 
+  /* Editor del robots.txt: números de línea a la izquierda; «Ver línea» resalta una un momento. */
+  .editor { position: relative; }
+  .editor textarea { padding-left: 58px; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+  .editor__gutter { position: absolute; top: 1px; bottom: 1px; left: 1px; width: 44px; overflow: hidden; pointer-events: none; border-right: 1px solid var(--border); border-radius: var(--r-md) 0 0 var(--r-md); }
+  .editor__nums { padding: 12px 10px 12px 0; text-align: right; font: 13px/1.6 var(--mono); color: rgba(163, 163, 163, 0.4); font-variant-numeric: tabular-nums; }
+  .editor__nums div.is-hl { color: var(--fg-strong); }
+  .editor__hl { position: absolute; left: 1px; right: 1px; pointer-events: none; background: color-mix(in srgb, var(--error) 16%, transparent); box-shadow: inset 2px 0 0 var(--error); opacity: 0; transition: opacity 500ms var(--ease); }
+  .editor__hl.is-on { opacity: 1; transition: none; }
+  .linkbtn { all: unset; cursor: pointer; color: var(--fg-strong); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  .linkbtn:hover { text-decoration-color: var(--fg-strong); }
+
   /* Resultado */
   .metrics { display: grid; grid-template-columns: repeat(2, 1fr); max-width: 760px; border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
   .metric { padding: 20px 22px; }
@@ -92,6 +103,8 @@
   .bot__row:hover { background: rgba(255, 255, 255, 0.02); }
   .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
   .bot__who, .bot__why { font-size: 13px; color: var(--fg-muted); min-width: 0; }
+  .bot__who { display: flex; align-items: center; gap: 10px; }
+  .bot__logo { flex: none; width: 20px; height: 20px; padding: 2px; border-radius: var(--r-sm); background: #fff; object-fit: contain; }
   .state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg-strong); }
   .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .bot.is-open .chev { transform: rotate(180deg); }
@@ -132,7 +145,11 @@
     <form id="form" autocomplete="off">
       <label>
         <span class="mono">Tu robots.txt</span>
-        <textarea id="text" spellcheck="false" placeholder="User-agent: *&#10;Disallow: /carrito/"></textarea>
+        <div class="editor">
+          <textarea id="text" spellcheck="false" wrap="off" placeholder="User-agent: *&#10;Disallow: /carrito/"></textarea>
+          <div class="editor__gutter" aria-hidden="true"><div class="editor__nums" id="nums"></div></div>
+          <div class="editor__hl" id="hl" aria-hidden="true"></div>
+        </div>
         <small>Ábrelo en <code>tudominio.com/robots.txt</code>, cópialo entero y pégalo aquí.</small>
       </label>
       <label>
@@ -337,6 +354,9 @@ const BOTS = [
   }
 ];
 
+// Favicon de cada empresa, en la carpeta logos/: se sirven desde aquí, sin pedir nada a terceros.
+const LOGOS = { OpenAI: 'openai.png', Google: 'google.png', Microsoft: 'microsoft.png', Anthropic: 'anthropic.png', Perplexity: 'perplexity.png', Apple: 'apple.png', Meta: 'meta.jpg', DuckDuckGo: 'duckduckgo.png', Amazon: 'amazon.png', Mistral: 'mistral.png' };
+
 const KINDS = {
   search: { title: 'Buscadores', short: 'Buscadores', text: 'Rastrean tu web para que su buscador o su IA puedan mostrarte.' },
   user: { title: 'Visitas que pide una persona', short: 'A petición', text: 'Entran cuando alguien le pide a la IA que lea una página.' },
@@ -487,21 +507,56 @@ function botRow(r) {
   const state = r.allowed === null ? ['dot--faint', 'Sin saber'] : r.allowed ? ['dot--success', 'Permitido'] : ['dot--error', 'Bloqueado'];
   return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
-      <span class="bot__who">${esc(r.company)} · ${esc(r.product)}</span>
+      <span class="bot__who"><img class="bot__logo" src="logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="20" height="20">${esc(r.product)}</span>
       <span class="state"><span class="dot ${state[0]}"></span>${state[1]}</span>
       <span class="bot__why">${why}</span>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
-    <div class="bot__more"><p>${scope}${note} ${link('Documentación de ' + esc(r.company), r.source)}.</p></div></li>`;
+    <div class="bot__more"><p>${scope}${note} ${link('Documentación de ' + esc(r.company), r.source)}.${r.rule ? ` <button class="linkbtn" type="button" data-line="${r.rule.line}">Ver la línea ${r.rule.line} en tu robots.txt</button>` : ''}</p></div></li>`;
 }
 
 $('#kinds').addEventListener('click', e => {
+  const go = e.target.closest('[data-line]');
+  if (go) return showLine(+go.dataset.line);
   const row = e.target.closest('.bot__row');
   if (!row) return;
   const li = row.parentElement;
   li.classList.toggle('is-open');
   row.setAttribute('aria-expanded', li.classList.contains('is-open'));
 });
+
+// ---------- Editor: números de línea y «Ver línea» ----------
+const ta = $('#text'), nums = $('#nums'), hl = $('#hl');
+const lineH = () => parseFloat(getComputedStyle(ta).lineHeight);
+let hlLine = 0, hlTimer = null;
+function renderNums() {
+  const n = Math.max(1, ta.value.split(/\r\n|\r|\n/).length);
+  nums.innerHTML = Array.from({ length: n }, (_, i) => `<div${i + 1 === hlLine ? ' class="is-hl"' : ''}>${i + 1}</div>`).join('');
+  syncScroll();
+}
+function syncScroll() {
+  nums.style.transform = `translateY(${-ta.scrollTop}px)`;
+  if (hlLine) {
+    const top = 1 + 12 + (hlLine - 1) * lineH() - ta.scrollTop;
+    hl.style.top = top + 'px'; hl.style.height = lineH() + 'px';
+    hl.style.visibility = top < 0 || top + lineH() > ta.offsetHeight ? 'hidden' : 'visible';
+  }
+}
+function showLine(n) {
+  hlLine = n;
+  ta.scrollTop = Math.max(0, (n - 1) * lineH() - ta.clientHeight / 2 + lineH());
+  renderNums();
+  ta.closest('.editor').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  clearTimeout(hlTimer);
+  hl.classList.add('is-on');
+  // Se queda un momento y se apaga
+  hlTimer = setTimeout(() => { hl.classList.remove('is-on'); hlTimer = setTimeout(() => { hlLine = 0; renderNums(); }, 500); }, 1800);
+  track('robots-ver-linea');
+}
+ta.addEventListener('input', renderNums);
+ta.addEventListener('scroll', syncScroll);
+$('#reset').addEventListener('click', renderNums);
+renderNums();
 
 renderNav();
 </script>
