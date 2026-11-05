@@ -75,14 +75,20 @@
   .msg.is-bad { color: var(--error); }
 
   /* Resultado */
-  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 760px; border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
   .metric { padding: 20px 22px; }
   .metric + .metric { border-left: 1px solid var(--border); }
   .metric b { display: block; margin-bottom: 6px; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .metric span { font-size: 13px; color: var(--fg-muted); }
+  .metric b small { font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--fg-muted); }
+  .metric.is-bad b { color: #fca5a5; }
+  .period { margin: 10px 0 0; font: 12px var(--mono); color: var(--fg-muted); }
   .kind { margin-top: 32px; scroll-margin-top: 16px; }
   .kind h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
-  .kind > p { margin: 2px 0 12px; font-size: 13px; color: var(--fg-muted); }
+  .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+  .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
+  .kind__sum { display: flex; gap: 16px; flex: none; margin: 0; font-size: 13px; color: var(--fg-muted); }
+  .kind__sum .is-bad { display: inline-flex; align-items: center; gap: 8px; color: #fca5a5; }
   /* Filas: una columna por dato, con su cabecera, como el ranking de «Dónde deberías estar». */
   .cols, .bot__row { display: grid; grid-template-columns: 190px minmax(160px, 1fr) 150px 72px 80px 72px 16px; gap: 24px; align-items: center; }
   .cols { padding: 0 8px 8px; font-size: 12px; color: var(--fg-muted); }
@@ -125,6 +131,7 @@
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; }
     .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
     .cols { display: none; }
+    .kind__head { flex-direction: column; align-items: flex-start; gap: 8px; }
     .bot__row { grid-template-columns: 1fr auto 16px; row-gap: 4px; }
     .bot__who { grid-column: 1; grid-row: 2; }
     .bot__row .state { grid-column: 2; grid-row: 1; }
@@ -166,6 +173,7 @@
 
     <div id="result" hidden>
       <div class="metrics" id="metrics"></div>
+      <p class="period" id="period"></p>
       <p class="warn" id="warn" hidden></p>
       <div id="kinds"></div>
     </div>
@@ -385,13 +393,16 @@ function render(st, files) {
   results = BOTS.map((b, i) => ({ ...b, ...st.bots[i] }));
   const visits = results.reduce((n, r) => n + r.hits, 0);
   const range = st.first !== null ? (day(st.first) === day(st.last) ? day(st.first) : `${day(st.first)} – ${day(st.last)}`) : 'Sin fechas';
+  const seen = results.filter(r => r.hits).length;
+  const errs = results.filter(r => stateOf(r)[0] === 'dot--error').length;
   $('#metrics').innerHTML =
     `<div class="metric"><b>${num(visits)}</b><span>${visits === 1 ? 'visita' : 'visitas'} de bots de IA</span></div>` +
-    `<div class="metric"><b>${results.filter(r => r.hits).length}</b><span>de ${BOTS.length} bots aparecen</span></div>` +
-    `<div class="metric"><b>${num(st.lines)}</b><span>${st.lines === 1 ? 'línea' : 'líneas'} · ${esc(range)}</span></div>`;
+    `<div class="metric"><b>${seen}<small> de ${BOTS.length}</small></b><span>bots aparecen en tus logs</span></div>` +
+    `<div class="metric${errs ? ' is-bad' : ''}"><b>${errs}</b><span>${errs === 1 ? 'bot recibe' : 'bots reciben'} error en todas sus visitas</span></div>`;
+  $('#period').textContent = `${st.first !== null ? range : 'Sin fechas'} · ${num(st.lines)} ${st.lines === 1 ? 'línea leída' : 'líneas leídas'}`;
   $('#kinds').innerHTML = Object.entries(KINDS).map(([k, info]) => `
-    <section class="kind" id="k-${k}"><h2>${info.title}</h2><p>${info.text}</p>
-      <div class="cols"><span>Bot</span><span>Servicio</span><span>Estado</span><span class="r">Visitas</span><span class="r">Con error</span><span class="r">Última</span><span></span></div>
+    <section class="kind" id="k-${k}"><header class="kind__head"><div><h2>${info.title}</h2><p>${info.text}</p></div>${kindSummary(k)}</header>
+      <div class="cols"><span>Bot</span><span>Para qué</span><span>Estado</span><span class="r">Visitas</span><span class="r">Con error</span><span class="r">Última</span><span></span></div>
       <ul class="bots">${results.filter(r => r.kind === k).map(botRow).join('')}</ul></section>`).join('');
   const warn = [];
   if (st.lines && !st.read) warn.push('No reconocemos el formato de tus logs: contamos las visitas de cada bot, pero no sabemos a qué páginas fueron ni qué les respondiste. Lee el formato de Apache y Nginx, el W3C de IIS y CloudFront, y el JSON de Cloudflare, Caddy y Google Cloud.');
@@ -399,6 +410,13 @@ function render(st, files) {
   $('#warn').hidden = !warn.length;
   $('#result').hidden = false;
   renderNav();
+}
+
+// Cómo va cada grupo, en una línea: cuántos aparecen y a cuántos les das error
+function kindSummary(k) {
+  const rows = results.filter(r => r.kind === k);
+  const seen = rows.filter(r => r.hits).length, err = rows.filter(r => stateOf(r)[0] === 'dot--error').length;
+  return `<p class="kind__sum"><span>${seen} de ${rows.length} aparecen</span>${err ? `<span class="is-bad"><span class="dot dot--error"></span>${err} con error</span>` : ''}</p>`;
 }
 
 const shortDay = t => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
