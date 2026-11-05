@@ -369,7 +369,7 @@ const BOTS = [
   }
 ];
 
-// Favicon de cada empresa, en la carpeta logos/: se sirven desde aquí, sin pedir nada a terceros.
+// Logo de cada empresa, en la carpeta logos/ común a los ejercicios: se sirven desde aquí, sin pedir nada a terceros.
 const LOGOS = { OpenAI: 'openai.svg', Google: 'google.svg', Microsoft: 'microsoft.svg', Anthropic: 'claude.svg', Perplexity: 'perplexity.png', Apple: 'apple.svg', Meta: 'meta.svg', DuckDuckGo: 'duckduckgo.svg', Amazon: 'amazon.png', Mistral: 'mistral.png' };
 
 const KINDS = {
@@ -527,7 +527,7 @@ function botRow(r) {
   const state = r.allowed === null ? ['dot--faint', 'Sin saber'] : r.allowed ? ['dot--success', 'Permitido'] : ['dot--error', 'Bloqueado'];
   return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
-      <span class="bot__who"><img class="bot__logo" src="logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="18" height="18">${esc(r.product)}</span>
+      <span class="bot__who"><img class="bot__logo" src="../logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="18" height="18">${esc(r.product)}</span>
       <span class="state"><span class="dot ${state[0]}"></span>${state[1]}</span>
       ${why}
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>

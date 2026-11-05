@@ -84,15 +84,16 @@
   .kind h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .kind > p { margin: 2px 0 12px; font-size: 13px; color: var(--fg-muted); }
   /* Filas: una columna por dato, con su cabecera, como el ranking de «Dónde deberías estar». */
-  .cols, .bot__row { display: grid; grid-template-columns: 180px minmax(120px, 1fr) 130px 80px 80px 90px 16px; gap: 16px; align-items: center; }
-  .cols { padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); }
+  .cols, .bot__row { display: grid; grid-template-columns: 190px minmax(160px, 1fr) 150px 72px 80px 72px 16px; gap: 24px; align-items: center; }
+  .cols { padding: 0 8px 8px; font-size: 12px; color: var(--fg-muted); }
   .cols .r, .bot__n { text-align: right; }
   .bots { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
   .bot { border-bottom: 1px solid var(--border); }
-  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 180px minmax(120px, 1fr) 130px 80px 80px 90px 16px; gap: 16px; align-items: center; padding: 12px 4px; }
+  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 190px minmax(160px, 1fr) 150px 72px 80px 72px 16px; gap: 24px; align-items: center; padding: 14px 8px; }
   .bot__row:hover { background: rgba(255, 255, 255, 0.02); }
   .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
-  .bot__who { font-size: 13px; color: var(--fg); min-width: 0; }
+  .bot__who { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); min-width: 0; }
+  .bot__logo { flex: none; width: 18px; height: 18px; object-fit: contain; }
   .bot__n { font: 13px var(--mono); color: var(--fg); }
   .bot__n.is-bad { color: #fca5a5; }
   .bot__n.is-none { color: rgba(163, 163, 163, 0.4); }
@@ -100,10 +101,10 @@
   .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .bot.is-open .chev { transform: rotate(180deg); }
   /* Desplegable: respuestas y páginas, lado a lado, en una tarjeta bajo la fila. */
-  .bot__more { display: none; margin: 0 4px 14px; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.02); }
+  .bot__more { display: none; margin: 0 8px 16px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.02); }
   .bot.is-open .bot__more { display: block; }
   .more__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 28px; }
-  .more__title { margin: 0 0 10px; }
+  .more__title { margin: 0 0 12px; font-size: 13px; color: var(--fg-muted); }
   .codes, .pages { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
   .codes li { display: grid; grid-template-columns: 40px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font: 12px var(--mono); color: var(--fg); }
   .codes li span:last-child, .pages li span:last-child { text-align: right; color: var(--fg-muted); }
@@ -132,6 +133,7 @@
     .bot__n[data-k="v"] { grid-column: 1; } .bot__n[data-k="e"] { grid-column: 2; } .bot__n[data-k="u"] { display: none; }
     .chev { grid-column: 3; grid-row: 1; }
     .more__grid { grid-template-columns: 1fr; gap: 18px; }
+    .bot__more { padding: 14px 16px; }
   }
 </style>
 <!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
@@ -157,7 +159,7 @@
       <label class="drop">
         <input id="files" type="file" multiple accept=".log,.txt,.gz,text/plain,application/gzip">
         <strong>Suelta aquí tus logs o pulsa para elegirlos</strong>
-        <span>El archivo de accesos de tu servidor o de tu CDN, también en .gz. Puedes subir varios.</span>
+        <span>El archivo de accesos de tu servidor o de tu CDN, también en .gz. Puedes subir varios. No sale de tu navegador.</span>
       </label>
       <p class="msg" id="msg" hidden></p>
     </form>
@@ -177,28 +179,32 @@
 // Bots que se pueden ver en los logs: el nombre aparece en su user agent, como lo documenta cada empresa.
 // Google-Extended y Applebot-Extended no van aquí: no hacen visitas, solo son señales del robots.txt.
 const BOTS = [
-  { token: 'OAI-SearchBot', company: 'OpenAI', product: 'ChatGPT', kind: 'search', source: 'https://developers.openai.com/api/docs/bots' },
-  { token: 'Googlebot', company: 'Google', product: 'Google', kind: 'search', source: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers' },
+  { token: 'OAI-SearchBot', company: 'OpenAI', product: 'Búsqueda de ChatGPT', kind: 'search', source: 'https://developers.openai.com/api/docs/bots' },
+  { token: 'Googlebot', company: 'Google', product: 'Búsqueda de Google', kind: 'search', source: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers' },
   { token: 'bingbot', company: 'Microsoft', product: 'Bing y Copilot', kind: 'search', source: 'https://www.bing.com/webmasters/help/which-crawlers-does-bing-use-8c184ec0' },
-  { token: 'Claude-SearchBot', company: 'Anthropic', product: 'Claude', kind: 'search', source: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler' },
-  { token: 'PerplexityBot', company: 'Perplexity', product: 'Perplexity', kind: 'search', source: 'https://docs.perplexity.ai/guides/bots' },
+  { token: 'Claude-SearchBot', company: 'Anthropic', product: 'Búsqueda de Claude', kind: 'search', source: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler' },
+  { token: 'PerplexityBot', company: 'Perplexity', product: 'Búsqueda de Perplexity', kind: 'search', source: 'https://docs.perplexity.ai/docs/resources/perplexity-crawlers' },
   { token: 'Applebot', company: 'Apple', product: 'Siri, Spotlight y Safari', kind: 'search', source: 'https://support.apple.com/en-us/119829' },
-  { token: 'meta-webindexer', company: 'Meta', product: 'Meta AI', kind: 'search', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
-  { token: 'DuckAssistBot', company: 'DuckDuckGo', product: 'DuckDuckGo', kind: 'search', source: 'https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot' },
-  { token: 'Amzn-SearchBot', company: 'Amazon', product: 'Alexa', kind: 'search', source: 'https://developer.amazon.com/amazonbot' },
-  { token: 'MistralAI-Index', company: 'Mistral', product: 'Vibe', kind: 'search', source: 'https://docs.mistral.ai/robots' },
+  { token: 'meta-webindexer', company: 'Meta', product: 'Búsqueda de Meta AI', kind: 'search', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
+  { token: 'DuckAssistBot', company: 'DuckDuckGo', product: 'Respuestas con IA', kind: 'search', source: 'https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot' },
+  { token: 'Amzn-SearchBot', company: 'Amazon', product: 'Búsquedas de Amazon, como Alexa', kind: 'search', source: 'https://developer.amazon.com/amazonbot' },
+  { token: 'MistralAI-Index', company: 'Mistral', product: 'Búsqueda de Vibe', kind: 'search', source: 'https://docs.mistral.ai/robots' },
   { token: 'ChatGPT-User', company: 'OpenAI', product: 'ChatGPT', kind: 'user', source: 'https://developers.openai.com/api/docs/bots' },
   { token: 'Claude-User', company: 'Anthropic', product: 'Claude', kind: 'user', source: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler' },
   { token: 'Google-Agent', company: 'Google', product: 'Agentes de Google', kind: 'user', source: 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers' },
-  { token: 'Perplexity-User', company: 'Perplexity', product: 'Perplexity', kind: 'user', source: 'https://docs.perplexity.ai/guides/bots' },
-  { token: 'meta-externalfetcher', company: 'Meta', product: 'Meta', kind: 'user', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
+  { token: 'Perplexity-User', company: 'Perplexity', product: 'Perplexity', kind: 'user', source: 'https://docs.perplexity.ai/docs/resources/perplexity-crawlers' },
+  { token: 'meta-externalfetcher', company: 'Meta', product: 'Sus productos de IA', kind: 'user', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
   { token: 'Amzn-User', company: 'Amazon', product: 'Alexa', kind: 'user', source: 'https://developer.amazon.com/amazonbot' },
   { token: 'MistralAI-User', company: 'Mistral', product: 'Vibe', kind: 'user', source: 'https://docs.mistral.ai/robots' },
-  { token: 'GPTBot', company: 'OpenAI', product: 'OpenAI', kind: 'train', source: 'https://developers.openai.com/api/docs/bots' },
-  { token: 'ClaudeBot', company: 'Anthropic', product: 'Anthropic', kind: 'train', source: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler' },
-  { token: 'meta-externalagent', company: 'Meta', product: 'Meta', kind: 'train', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
-  { token: 'MistralAI-Training', company: 'Mistral', product: 'Mistral', kind: 'train', source: 'https://docs.mistral.ai/robots' },
+  { token: 'GPTBot', company: 'OpenAI', product: 'Entrenar sus modelos', kind: 'train', source: 'https://developers.openai.com/api/docs/bots' },
+  { token: 'ClaudeBot', company: 'Anthropic', product: 'Entrenar sus modelos', kind: 'train', source: 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler' },
+  { token: 'meta-externalagent', company: 'Meta', product: 'Entrenar modelos y mejorar productos', kind: 'train', source: 'https://developers.facebook.com/docs/sharing/webmasters/web-crawlers' },
+  { token: 'Amazonbot', company: 'Amazon', product: 'Mejorar productos y entrenar modelos', kind: 'train', source: 'https://developer.amazon.com/amazonbot' },
+  { token: 'MistralAI-Training', company: 'Mistral', product: 'Entrenar sus modelos', kind: 'train', source: 'https://docs.mistral.ai/robots' },
 ];
+
+// Logo de cada empresa, en la carpeta logos/ común a los ejercicios: se sirven desde aquí, sin pedir nada a terceros.
+const LOGOS = { OpenAI: 'openai.svg', Google: 'google.svg', Microsoft: 'microsoft.svg', Anthropic: 'claude.svg', Perplexity: 'perplexity.png', Apple: 'apple.svg', Meta: 'meta.svg', DuckDuckGo: 'duckduckgo.svg', Amazon: 'amazon.png', Mistral: 'mistral.png' };
 
 const KINDS = {
   search: { title: 'Buscadores', short: 'Buscadores', text: 'Rastrean tu web para que su buscador o su IA puedan mostrarte.' },
@@ -208,9 +214,9 @@ const KINDS = {
 
 // ---------- Lector de logs ----------
 // Lee tres formatos: el combinado de Apache y Nginx, el W3C (IIS, CloudFront) y el JSON por líneas (Cloudflare, Caddy, Google Cloud).
-// El nombre del bot tiene que ir como palabra suelta: «Googlebot» no cuenta en «Googlebot-Image».
+// El nombre del bot tiene que ir como palabra suelta: «Googlebot» no cuenta en «Googlebot-Image», ni «bingbot» en «bingbot.htm».
 const BY_TOKEN = new Map(BOTS.map((b, i) => [b.token.toLowerCase(), i]));
-const ANY_BOT = new RegExp('(?:^|[^A-Za-z0-9-])(' + [...BOTS].sort((a, b) => b.token.length - a.token.length).map(b => b.token.replace(/-/g, '\\-')).join('|') + ')(?![A-Za-z0-9-])', 'i');
+const ANY_BOT = new RegExp('(?:^|[^A-Za-z0-9-])(' + [...BOTS].sort((a, b) => b.token.length - a.token.length).map(b => b.token.replace(/-/g, '\\-')).join('|') + ')(?![A-Za-z0-9.-])', 'i');
 const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 
 // Combinado: «[10/Oct/2026:13:55:36 +0000] "GET /ruta HTTP/1.1" 200». Se toma la hora del log, sin la zona.
@@ -266,7 +272,7 @@ function readJSON(line) {
 }
 
 function emptyStats() {
-  return { lines: 0, dated: 0, read: 0, first: null, last: null, bots: BOTS.map(() => ({ hits: 0, unparsed: 0, last: null, status: {}, pageStatus: {}, pages: new Map() })) };
+  return { lines: 0, dated: 0, read: 0, first: null, last: null, bots: BOTS.map(() => ({ hits: 0, unparsed: 0, robots: 0, last: null, status: {}, pageStatus: {}, pages: new Map() })) };
 }
 
 // Cada archivo decide su formato con su primera línea útil; un nuevo «#Fields:» cambia las columnas.
@@ -298,6 +304,7 @@ function readLine(st, file, line) {
     // Sin el robots.txt: un bot puede leerlo y tener cerradas todas las páginas
     if (!/^\/robots\.txt(\?|$)/.test(e.path || '')) b.pageStatus[e.status] = (b.pageStatus[e.status] || 0) + 1;
   }
+  if (/^\/robots\.txt(\?|$)/.test(e.path || '')) b.robots++;
   if (e.path !== null && (b.pages.size < 5000 || b.pages.has(e.path))) b.pages.set(e.path, (b.pages.get(e.path) || 0) + 1);
 }
 
@@ -367,6 +374,8 @@ async function run(files) {
 // Entra: alguna página le responde sin cerrarle la puerta. Le das error: todas se la cierran (sin contar el robots.txt).
 function stateOf(b) {
   if (!b.hits) return ['dot--faint', 'No aparece'];
+  // Lee el robots.txt y no pide nada más: lo normal cuando el robots.txt no le deja entrar
+  if (b.robots && b.robots === b.hits - b.unparsed) return ['dot--faint', 'Solo el robots.txt'];
   const codes = Object.keys(b.pageStatus);
   if (!codes.length) return ['dot--success', 'Aparece'];
   return codes.every(c => blocks(+c)) ? ['dot--error', 'Le das error'] : ['dot--success', 'Entra'];
@@ -400,20 +409,20 @@ function botRow(r) {
   const cell = (k, l, v, cls = '') => `<span class="bot__n ${cls}" data-k="${k}" data-l="${l}">${v}</span>`;
   const link = `<a href="${esc(r.source)}" target="_blank" rel="noopener">Documentación de ${esc(r.company)}</a>`;
   let more;
-  if (!r.hits) more = `<p class="more__foot" style="margin:0">No sale en estos logs: puede que no pasara en esas fechas o que tu CDN lo pare antes de tu servidor. ${link}.</p>`;
+  if (!r.hits) more = `<p class="more__foot" style="margin:0">No sale en estos logs. Puede que no pasara en esas fechas o que tu CDN lo pare antes de llegar a tu servidor. ${link}.</p>`;
   else {
     const codes = Object.entries(r.status).sort((a, b) => b[1] - a[1]);
     const max = codes.length ? codes[0][1] : 1;
     const codeList = codes.map(([c, n]) => `<li class="${blocks(+c) ? 'is-bad' : +c >= 400 ? 'is-gone' : ''}"><span>${c}</span><span class="bar"><i style="width:${Math.max(2, n / max * 100)}%"></i></span><span>${num(n)}</span></li>`).join('');
     const pages = [...r.pages].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([p, n]) => `<li><span title="${esc(p)}">${esc(p)}</span><span>${num(n)}</span></li>`).join('');
     more = (codes.length || pages ? `<div class="more__grid">
-        ${codes.length ? `<div><p class="mono more__title">Respuestas</p><ul class="codes">${codeList}</ul></div>` : ''}
-        ${pages ? `<div><p class="mono more__title">Páginas más visitadas</p><ul class="pages">${pages}</ul></div>` : ''}
-      </div>` : '') + `<p class="more__foot">${r.unparsed ? `${num(r.unparsed)} sin página ni respuesta: tu log no las trae. ` : ''}${link}.</p>`;
+        ${codes.length ? `<div><p class="more__title">Qué le respondiste</p><ul class="codes">${codeList}</ul></div>` : ''}
+        ${pages ? `<div><p class="more__title">Páginas que más visitó</p><ul class="pages">${pages}</ul></div>` : ''}
+      </div>` : '') + `<p class="more__foot">${r.robots && r.robots === r.hits - r.unparsed ? 'Solo pidió el robots.txt: si en él le cierras tu web, no pide nada más. ' : ''}${stateOf(r)[0] === 'dot--error' ? 'Todas sus visitas a tus páginas acabaron en error: mira si lo bloquea tu CDN, tu servidor o un plugin de seguridad. ' : ''}${r.unparsed ? `En ${num(r.unparsed)} ${r.unparsed === 1 ? 'visita' : 'visitas'} tu log no dice la página ni la respuesta. ` : ''}${link}.</p>`;
   }
   return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
-      <span class="bot__who">${esc(r.product)}</span>
+      <span class="bot__who"><img class="bot__logo" src="../logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="18" height="18">${esc(r.product)}</span>
       <span class="state"><span class="dot ${dot}"></span>${label}</span>
       ${cell('v', 'Visitas', r.hits ? num(r.hits) : '—', r.hits ? '' : 'is-none')}
       ${cell('e', 'Con error', bad ? num(bad) : '—', bad ? 'is-bad' : 'is-none')}
