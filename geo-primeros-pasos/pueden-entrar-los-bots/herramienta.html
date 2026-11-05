@@ -104,17 +104,16 @@
   .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
   .bot__who, .bot__why { font-size: 13px; color: var(--fg-muted); min-width: 0; }
   .bot__who { display: flex; align-items: center; gap: 10px; }
-  .bot__logo { flex: none; width: 18px; height: 18px; border-radius: var(--r-sm); object-fit: contain; }
+  .bot__logo { flex: none; width: 18px; height: 18px; object-fit: contain; }
   .state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg-strong); }
   .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .bot.is-open .chev { transform: rotate(180deg); }
-  .bot.is-open .bot__row { background: rgba(255, 255, 255, 0.02); }
   .bot__why code { color: var(--fg); }
   .bot__why--none { color: rgba(163, 163, 163, 0.45); }
-  .bot__more { display: none; padding: 4px 8px 18px; background: rgba(255, 255, 255, 0.02); }
+  .bot__more { display: none; padding: 0 8px 16px; }
   .bot.is-open .bot__more { display: block; }
-  .facts { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 10px 28px; margin: 0; max-width: 820px; font-size: 13px; }
-  .facts dt { padding-top: 2px; }
+  .facts { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 12px 28px; margin: 0; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.02); font-size: 13px; }
+  .facts dt { color: var(--fg-muted); }
   .facts dd { margin: 0; color: var(--fg); }
   .facts dd .linkbtn { margin-left: 12px; }
 
@@ -127,7 +126,7 @@
     .bot__row .state { grid-column: 2; grid-row: 1; }
     .bot__why { grid-column: 1 / -1; grid-row: 3; }
     .bot__why--none { display: none; }
-    .facts { grid-template-columns: 1fr; gap: 2px; } .facts dd + dt { margin-top: 10px; } .facts dd .linkbtn { display: table; margin: 6px 0 0; }
+    .facts { grid-template-columns: 1fr; gap: 2px; padding: 14px 16px; } .facts dd + dt { margin-top: 10px; } .facts dd .linkbtn { display: table; margin: 6px 0 0; }
     .chev { grid-column: 3; grid-row: 1; }
   }
 </style>
@@ -363,7 +362,7 @@ const BOTS = [
 ];
 
 // Favicon de cada empresa, en la carpeta logos/: se sirven desde aquí, sin pedir nada a terceros.
-const LOGOS = { OpenAI: 'openai.png', Google: 'google.png', Microsoft: 'microsoft.png', Anthropic: 'anthropic.png', Perplexity: 'perplexity.png', Apple: 'apple.png', Meta: 'meta.jpg', DuckDuckGo: 'duckduckgo.png', Amazon: 'amazon.png', Mistral: 'mistral.png' };
+const LOGOS = { OpenAI: 'openai.svg', Google: 'google.svg', Microsoft: 'microsoft.svg', Anthropic: 'claude.svg', Perplexity: 'perplexity.png', Apple: 'apple.svg', Meta: 'meta.svg', DuckDuckGo: 'duckduckgo.svg', Amazon: 'amazon.png', Mistral: 'mistral.png' };
 
 const KINDS = {
   search: { title: 'Buscadores', short: 'Buscadores', text: 'Rastrean tu web para que su buscador o su IA puedan mostrarte.' },
@@ -526,10 +525,10 @@ function botRow(r) {
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
     <div class="bot__more"><dl class="facts">
-      <dt class="mono">Grupo que le aplica</dt><dd>${group}</dd>
-      <dt class="mono">Regla que decide</dt><dd>${rule}</dd>
-      ${note ? `<dt class="mono">A tener en cuenta</dt><dd>${note}</dd>` : ''}
-      <dt class="mono">Fuente</dt><dd>${link('Documentación de ' + esc(r.company), r.source)}</dd>
+      <dt>Grupo que le aplica</dt><dd>${group}</dd>
+      <dt>Regla que decide</dt><dd>${rule}</dd>
+      ${note ? `<dt>A tener en cuenta</dt><dd>${note}</dd>` : ''}
+      <dt>Fuente</dt><dd>${link('Documentación de ' + esc(r.company), r.source)}</dd>
     </dl></div></li>`;
 }
 
