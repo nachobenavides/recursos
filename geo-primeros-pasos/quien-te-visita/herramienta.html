@@ -137,6 +137,8 @@
   .ptable__path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); }
   .ptable__n { font: 12px var(--mono); color: var(--fg); }
   .ptable__more { margin: 0; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--fg-muted); }
+  .linkbtn { all: unset; cursor: pointer; margin-left: 6px; color: var(--fg-strong); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  .linkbtn:hover { text-decoration-color: var(--fg-strong); }
   .warn { margin: 16px 0 0; max-width: 760px; font-size: 13px; color: var(--fg-muted); }
 
   @media (max-width: 860px) {
@@ -454,14 +456,14 @@ const codeChip = (c, n, tag = 'span') => { const [k, t] = codeKind(c); return `<
 const errorsOf = codes => Object.entries(codes).filter(([c]) => blocks(+c)).reduce((n, [, v]) => n + v, 0);
 
 // Tabla de páginas: sin filtro, primero las que dan error; con un código, solo las páginas que lo dieron
-function pagesTable(r, code) {
+function pagesTable(r, code, limit = 10) {
   let all = [...r.pages].map(([p, v]) => ({ p, n: v.n, codes: v.codes, last: v.last, err: errorsOf(v.codes) }));
   if (code) all = all.filter(x => x.codes[code]).sort((a, b) => b.codes[code] - a.codes[code] || b.n - a.n);
   else all.sort((a, b) => b.err - a.err || b.n - a.n);
-  const shown = all.slice(0, 10), rest = all.length - shown.length;
+  const shown = all.slice(0, limit), rest = all.length - shown.length;
   return `<div class="ptable__head"><span>Página</span><span>Respuestas</span><span>Visitas</span><span>Última</span></div>
     ${shown.map(x => `<div class="ptable__row${x.err ? ' is-bad' : ''}"><span class="ptable__path" title="${esc(x.p)}">${esc(x.p)}</span><span class="codes">${Object.entries(x.codes).sort((a, b) => b[1] - a[1]).map(([c, n]) => codeChip(c, n)).join('')}</span><span class="ptable__n">${num(x.n)}</span><span class="ptable__d">${x.last !== null ? shortDay(x.last) : '—'}</span></div>`).join('')}
-    ${rest > 0 ? `<p class="ptable__more">Y ${num(rest)} ${rest === 1 ? 'página más' : 'páginas más'}${code ? ` con ${code}` : ''}.</p>` : ''}`;
+    ${rest > 0 ? `<p class="ptable__more">Y ${num(rest)} ${rest === 1 ? 'página más' : 'páginas más'}${code ? ` con ${code}` : ''}. <button class="linkbtn" type="button" data-more="${limit + 20}">Ver ${Math.min(20, rest)} más</button></p>` : ''}`;
 }
 
 function botRow(r) {
@@ -523,8 +525,16 @@ $('#kinds').addEventListener('click', e => {
     const li = chip.closest('.bot'), r = results[+li.dataset.i];
     const on = !chip.classList.contains('is-active');
     li.querySelectorAll('button.code').forEach(b => { b.classList.toggle('is-active', on && b === chip); b.classList.toggle('is-dim', on && b !== chip); });
-    li.querySelector('.ptable').innerHTML = pagesTable(r, on ? chip.dataset.code : null);
+    li.dataset.code = on ? chip.dataset.code : '';
+    li.querySelector('.ptable').innerHTML = pagesTable(r, li.dataset.code || null);
     if (on) track('logs-filtrar-codigo');
+    return;
+  }
+  // «Ver más»: muestra las siguientes páginas, con el filtro que haya puesto
+  const more = e.target.closest('[data-more]');
+  if (more) {
+    const li = more.closest('.bot');
+    li.querySelector('.ptable').innerHTML = pagesTable(results[+li.dataset.i], li.dataset.code || null, +more.dataset.more);
     return;
   }
   const row = e.target.closest('.bot__row');
