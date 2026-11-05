@@ -104,7 +104,7 @@
   .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
   .bot__who, .bot__why { font-size: 13px; color: var(--fg-muted); min-width: 0; }
   .bot__who { display: flex; align-items: center; gap: 10px; }
-  .bot__logo { flex: none; width: 20px; height: 20px; padding: 2px; border-radius: var(--r-sm); background: #fff; object-fit: contain; }
+  .bot__logo { flex: none; width: 18px; height: 18px; border-radius: var(--r-sm); object-fit: contain; }
   .state { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--fg-strong); }
   .chev { color: var(--fg-muted); transition: transform 200ms var(--ease); }
   .bot.is-open .chev { transform: rotate(180deg); }
@@ -507,7 +507,7 @@ function botRow(r) {
   const state = r.allowed === null ? ['dot--faint', 'Sin saber'] : r.allowed ? ['dot--success', 'Permitido'] : ['dot--error', 'Bloqueado'];
   return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
-      <span class="bot__who"><img class="bot__logo" src="logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="20" height="20">${esc(r.product)}</span>
+      <span class="bot__who"><img class="bot__logo" src="logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="18" height="18">${esc(r.product)}</span>
       <span class="state"><span class="dot ${state[0]}"></span>${state[1]}</span>
       <span class="bot__why">${why}</span>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
