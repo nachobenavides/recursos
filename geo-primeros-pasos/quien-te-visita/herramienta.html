@@ -13,7 +13,7 @@
   :root {
     --bg: #0b0b0b; --bg-elevated: #111111; --border: #2b2b2b; --border-strong: #404040;
     --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
-    --success: #10b981; --error: #ef4444;
+    --success: #10b981; --error: #ef4444; --info: #60a5fa; --warning: #f59e0b;
     --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
     --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
@@ -115,14 +115,23 @@
   .facts dd a { color: var(--fg-strong); }
   .codes { display: flex; flex-wrap: wrap; gap: 6px; }
   .code { display: inline-flex; align-items: center; gap: 8px; height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-full); font: 12px var(--mono); color: var(--fg-muted); }
-  .code i { font-style: normal; color: var(--success); }
-  .code.is-gone i { color: var(--fg-muted); }
+  .code i { font-style: normal; }
+  .code.is-ok i { color: var(--success); }
+  .code.is-redir i { color: #93c5fd; }
+  .code.is-gone i { color: #fcd34d; }
   .code.is-bad { border-color: color-mix(in srgb, var(--error) 45%, transparent); }
   .code.is-bad i { color: #fca5a5; }
+  button.code { all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-full); font: 12px var(--mono); color: var(--fg-muted); cursor: pointer; transition: border-color 150ms var(--ease), opacity 150ms var(--ease); }
+  button.code.is-bad { border-color: color-mix(in srgb, var(--error) 45%, transparent); }
+  button.code:hover { border-color: var(--fg-muted); }
+  button.code.is-active { border-color: var(--fg-strong); color: var(--fg-strong); }
+  button.code.is-dim { opacity: 0.45; }
+  .hint { display: block; margin-top: 8px; font-size: 12px; color: var(--fg-muted); }
   .ptable { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
-  .ptable__head, .ptable__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto) 64px; gap: 20px; align-items: center; padding: 8px 12px; }
+  .ptable__head, .ptable__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto) 56px 64px; gap: 20px; align-items: center; padding: 8px 12px; }
   .ptable__head { font-size: 12px; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
-  .ptable__head span:last-child, .ptable__n { text-align: right; }
+  .ptable__head span:nth-child(n+3), .ptable__n, .ptable__d { text-align: right; }
+  .ptable__d { font: 12px var(--mono); color: var(--fg-muted); }
   .ptable__row + .ptable__row { border-top: 1px solid var(--border); }
   .ptable__row.is-bad { box-shadow: inset 2px 0 0 var(--error); }
   .ptable__path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); }
@@ -144,7 +153,7 @@
     .bot__n[data-k="v"] { grid-column: 1; } .bot__n[data-k="e"] { grid-column: 2; } .bot__n[data-k="u"] { display: none; }
     .chev { grid-column: 3; grid-row: 1; }
     .facts { grid-template-columns: 1fr; gap: 4px; } .facts dd + dt { margin-top: 12px; }
-    .ptable__head { display: none; } .ptable__row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; } .ptable__row .codes { grid-column: 1 / -1; grid-row: 2; }
+    .ptable__head { display: none; } .ptable__row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; } .ptable__path { grid-column: 1; grid-row: 1; } .ptable__n { grid-column: 2; grid-row: 1; } .ptable__row .codes { grid-column: 1; grid-row: 2; } .ptable__d { grid-column: 2; grid-row: 2; }
     .bot__more { padding: 14px 16px; }
   }
 </style>
@@ -319,8 +328,9 @@ function readLine(st, file, line) {
   }
   if (/^\/robots\.txt(\?|$)/.test(e.path || '')) b.robots++;
   if (e.path !== null && (b.pages.size < 5000 || b.pages.has(e.path))) {
-    const pg = b.pages.get(e.path) || { n: 0, codes: {} };
+    const pg = b.pages.get(e.path) || { n: 0, codes: {}, last: null };
     pg.n++;
+    if (e.when !== null && (pg.last === null || e.when > pg.last)) pg.last = e.when;
     if (e.status !== null) pg.codes[e.status] = (pg.codes[e.status] || 0) + 1;
     b.pages.set(e.path, pg);
   }
@@ -431,9 +441,28 @@ function kindSummary(k) {
 
 const shortDay = t => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
-// Un código de respuesta, con su color: verde si entra, gris si la página no existe o redirige, rojo si le cierras la puerta
-const codeChip = (c, n) => `<span class="code ${blocks(+c) ? 'is-bad' : +c >= 300 ? 'is-gone' : ''}"><i>${c}</i>${num(n)}</span>`;
+// Cada código, con el color de lo que significa para el bot
+function codeKind(c) {
+  c = +c;
+  if (blocks(c)) return ['is-bad', 'Le cierras la puerta'];
+  if (c >= 400) return ['is-gone', 'La página no existe'];
+  if (c === 304) return ['is-redir', 'La página no ha cambiado desde su última visita'];
+  if (c >= 300) return ['is-redir', 'Le redirige a otra página'];
+  return ['is-ok', 'La página le respondió bien'];
+}
+const codeChip = (c, n, tag = 'span') => { const [k, t] = codeKind(c); return `<${tag} class="code ${k}"${tag === 'button' ? ` type="button" data-code="${c}"` : ''} title="${c} · ${t}"><i>${c}</i>${num(n)}</${tag}>`; };
 const errorsOf = codes => Object.entries(codes).filter(([c]) => blocks(+c)).reduce((n, [, v]) => n + v, 0);
+
+// Tabla de páginas: sin filtro, primero las que dan error; con un código, solo las páginas que lo dieron
+function pagesTable(r, code) {
+  let all = [...r.pages].map(([p, v]) => ({ p, n: v.n, codes: v.codes, last: v.last, err: errorsOf(v.codes) }));
+  if (code) all = all.filter(x => x.codes[code]).sort((a, b) => b.codes[code] - a.codes[code] || b.n - a.n);
+  else all.sort((a, b) => b.err - a.err || b.n - a.n);
+  const shown = all.slice(0, 10), rest = all.length - shown.length;
+  return `<div class="ptable__head"><span>Página</span><span>Respuestas</span><span>Visitas</span><span>Última</span></div>
+    ${shown.map(x => `<div class="ptable__row${x.err ? ' is-bad' : ''}"><span class="ptable__path" title="${esc(x.p)}">${esc(x.p)}</span><span class="codes">${Object.entries(x.codes).sort((a, b) => b[1] - a[1]).map(([c, n]) => codeChip(c, n)).join('')}</span><span class="ptable__n">${num(x.n)}</span><span class="ptable__d">${x.last !== null ? shortDay(x.last) : '—'}</span></div>`).join('')}
+    ${rest > 0 ? `<p class="ptable__more">Y ${num(rest)} ${rest === 1 ? 'página más' : 'páginas más'}${code ? ` con ${code}` : ''}.</p>` : ''}`;
+}
 
 function botRow(r) {
   const [dot, label] = stateOf(r);
@@ -447,26 +476,19 @@ function botRow(r) {
       ${source}</dl>`;
   else {
     const codes = Object.entries(r.status).sort((a, b) => b[1] - a[1]);
-    // Primero las páginas que le dan error; después, las más visitadas
-    const all = [...r.pages].map(([p, v]) => ({ p, n: v.n, codes: v.codes, err: errorsOf(v.codes) })).sort((a, b) => b.err - a.err || b.n - a.n);
-    const shown = all.slice(0, 10);
-    const table = shown.length ? `<div class="ptable">
-        <div class="ptable__head"><span>Página</span><span>Respuestas</span><span>Visitas</span></div>
-        ${shown.map(x => `<div class="ptable__row${x.err ? ' is-bad' : ''}"><span class="ptable__path" title="${esc(x.p)}">${esc(x.p)}</span><span class="codes">${Object.entries(x.codes).sort((a, b) => b[1] - a[1]).map(([c, n]) => codeChip(c, n)).join('')}</span><span class="ptable__n">${num(x.n)}</span></div>`).join('')}
-        ${all.length > shown.length ? `<p class="ptable__more">Y ${num(all.length - shown.length)} ${all.length - shown.length === 1 ? 'página más' : 'páginas más'}.</p>` : ''}
-      </div>` : '';
+    const table = r.pages.size ? `<div class="ptable">${pagesTable(r)}</div>` : '';
     const notes = [];
     if (r.robots && r.robots === r.hits - r.unparsed) notes.push('Solo pidió el robots.txt: si en él le cierras tu web, no pide nada más.');
     else if (dot === 'dot--error') notes.push('Todas sus visitas a tus páginas acabaron en error: mira si lo bloquea tu CDN, tu servidor o un plugin de seguridad.');
     else if (bad) notes.push('Algunas páginas le dan error: son las primeras de la tabla.');
     if (r.unparsed) notes.push(`En ${num(r.unparsed)} ${r.unparsed === 1 ? 'visita' : 'visitas'} tu log no dice la página ni la respuesta.`);
     more = `<dl class="facts">
-      ${codes.length ? `<dt>Qué le respondiste</dt><dd><span class="codes">${codes.map(([c, n]) => codeChip(c, n)).join('')}</span></dd>` : ''}
+      ${codes.length ? `<dt>Qué le respondiste</dt><dd><span class="codes">${codes.map(([c, n]) => codeChip(c, n, r.pages.size ? 'button' : 'span')).join('')}</span>${r.pages.size && codes.length > 1 ? '<small class="hint">Pulsa un código para ver solo sus páginas.</small>' : ''}</dd>` : ''}
       ${table ? `<dt>Páginas</dt><dd>${table}</dd>` : ''}
       ${notes.length ? `<dt>A tener en cuenta</dt><dd>${notes.join(' ')}</dd>` : ''}
       ${source}</dl>`;
   }
-  return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
+  return `<li class="bot" data-i="${BOTS.indexOf(BOTS.find(b => b.token === r.token))}"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
       <span class="bot__who"><img class="bot__logo" src="../logos/${LOGOS[r.company]}" alt="${esc(r.company)}" title="${esc(r.company)}" width="18" height="18">${esc(r.product)}</span>
       <span class="state"><span class="dot ${dot}"></span>${label}</span>
@@ -496,6 +518,15 @@ $('#nav').addEventListener('click', e => {
 });
 
 $('#kinds').addEventListener('click', e => {
+  const chip = e.target.closest('button.code');
+  if (chip) {
+    const li = chip.closest('.bot'), r = results[+li.dataset.i];
+    const on = !chip.classList.contains('is-active');
+    li.querySelectorAll('button.code').forEach(b => { b.classList.toggle('is-active', on && b === chip); b.classList.toggle('is-dim', on && b !== chip); });
+    li.querySelector('.ptable').innerHTML = pagesTable(r, on ? chip.dataset.code : null);
+    if (on) track('logs-filtrar-codigo');
+    return;
+  }
   const row = e.target.closest('.bot__row');
   if (!row) return;
   const li = row.parentElement;
