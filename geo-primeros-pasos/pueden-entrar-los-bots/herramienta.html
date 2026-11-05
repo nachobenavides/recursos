@@ -219,7 +219,7 @@ const BOTS = [
     "company": "Perplexity",
     "product": "Búsqueda de Perplexity",
     "kind": "search",
-    "source": "https://docs.perplexity.ai/guides/bots"
+    "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers"
   },
   {
     "token": "Applebot",
@@ -242,7 +242,8 @@ const BOTS = [
     "company": "DuckDuckGo",
     "product": "Respuestas con IA",
     "kind": "search",
-    "source": "https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot"
+    "source": "https://duckduckgo.com/duckduckgo-help-pages/results/duckassistbot",
+    "note": "No se usa para entrenar modelos, y bloquearlo no te saca de los resultados de DuckDuckGo."
   },
   {
     "token": "Amzn-SearchBot",
@@ -265,7 +266,7 @@ const BOTS = [
     "product": "ChatGPT",
     "kind": "user",
     "source": "https://developers.openai.com/api/docs/bots",
-    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+    "note": "OpenAI avisa de que, como lo pide una persona, las reglas del robots.txt pueden no aplicarse."
   },
   {
     "token": "Claude-User",
@@ -281,15 +282,15 @@ const BOTS = [
     "product": "Agentes de Google",
     "kind": "user",
     "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-user-triggered-fetchers",
-    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+    "note": "Google dice que, como lo pide una persona, en general no sigue el robots.txt. Tampoco le da un nombre para usar en él."
   },
   {
     "token": "Perplexity-User",
     "company": "Perplexity",
     "product": "Perplexity",
     "kind": "user",
-    "source": "https://docs.perplexity.ai/guides/bots",
-    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+    "source": "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
+    "note": "Perplexity dice que, como lo pide una persona, en general no sigue el robots.txt."
   },
   {
     "token": "meta-externalfetcher",
@@ -297,7 +298,7 @@ const BOTS = [
     "product": "Sus productos de IA",
     "kind": "user",
     "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers",
-    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+    "note": "Meta avisa de que puede saltarse las reglas del robots.txt."
   },
   {
     "token": "Amzn-User",
@@ -305,7 +306,7 @@ const BOTS = [
     "product": "Alexa",
     "kind": "user",
     "source": "https://developer.amazon.com/amazonbot",
-    "note": "Su empresa avisa de que puede no respetar el robots.txt."
+    "note": "Amazon avisa de que, como lo pide una persona, puede no seguir todas las reglas del robots.txt."
   },
   {
     "token": "MistralAI-User",
@@ -335,7 +336,7 @@ const BOTS = [
     "product": "Gemini",
     "kind": "train",
     "source": "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
-    "note": "No entra en tu web: decide si Google usa lo que rastrea para entrenar Gemini y para sus respuestas. No afecta a la Búsqueda de Google."
+    "note": "No entra en tu web: decide si Google usa lo que rastrea para entrenar Gemini y para fundamentar sus respuestas en la app de Gemini y en Vertex AI. No afecta a la Búsqueda de Google."
   },
   {
     "token": "Applebot-Extended",
@@ -351,6 +352,13 @@ const BOTS = [
     "product": "Entrenar modelos y mejorar productos",
     "kind": "train",
     "source": "https://developers.facebook.com/docs/sharing/webmasters/web-crawlers"
+  },
+  {
+    "token": "Amazonbot",
+    "company": "Amazon",
+    "product": "Mejorar productos y entrenar modelos",
+    "kind": "train",
+    "source": "https://developer.amazon.com/amazonbot"
   },
   {
     "token": "MistralAI-Training",
