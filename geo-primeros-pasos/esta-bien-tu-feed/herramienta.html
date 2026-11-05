@@ -75,17 +75,24 @@
   .msg.is-bad { color: var(--error); }
 
   /* Resultado */
-  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 760px; border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--border); border-radius: var(--r-lg); margin-top: 32px; }
   .metric { padding: 20px 22px; }
   .metric + .metric { border-left: 1px solid var(--border); }
   .metric b { display: block; margin-bottom: 6px; font-size: 32px; font-weight: 500; line-height: 1; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .metric span { font-size: 13px; color: var(--fg-muted); }
+  .metric b small { font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--fg-muted); }
+  .metric.is-bad b { color: #fca5a5; }
+  .period { margin: 10px 0 0; font: 12px var(--mono); color: var(--fg-muted); }
+  .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+  .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
+  .kind__head .kind__sum { display: inline-flex; align-items: center; gap: 8px; flex: none; margin: 0; }
+  .kind__sum.is-bad { color: #fca5a5; }
   .kind { margin-top: 32px; scroll-margin-top: 16px; }
   .kind h2 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
   .kind > p { margin: 2px 0 12px; font-size: 13px; color: var(--fg-muted); }
   /* Filas: una columna por dato, con su cabecera, como el ranking de «Dónde deberías estar». */
   .cols, .bot__row { display: grid; grid-template-columns: 180px minmax(120px, 1fr) 130px 80px 80px 90px 16px; gap: 16px; align-items: center; }
-  .cols { padding: 0 4px 8px; font: 11px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-muted); }
+  .cols { padding: 0 8px 8px; font-size: 12px; color: var(--fg-muted); }
   .cols .r, .bot__n { text-align: right; }
   .bots { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
   .bot { border-bottom: 1px solid var(--border); }
@@ -135,8 +142,25 @@
   }
 
   /* Comprobaciones: nombre, atributo, estado y productos afectados. */
-  .cols, .bot__row { grid-template-columns: minmax(200px, 1fr) 190px 120px 90px 16px; }
-  .bot__row { grid-template-columns: minmax(200px, 1fr) 190px 120px 90px 16px; }
+  .cols, .bot__row { grid-template-columns: minmax(200px, 1fr) 200px 120px 90px 16px; gap: 24px; }
+  .bot__row { padding: 14px 8px; }
+  .bot__attr code { padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.04); font-size: 12px; color: var(--fg); }
+  .bot__more { margin: 0 8px 16px; padding: 18px 20px; }
+  .facts { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 14px 28px; margin: 0; font-size: 13px; }
+  .facts dt { color: var(--fg-muted); }
+  .facts dd { margin: 0; min-width: 0; color: var(--fg); }
+  .facts dd a { color: var(--fg-strong); }
+  .facts code { padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.04); }
+  .ptable { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+  .ptable__head, .ptable__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px; align-items: center; padding: 8px 12px; }
+  .ptable__head.is-one, .ptable__row.is-one { grid-template-columns: minmax(0, 1fr); }
+  .ptable__head { font-size: 12px; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+  .ptable__row + .ptable__row { border-top: 1px solid var(--border); }
+  .ptable__id, .ptable__val { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg-strong); }
+  .ptable__val { color: #fca5a5; }
+  .ptable__more { margin: 0; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--fg-muted); }
+  .linkbtn { all: unset; cursor: pointer; margin-left: 6px; color: var(--fg-strong); text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  .linkbtn:hover { text-decoration-color: var(--fg-strong); }
   .bot__name { font-size: 14px; color: var(--fg-strong); }
   .bot__attr { font: 12.5px var(--mono); color: var(--fg-muted); overflow-wrap: anywhere; }
   .more__rule { margin: 0 0 12px; font-size: 13px; color: var(--fg); }
@@ -150,6 +174,9 @@
     .bot__name { grid-column: 1; grid-row: 1; }
     .bot__attr { grid-column: 1; grid-row: 2; }
     .bot__n[data-k="n"] { grid-column: 1; grid-row: 3; }
+    .kind__head { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .facts { grid-template-columns: 1fr; gap: 4px; } .facts dd + dt { margin-top: 12px; }
+    .bot__more { padding: 14px 16px; }
   }
 </style>
 <!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
@@ -182,6 +209,7 @@
 
     <div id="result" hidden>
       <div class="metrics" id="metrics"></div>
+      <p class="period" id="period"></p>
       <p class="warn" id="warn" hidden></p>
       <div id="kinds"></div>
     </div>
@@ -326,7 +354,7 @@ const CHECKS = [
   { id: 'availability_date', rule: 'Obligatoria si la disponibilidad es preorder o backorder.', group: 'cond', attr: 'availability_date', name: 'Fecha de disponibilidad (preventa y bajo pedido)', test: p => /^(preorder|backorder)$/i.test(val(p, 'availability') || '') && !val(p, 'availability_date') && 'Falta' },
 
   // Formato: valores que Google no acepta como están
-  { id: 'id_dup', expect: 'un id distinto en cada producto', rule: 'Cada producto necesita un identificador único.', group: 'fmt', attr: 'id', name: 'Identificador repetido', test: (p, st) => { const v = val(p, 'id'); if (!v) return false; if (st.ids.has(v)) return 'Falta'; st.ids.add(v); return false; } },
+  { id: 'id_dup', expect: 'un id distinto en cada producto', rule: 'Cada producto necesita un identificador único.', group: 'fmt', attr: 'id', name: 'Identificador repetido', test: (p, st) => { const v = val(p, 'id'); if (!v) return false; if (st.ids.has(v)) return 'repetido'; st.ids.add(v); return false; } },
   { id: 'id_len', expect: '50 caracteres como máximo', rule: 'Hasta 50 caracteres.', group: 'fmt', attr: 'id', name: 'Identificador, largo', test: p => (val(p, 'id') || '').length > 50 && val(p, 'id') },
   { id: 'title_len', expect: '150 caracteres como máximo', rule: 'Hasta 150 caracteres.', group: 'fmt', attr: 'title', name: 'Título, largo', test: p => (val(p, 'title') || '').length > 150 && `${val(p, 'title').length} caracteres` },
   { id: 'desc_len', expect: '5000 caracteres como máximo', rule: 'Hasta 5000 caracteres.', group: 'fmt', attr: 'description', name: 'Descripción, larga', test: p => (val(p, 'description') || '').length > 5000 && `${val(p, 'description').length} caracteres` },
@@ -375,7 +403,7 @@ function checkProduct(st, p) {
     if (!r) return;
     const s = st.checks[i];
     s.n++;
-    if (s.ex.length < 10) s.ex.push([pid, r === 'Falta' ? '' : String(r)]);
+    if (s.ex.length < 1000) s.ex.push([pid, r === 'Falta' ? '' : String(r)]);
     if (isErr(c)) bad = true;
   });
   if (bad) st.bad++;
@@ -425,39 +453,56 @@ function stateOf(c, s) {
 function render(st, info) {
   results = CHECKS.map((c, i) => ({ ...c, ...st.checks[i] }));
   const fmt = info.mode === 'xml' ? 'XML' : info.sep === '\t' ? 'Texto con tabuladores' : info.sep === ',' ? 'Texto con comas' : 'Texto con punto y coma';
+  const failing = results.filter(r => r.n && isErr(r)).length, errChecks = CHECKS.filter(isErr).length;
   $('#metrics').innerHTML =
-    `<div class="metric"><b>${num(st.products)}</b><span>${st.products === 1 ? 'producto' : 'productos'}</span></div>` +
-    `<div class="metric"><b>${num(st.bad)}</b><span>con algún error</span></div>` +
-    `<div class="metric"><b>${esc(fmt)}</b><span>formato del archivo</span></div>`;
+    `<div class="metric"><b>${num(st.products)}</b><span>${st.products === 1 ? 'producto en tu feed' : 'productos en tu feed'}</span></div>` +
+    `<div class="metric${st.bad ? ' is-bad' : ''}"><b>${num(st.bad)}</b><span>${st.bad === 1 ? 'producto con algún error' : 'productos con algún error'}</span></div>` +
+    `<div class="metric${failing ? ' is-bad' : ''}"><b>${failing}<small> de ${errChecks}</small></b><span>comprobaciones con errores</span></div>`;
+  $('#period').textContent = `${fmt} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'}`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
   if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
   $('#warn').innerHTML = warn.map(esc).join(' ');
   $('#warn').hidden = !warn.length;
   $('#kinds').innerHTML = Object.entries(GROUPS).map(([k, g]) => `
-    <section class="kind" id="k-${k}"><h2>${g.title}</h2><p>${g.text}</p>
+    <section class="kind" id="k-${k}"><header class="kind__head"><div><h2>${g.title}</h2><p>${g.text}</p></div>${groupSummary(k)}</header>
       <div class="cols"><span>Comprobación</span><span>Atributo</span><span>Estado</span><span class="r">Productos</span><span></span></div>
       <ul class="bots">${results.filter(r => r.group === k).map(row).join('')}</ul></section>`).join('');
   $('#result').hidden = false;
   renderNav();
 }
 
-function row(r) {
-  const [dot, label] = stateOf(r, r);
-  const link = `<a href="${SPEC}" target="_blank" rel="noopener">Especificación de Google</a>`;
+// Cómo va cada bloque, en una línea: cuántas comprobaciones tienen problemas
+function groupSummary(k) {
+  const rows = results.filter(r => r.group === k), bad = rows.filter(r => r.n);
+  if (!bad.length) return `<p class="kind__sum"><span class="dot dot--success"></span>Todo bien</p>`;
+  const err = bad.some(isErr);
+  return `<p class="kind__sum${err ? ' is-bad' : ''}"><span class="dot ${err ? 'dot--error' : 'dot--faint'}"></span>${bad.length} de ${rows.length} con ${err ? 'errores' : 'algo que mejorar'}</p>`;
+}
+
+// Tabla de productos afectados: los primeros 10 y «Ver más» de 20 en 20
+function examplesTable(r, limit = 10) {
   const missing = r.group !== 'fmt';
-  const ex = r.ex.map(([id, v]) => `<li><span title="${esc(id)}">${esc(id)}</span>${missing ? '' : `<span title="${esc(v)}">${esc(v)}</span>`}</li>`).join('');
-  const head = r.n > r.ex.length ? `Primeros ${r.ex.length} de ${num(r.n)}` : r.n === 1 ? 'El producto' : 'Los productos';
-  const rule = r.expect ? `<p class="more__rule">Tiene que ser: <code>${esc(r.expect)}</code>. ${link}.</p>` : `<p class="more__rule">${esc(r.rule)} ${link}.</p>`;
-  const more = rule + (r.n ? `<div class="ex__head mono"><span>${missing ? head + ' sin este dato' : head}</span>${missing ? '' : '<span>Tiene</span>'}</div><ul class="pages examples">${ex}</ul>` : '');
-  return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
+  const shown = r.ex.slice(0, limit), rest = r.n - shown.length, canMore = r.ex.length > shown.length;
+  return `<div class="ptable__head${missing ? ' is-one' : ''}"><span>Producto</span>${missing ? '' : '<span>Lo que tiene</span>'}</div>
+    ${shown.map(([id, v]) => `<div class="ptable__row${missing ? ' is-one' : ''}"><span class="ptable__id" title="${esc(id)}">${esc(id)}</span>${missing ? '' : `<span class="ptable__val" title="${esc(v)}">${esc(v)}</span>`}</div>`).join('')}
+    ${rest > 0 ? `<p class="ptable__more">Y ${num(rest)} ${rest === 1 ? 'producto más' : 'productos más'}.${canMore ? ` <button class="linkbtn" type="button" data-more="${limit + 20}">Ver ${Math.min(20, r.ex.length - shown.length)} más</button>` : ''}</p>` : ''}`;
+}
+
+function row(r, i) {
+  const [dot, label] = stateOf(r, r);
+  const missing = r.group !== 'fmt';
+  const facts = [`<dt>Qué pide Google</dt><dd>${r.expect ? `Tiene que ser: <code>${esc(r.expect)}</code>` : esc(r.rule)}</dd>`];
+  if (r.n) facts.push(`<dt>${missing ? 'Productos sin este dato' : 'Productos con este error'}</dt><dd><div class="ptable">${examplesTable(r)}</div></dd>`);
+  facts.push(`<dt>Fuente</dt><dd><a href="${SPEC}" target="_blank" rel="noopener">Especificación de datos de producto de Google</a></dd>`);
+  return `<li class="bot" data-i="${CHECKS.indexOf(CHECKS.find(c => c.id === r.id))}"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__name">${esc(r.name)}</span>
-      <span class="bot__attr">${esc(r.attr)}</span>
+      <span class="bot__attr"><code>${esc(r.attr)}</code></span>
       <span class="state"><span class="dot ${dot}"></span>${label}</span>
       <span class="bot__n ${r.n ? (isErr(r) ? 'is-bad' : '') : 'is-none'}" data-k="n" data-l="Productos">${r.n ? num(r.n) : '—'}</span>
       <svg class="chev" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
     </button>
-    <div class="bot__more">${more}</div></li>`;
+    <div class="bot__more"><dl class="facts">${facts.join('')}</dl></div></li>`;
 }
 
 // Menú: un punto por grupo; rojo si hay errores, gris si faltan recomendados y verde si todo está bien.
@@ -475,6 +520,12 @@ $('#nav').addEventListener('click', e => {
   if (b && results) document.getElementById('k-' + b.dataset.k).scrollIntoView({ behavior: 'smooth' });
 });
 $('#kinds').addEventListener('click', e => {
+  const more = e.target.closest('[data-more]');
+  if (more) {
+    const li = more.closest('.bot');
+    li.querySelector('.ptable').innerHTML = examplesTable(results[+li.dataset.i], +more.dataset.more);
+    return;
+  }
   const r = e.target.closest('.bot__row');
   if (!r) return;
   const li = r.parentElement;
