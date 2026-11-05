@@ -90,12 +90,12 @@
   .kind__sum { display: flex; gap: 16px; flex: none; margin: 0; font-size: 13px; color: var(--fg-muted); }
   .kind__sum .is-bad { display: inline-flex; align-items: center; gap: 8px; color: #fca5a5; }
   /* Filas: una columna por dato, con su cabecera, como el ranking de «Dónde deberías estar». */
-  .cols, .bot__row { display: grid; grid-template-columns: 190px minmax(160px, 1fr) 150px 72px 80px 72px 16px; gap: 24px; align-items: center; }
+  .cols, .bot__row { display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr) 140px 64px 72px 64px 16px; gap: 20px; align-items: center; }
   .cols { padding: 0 8px 8px; font-size: 12px; color: var(--fg-muted); }
   .cols .r, .bot__n { text-align: right; }
   .bots { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
   .bot { border-bottom: 1px solid var(--border); }
-  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: 190px minmax(160px, 1fr) 150px 72px 80px 72px 16px; gap: 24px; align-items: center; padding: 14px 8px; }
+  .bot__row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: minmax(120px, 190px) minmax(0, 1fr) 140px 64px 72px 64px 16px; gap: 20px; align-items: center; padding: 14px 8px; }
   .bot__row:hover { background: rgba(255, 255, 255, 0.02); }
   .bot__token { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
   .bot__who { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); min-width: 0; }
@@ -141,6 +141,11 @@
   .linkbtn:hover { text-decoration-color: var(--fg-strong); }
   .warn { margin: 16px 0 0; max-width: 760px; font-size: 13px; color: var(--fg-muted); }
 
+  /* Pantallas medianas: sin la columna «Última», para que «Para qué» tenga sitio */
+  @media (min-width: 861px) and (max-width: 1180px) {
+    .cols, .bot__row { grid-template-columns: minmax(110px, 160px) minmax(140px, 1fr) 120px 56px 64px 16px; }
+    .cols span:nth-child(6), .bot__n[data-k="u"] { display: none; }
+  }
   @media (max-width: 860px) {
     .app { grid-template-columns: minmax(0, 1fr); } aside { position: static; height: auto; padding-bottom: 12px; } .side-foot { margin-top: 20px; }
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; }

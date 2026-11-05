@@ -92,8 +92,6 @@
   .sum__row b { font: 500 14px var(--mono); color: var(--fg-strong); }
   .sum__row b.is-bad { color: #fca5a5; }
   .sum__row b small { font-size: 12px; font-weight: 400; color: var(--fg-muted); }
-  .scope { margin: 6px 0 0; max-width: 820px; font-size: 12px; line-height: 1.6; color: var(--fg-muted); }
-  .scope a { color: var(--fg); }
   .period { margin: 10px 0 0; font: 12px var(--mono); color: var(--fg-muted); }
   .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
   .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
@@ -154,7 +152,7 @@
   }
 
   /* Comprobaciones: nombre, atributo, estado y productos afectados. */
-  .cols, .bot__row { grid-template-columns: minmax(200px, 1fr) 200px 120px 90px 16px; gap: 24px; }
+  .cols, .bot__row { grid-template-columns: minmax(0, 1fr) minmax(120px, 200px) 110px 80px 16px; gap: 20px; }
   .bot__row { padding: 14px 8px; }
   .bot__attr code { padding: 1px 6px; border: 1px solid var(--border); border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.04); font-size: 12px; color: var(--fg); }
   .bot__more { margin: 0 8px 16px; padding: 18px 20px; }
@@ -223,7 +221,6 @@
     <div id="result" hidden>
       <div class="metrics" id="metrics"></div>
       <p class="period" id="period"></p>
-      <p class="scope" id="scope"></p>
       <p class="warn" id="warn" hidden></p>
       <div id="kinds"></div>
     </div>
@@ -334,7 +331,6 @@ async function isGzip(file) {
 
 // ---------- Comprobaciones ----------
 // Cada una sale de la especificación de datos de producto de Google Merchant Center y de la ayuda de cada atributo, revisadas el 5 de noviembre de 2026.
-const REVIEWED = '5 de noviembre de 2026';
 const SPEC = 'https://support.google.com/merchants/answer/7052112';
 const val = (p, k) => (p[k] || []).find(x => x !== '') ?? null;
 const vals = (p, k) => (p[k] || []).filter(x => x !== '');
@@ -490,7 +486,6 @@ function render(st, info) {
       `<button class="sum__row" type="button" data-k="more"><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span><b>${used}<small> de ${ctxTotal}</small></b><span class="sum__txt">atributos de contexto que usas</span></button>` +
     `</div>`;
   $('#period').innerHTML = `${esc(fmt)} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'} · Tu feed no sale de tu navegador`;
-  $('#scope').innerHTML = `Según la <a href="${SPEC}" target="_blank" rel="noopener">especificación de datos de producto de Google</a>, revisada el ${REVIEWED}. Esta herramienta solo revisa el archivo. Merchant Center hace además otras comprobaciones que aquí no se ven: las imágenes, que el precio coincida con el de tu web y sus políticas.<br>Un producto puede tener más de un tipo de error, por eso las cifras de la derecha no suman el total.`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
   if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
