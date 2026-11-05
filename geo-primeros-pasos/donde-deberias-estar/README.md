@@ -24,9 +24,7 @@ herramienta.html         Microherramienta para llevar el control del ejercicio
 
 ## Cómo usarlo
 
-La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/donde-deberias-estar/): desde ahí abres la microherramienta sin descargar nada.
-
-Si prefieres tenerlo en tu ordenador, pulsa el botón verde **Code** y después **Download ZIP**. Descomprime la carpeta y abre `herramienta.html` con doble clic: se abre en tu navegador y no necesita instalar nada.
+La forma más sencilla es la [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/donde-deberias-estar/): desde ahí abres la microherramienta.
 
 Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. Pulsa «Descargar mi trabajo» de vez en cuando para no perderlo.
 
