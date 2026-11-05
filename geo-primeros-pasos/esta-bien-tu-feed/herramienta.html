@@ -490,7 +490,7 @@ function render(st, info) {
       `<button class="sum__row" type="button" data-k="more"><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span><b>${used}<small> de ${ctxTotal}</small></b><span class="sum__txt">atributos de contexto que usas</span></button>` +
     `</div>`;
   $('#period').innerHTML = `${esc(fmt)} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'} · Tu feed no sale de tu navegador`;
-  $('#scope').innerHTML = `Según la <a href="${SPEC}" target="_blank" rel="noopener">especificación de datos de producto de Google</a>, revisada el ${REVIEWED}. Revisa el archivo: Merchant Center comprueba además las imágenes, que el precio coincida con tu web y sus políticas, y eso esta herramienta no lo ve. Un producto puede tener más de un tipo de error.`;
+  $('#scope').innerHTML = `Según la <a href="${SPEC}" target="_blank" rel="noopener">especificación de datos de producto de Google</a>, revisada el ${REVIEWED}. Esta herramienta solo revisa el archivo. Merchant Center hace además otras comprobaciones que aquí no se ven: las imágenes, que el precio coincida con el de tu web y sus políticas.<br>Un producto puede tener más de un tipo de error, por eso las cifras de la derecha no suman el total.`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
   if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
