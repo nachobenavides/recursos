@@ -109,21 +109,25 @@
   /* Desplegable: respuestas y páginas, lado a lado, en una tarjeta bajo la fila. */
   .bot__more { display: none; margin: 0 8px 16px; padding: 18px 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.02); }
   .bot.is-open .bot__more { display: block; }
-  .more__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 28px; }
-  .more__title { margin: 0 0 12px; font-size: 13px; color: var(--fg-muted); }
-  .codes, .pages { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-  .codes li { display: grid; grid-template-columns: 40px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font: 12px var(--mono); color: var(--fg); }
-  .codes li span:last-child, .pages li span:last-child { text-align: right; color: var(--fg-muted); }
-  .bar { height: 6px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
-  .bar i { display: block; height: 100%; border-radius: inherit; background: var(--success); }
-  .codes li.is-bad { color: #fca5a5; }
-  .codes li.is-bad .bar i { background: var(--error); }
-  .codes li.is-gone .bar i { background: var(--fg-muted); }
-  .pages li { display: flex; justify-content: space-between; gap: 16px; font: 12px var(--mono); color: var(--fg); }
-  .pages li span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pages li span:last-child { flex: none; }
-  .more__foot { margin: 14px 0 0; font-size: 13px; color: var(--fg-muted); }
-  .more__foot a { color: var(--fg); }
+  .facts { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 14px 28px; margin: 0; font-size: 13px; }
+  .facts dt { color: var(--fg-muted); }
+  .facts dd { margin: 0; min-width: 0; color: var(--fg); }
+  .facts dd a { color: var(--fg-strong); }
+  .codes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .code { display: inline-flex; align-items: center; gap: 8px; height: 22px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r-full); font: 12px var(--mono); color: var(--fg-muted); }
+  .code i { font-style: normal; color: var(--success); }
+  .code.is-gone i { color: var(--fg-muted); }
+  .code.is-bad { border-color: color-mix(in srgb, var(--error) 45%, transparent); }
+  .code.is-bad i { color: #fca5a5; }
+  .ptable { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
+  .ptable__head, .ptable__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto) 64px; gap: 20px; align-items: center; padding: 8px 12px; }
+  .ptable__head { font-size: 12px; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+  .ptable__head span:last-child, .ptable__n { text-align: right; }
+  .ptable__row + .ptable__row { border-top: 1px solid var(--border); }
+  .ptable__row.is-bad { box-shadow: inset 2px 0 0 var(--error); }
+  .ptable__path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 12px var(--mono); color: var(--fg); }
+  .ptable__n { font: 12px var(--mono); color: var(--fg); }
+  .ptable__more { margin: 0; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 12px; color: var(--fg-muted); }
   .warn { margin: 16px 0 0; max-width: 760px; font-size: 13px; color: var(--fg-muted); }
 
   @media (max-width: 860px) {
@@ -139,7 +143,8 @@
     .bot__n::before { content: attr(data-l) ' '; color: var(--fg-muted); }
     .bot__n[data-k="v"] { grid-column: 1; } .bot__n[data-k="e"] { grid-column: 2; } .bot__n[data-k="u"] { display: none; }
     .chev { grid-column: 3; grid-row: 1; }
-    .more__grid { grid-template-columns: 1fr; gap: 18px; }
+    .facts { grid-template-columns: 1fr; gap: 4px; } .facts dd + dt { margin-top: 12px; }
+    .ptable__head { display: none; } .ptable__row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 6px; } .ptable__row .codes { grid-column: 1 / -1; grid-row: 2; }
     .bot__more { padding: 14px 16px; }
   }
 </style>
@@ -313,7 +318,12 @@ function readLine(st, file, line) {
     if (!/^\/robots\.txt(\?|$)/.test(e.path || '')) b.pageStatus[e.status] = (b.pageStatus[e.status] || 0) + 1;
   }
   if (/^\/robots\.txt(\?|$)/.test(e.path || '')) b.robots++;
-  if (e.path !== null && (b.pages.size < 5000 || b.pages.has(e.path))) b.pages.set(e.path, (b.pages.get(e.path) || 0) + 1);
+  if (e.path !== null && (b.pages.size < 5000 || b.pages.has(e.path))) {
+    const pg = b.pages.get(e.path) || { n: 0, codes: {} };
+    pg.n++;
+    if (e.status !== null) pg.codes[e.status] = (pg.codes[e.status] || 0) + 1;
+    b.pages.set(e.path, pg);
+  }
 }
 
 // Lee el archivo por trozos, sin cargarlo entero; los .gz se descomprimen al vuelo.
@@ -348,7 +358,7 @@ const num = n => n.toLocaleString('es-ES');
 const day = t => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 // Respuestas que le cierran la puerta: sin permiso, demasiadas peticiones o error del servidor. Un 404 no lo es.
 const blocks = code => code === 401 || code === 403 || code === 429 || code >= 500;
-let results = null, busy = false;
+let results = null, busy = false, period = '';
 
 function say(text, bad) { const el = $('#msg'); el.textContent = text; el.hidden = !text; el.classList.toggle('is-bad', !!bad); }
 
@@ -392,7 +402,7 @@ function stateOf(b) {
 function render(st, files) {
   results = BOTS.map((b, i) => ({ ...b, ...st.bots[i] }));
   const visits = results.reduce((n, r) => n + r.hits, 0);
-  const range = st.first !== null ? (day(st.first) === day(st.last) ? day(st.first) : `${day(st.first)} – ${day(st.last)}`) : 'Sin fechas';
+  const range = period = st.first !== null ? (day(st.first) === day(st.last) ? day(st.first) : `${day(st.first)} – ${day(st.last)}`) : 'Sin fechas';
   const seen = results.filter(r => r.hits).length;
   const errs = results.filter(r => stateOf(r)[0] === 'dot--error').length;
   $('#metrics').innerHTML =
@@ -421,22 +431,40 @@ function kindSummary(k) {
 
 const shortDay = t => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
+// Un código de respuesta, con su color: verde si entra, gris si la página no existe o redirige, rojo si le cierras la puerta
+const codeChip = (c, n) => `<span class="code ${blocks(+c) ? 'is-bad' : +c >= 300 ? 'is-gone' : ''}"><i>${c}</i>${num(n)}</span>`;
+const errorsOf = codes => Object.entries(codes).filter(([c]) => blocks(+c)).reduce((n, [, v]) => n + v, 0);
+
 function botRow(r) {
   const [dot, label] = stateOf(r);
-  const bad = Object.entries(r.pageStatus).filter(([c]) => blocks(+c)).reduce((n, [, v]) => n + v, 0);
+  const bad = errorsOf(r.pageStatus);
   const cell = (k, l, v, cls = '') => `<span class="bot__n ${cls}" data-k="${k}" data-l="${l}">${v}</span>`;
-  const link = `<a href="${esc(r.source)}" target="_blank" rel="noopener">Documentación de ${esc(r.company)}</a>`;
+  const source = `<dt>Fuente</dt><dd><a href="${esc(r.source)}" target="_blank" rel="noopener">Documentación de ${esc(r.company)}</a></dd>`;
   let more;
-  if (!r.hits) more = `<p class="more__foot" style="margin:0">No sale en estos logs. Puede que no pasara en esas fechas o que tu CDN lo pare antes de llegar a tu servidor. ${link}.</p>`;
+  if (!r.hits) more = `<dl class="facts">
+      <dt>En estos logs</dt><dd>Ninguna visita${period && period !== 'Sin fechas' ? `, del ${esc(period.replace(' – ', ' al '))}` : ''}.</dd>
+      <dt>Puede ser porque</dt><dd>No pasó en esas fechas, o tu CDN lo para antes de que llegue a tu servidor. Con logs de más días es más fácil verlo.</dd>
+      ${source}</dl>`;
   else {
     const codes = Object.entries(r.status).sort((a, b) => b[1] - a[1]);
-    const max = codes.length ? codes[0][1] : 1;
-    const codeList = codes.map(([c, n]) => `<li class="${blocks(+c) ? 'is-bad' : +c >= 400 ? 'is-gone' : ''}"><span>${c}</span><span class="bar"><i style="width:${Math.max(2, n / max * 100)}%"></i></span><span>${num(n)}</span></li>`).join('');
-    const pages = [...r.pages].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([p, n]) => `<li><span title="${esc(p)}">${esc(p)}</span><span>${num(n)}</span></li>`).join('');
-    more = (codes.length || pages ? `<div class="more__grid">
-        ${codes.length ? `<div><p class="more__title">Qué le respondiste</p><ul class="codes">${codeList}</ul></div>` : ''}
-        ${pages ? `<div><p class="more__title">Páginas que más visitó</p><ul class="pages">${pages}</ul></div>` : ''}
-      </div>` : '') + `<p class="more__foot">${r.robots && r.robots === r.hits - r.unparsed ? 'Solo pidió el robots.txt: si en él le cierras tu web, no pide nada más. ' : ''}${stateOf(r)[0] === 'dot--error' ? 'Todas sus visitas a tus páginas acabaron en error: mira si lo bloquea tu CDN, tu servidor o un plugin de seguridad. ' : ''}${r.unparsed ? `En ${num(r.unparsed)} ${r.unparsed === 1 ? 'visita' : 'visitas'} tu log no dice la página ni la respuesta. ` : ''}${link}.</p>`;
+    // Primero las páginas que le dan error; después, las más visitadas
+    const all = [...r.pages].map(([p, v]) => ({ p, n: v.n, codes: v.codes, err: errorsOf(v.codes) })).sort((a, b) => b.err - a.err || b.n - a.n);
+    const shown = all.slice(0, 10);
+    const table = shown.length ? `<div class="ptable">
+        <div class="ptable__head"><span>Página</span><span>Respuestas</span><span>Visitas</span></div>
+        ${shown.map(x => `<div class="ptable__row${x.err ? ' is-bad' : ''}"><span class="ptable__path" title="${esc(x.p)}">${esc(x.p)}</span><span class="codes">${Object.entries(x.codes).sort((a, b) => b[1] - a[1]).map(([c, n]) => codeChip(c, n)).join('')}</span><span class="ptable__n">${num(x.n)}</span></div>`).join('')}
+        ${all.length > shown.length ? `<p class="ptable__more">Y ${num(all.length - shown.length)} ${all.length - shown.length === 1 ? 'página más' : 'páginas más'}.</p>` : ''}
+      </div>` : '';
+    const notes = [];
+    if (r.robots && r.robots === r.hits - r.unparsed) notes.push('Solo pidió el robots.txt: si en él le cierras tu web, no pide nada más.');
+    else if (dot === 'dot--error') notes.push('Todas sus visitas a tus páginas acabaron en error: mira si lo bloquea tu CDN, tu servidor o un plugin de seguridad.');
+    else if (bad) notes.push('Algunas páginas le dan error: son las primeras de la tabla.');
+    if (r.unparsed) notes.push(`En ${num(r.unparsed)} ${r.unparsed === 1 ? 'visita' : 'visitas'} tu log no dice la página ni la respuesta.`);
+    more = `<dl class="facts">
+      ${codes.length ? `<dt>Qué le respondiste</dt><dd><span class="codes">${codes.map(([c, n]) => codeChip(c, n)).join('')}</span></dd>` : ''}
+      ${table ? `<dt>Páginas</dt><dd>${table}</dd>` : ''}
+      ${notes.length ? `<dt>A tener en cuenta</dt><dd>${notes.join(' ')}</dd>` : ''}
+      ${source}</dl>`;
   }
   return `<li class="bot"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__token">${esc(r.token)}</span>
