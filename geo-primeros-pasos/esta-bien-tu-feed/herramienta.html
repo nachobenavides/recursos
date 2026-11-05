@@ -99,10 +99,10 @@
   .sum__cell b.is-bad { color: var(--error); }
   .sum__cell b.is-warn { color: var(--warning); }
   .sum__cell b small { font-size: 13px; font-weight: 400; color: var(--fg-muted); }
-  .sum__cell > span { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; line-height: 1.4; color: var(--fg-muted); }
-  .sum__cell .dot { flex: none; transform: translateY(-1px); }
+  .sum__cell > span { display: block; font-size: 12.5px; line-height: 1.4; color: var(--fg-muted); }
   .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
   .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
+  .kind__head p a { color: var(--fg); }
   .kind__head .kind__sum { display: inline-flex; align-items: center; gap: 8px; flex: none; margin: 0; }
   .kind__sum.is-bad { color: var(--error); }
   .kind { margin-top: 32px; scroll-margin-top: 16px; }
@@ -340,6 +340,9 @@ async function isGzip(file) {
 // ---------- Comprobaciones ----------
 // Cada una sale de la especificación de datos de producto de Google Merchant Center y de la ayuda de cada atributo, revisadas el 5 de noviembre de 2026.
 const SPEC = 'https://support.google.com/merchants/answer/7052112';
+// La página de ayuda de cada atributo, comprobadas una a una el 5 de noviembre de 2026
+const HELP = { id: 6324405, title: 6324415, description: 6324468, link: 6324416, image_link: 6324350, availability: 6324448, price: 6324371, brand: 6324351, availability_date: 6324470, sale_price: 6324471, condition: 6324469, gtin: 6324461, mpn: 6324482, identifier_exists: 6324478, gender: 6324479, age_group: 6324463, product_highlight: 9216100, product_detail: 9218260, product_type: 6324406, google_product_category: 6324436 };
+const helpUrl = attr => HELP[attr] ? `https://support.google.com/merchants/answer/${HELP[attr]}?hl=es` : SPEC;
 const val = (p, k) => (p[k] || []).find(x => x !== '') ?? null;
 const vals = (p, k) => (p[k] || []).filter(x => x !== '');
 const isUrl = v => /^https?:\/\/\S+$/i.test(v) && v.length <= 2000;
@@ -402,10 +405,10 @@ const CHECKS = [
 
 const GROUPS = {
   req: { title: 'Obligatorios', short: 'Obligatorios', text: 'Siempre. Sin ellos, Google no muestra el producto.' },
-  cond: { title: 'Condicionales', short: 'Condicionales', text: 'Obligatorios en algunos casos.' },
+  cond: { title: 'Condicionales', short: 'Condicionales', text: 'Obligatorios según el producto: la marca, si la tiene; la fecha de disponibilidad, si es preventa o bajo pedido.' },
   fmt: { title: 'Formato', short: 'Formato', text: 'Valores que Google no acepta tal como están.' },
   rec: { title: 'Recomendados', short: 'Recomendados', text: 'Google los recomienda: sin ellos, el producto puede tener visibilidad limitada.' },
-  more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto.' },
+  more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto. Estos son cuatro; hay muchos más, como el color, la talla o el material, en la <a href="https://support.google.com/merchants/answer/7052112?hl=es" target="_blank" rel="noopener">especificación de Google</a>.' },
 };
 
 const isErr = c => c.group !== 'more' && !c.warn;
@@ -483,16 +486,16 @@ function render(st, info) {
   const pct = Math.round(st.bad / st.products * 100);
   const used = results.filter(r => r.group === 'more' && r.n < st.products).length, ctxTotal = results.filter(r => r.group === 'more').length;
   const prod = n => n === 1 ? 'producto' : 'productos';
-  const cell = (k, n, label, tone, extra = '') => `<button class="sum__cell" type="button" data-k="${k}"><b class="${n && tone === 'dot--error' ? 'is-bad' : n && tone === 'dot--warn' ? 'is-warn' : ''}">${num(n)}${extra}</b><span><span class="dot ${n ? tone : 'dot--success'}"></span>${label}</span></button>`;
+  const cell = (k, n, label, tone, extra = '') => `<button class="sum__cell" type="button" data-k="${k}"><b class="${n && tone === 'dot--error' ? 'is-bad' : n && tone === 'dot--warn' ? 'is-warn' : ''}">${num(n)}${extra}</b><span>${label}</span></button>`;
   $('#metrics').innerHTML =
     `<div class="sum__head"><p><b class="${st.bad ? 'is-bad' : ''}">${num(st.bad)}</b> de ${num(st.products)} ${prod(st.products)} no ${st.bad === 1 ? 'cumple' : 'cumplen'} lo mínimo de Google</p><span class="sum__pct">${pct} %</span></div>` +
     `<div class="sum__bar"><i style="width:${pct}%"></i></div>` +
     `<div class="sum__grid">` +
       cell('req', st.groups.req, 'Sin un dato obligatorio', 'dot--error') +
-      cell('cond', st.groups.cond, 'Sin un dato obligatorio en su caso', 'dot--error') +
+      cell('cond', st.groups.cond, 'Sin un dato que su producto exige', 'dot--error') +
       cell('fmt', st.groups.fmt, 'Con formato incorrecto', 'dot--error') +
       cell('rec', st.groups.rec, 'Sin GTIN ni MPN: revísalos', 'dot--warn') +
-      `<button class="sum__cell" type="button" data-k="more"><b>${used}<small> de ${ctxTotal}</small></b><span><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span>Atributos de contexto que usas</span></button>` +
+      `<button class="sum__cell" type="button" data-k="more"><b>${used}<small> de ${ctxTotal}</small></b><span>Atributos de contexto que usas</span></button>` +
     `</div>`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
@@ -531,7 +534,7 @@ function row(r, i) {
   const missing = r.group !== 'fmt';
   const facts = [`<dt>Qué pide Google</dt><dd>${r.expect ? `Tiene que ser: <code>${esc(r.expect)}</code>` : esc(r.rule)}</dd>`];
   if (r.n) facts.push(`<dt>${missing ? 'Productos sin este dato' : 'Productos con este error'}</dt><dd><div class="ptable">${examplesTable(r)}</div></dd>`);
-  facts.push(`<dt>Fuente</dt><dd><a href="${SPEC}" target="_blank" rel="noopener">Especificación de datos de producto de Google</a></dd>`);
+  facts.push(`<dt>Fuente</dt><dd><a href="${helpUrl(r.attr)}" target="_blank" rel="noopener">Ayuda de Google sobre <code>${esc(r.attr)}</code></a></dd>`);
   return `<li class="bot" data-i="${CHECKS.indexOf(CHECKS.find(c => c.id === r.id))}"><button class="bot__row" type="button" aria-expanded="false">
       <span class="bot__name">${esc(r.name)}</span>
       <span class="bot__attr"><code>${esc(r.attr)}</code></span>
