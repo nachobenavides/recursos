@@ -46,6 +46,7 @@
   .dot--success { background: var(--success); }
   .dot--error { background: var(--error); }
   .dot--faint { background: rgba(163, 163, 163, 0.35); }
+  .dot--warn { background: #f59e0b; }
   .side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
 
   main { display: flex; flex-direction: column; margin: 8px 8px 8px 0; min-height: calc(100vh - 16px); padding: 0 24px; border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--bg-elevated); }
@@ -82,6 +83,17 @@
   .metric span { font-size: 13px; color: var(--fg-muted); }
   .metric b small { font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--fg-muted); }
   .metric.is-bad b { color: #fca5a5; }
+  .metrics { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); }
+  .metric--main { display: flex; flex-direction: column; justify-content: center; }
+  .metric--main b { font-size: 40px; }
+  .metric--list { display: grid; gap: 2px; padding: 12px 14px; }
+  .sum__row { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 6px 52px minmax(0, 1fr); gap: 12px; align-items: center; padding: 6px 8px; border-radius: var(--r-sm); cursor: pointer; font-size: 13px; color: var(--fg); }
+  .sum__row:hover { background: rgba(255, 255, 255, 0.04); }
+  .sum__row b { font: 500 14px var(--mono); color: var(--fg-strong); }
+  .sum__row b.is-bad { color: #fca5a5; }
+  .sum__row b small { font-size: 12px; font-weight: 400; color: var(--fg-muted); }
+  .scope { margin: 6px 0 0; max-width: 820px; font-size: 12px; line-height: 1.6; color: var(--fg-muted); }
+  .scope a { color: var(--fg); }
   .period { margin: 10px 0 0; font: 12px var(--mono); color: var(--fg-muted); }
   .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
   .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
@@ -175,6 +187,7 @@
     .bot__attr { grid-column: 1; grid-row: 2; }
     .bot__n[data-k="n"] { grid-column: 1; grid-row: 3; }
     .kind__head { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .sum__row { grid-template-columns: 6px 40px minmax(0, 1fr); }
     .facts { grid-template-columns: 1fr; gap: 4px; } .facts dd + dt { margin-top: 12px; }
     .bot__more { padding: 14px 16px; }
   }
@@ -210,6 +223,7 @@
     <div id="result" hidden>
       <div class="metrics" id="metrics"></div>
       <p class="period" id="period"></p>
+      <p class="scope" id="scope"></p>
       <p class="warn" id="warn" hidden></p>
       <div id="kinds"></div>
     </div>
@@ -319,7 +333,8 @@ async function isGzip(file) {
 }
 
 // ---------- Comprobaciones ----------
-// Cada una sale de la especificación de datos de producto de Google Merchant Center, revisada el 2 de noviembre de 2026.
+// Cada una sale de la especificación de datos de producto de Google Merchant Center y de la ayuda de cada atributo, revisadas el 5 de noviembre de 2026.
+const REVIEWED = '5 de noviembre de 2026';
 const SPEC = 'https://support.google.com/merchants/answer/7052112';
 const val = (p, k) => (p[k] || []).find(x => x !== '') ?? null;
 const vals = (p, k) => (p[k] || []).filter(x => x !== '');
@@ -350,7 +365,7 @@ const CHECKS = [
   { id: 'image_link', rule: 'Obligatorio. Empieza por http o https.', group: 'req', attr: 'image_link', name: 'Imagen principal', test: p => !val(p, 'image_link') && 'Falta' },
   { id: 'availability', rule: 'Obligatoria: in_stock, out_of_stock, preorder o backorder.', group: 'req', attr: 'availability', name: 'Disponibilidad', test: p => !val(p, 'availability') && 'Falta' },
   { id: 'price', rule: 'Obligatorio: número y moneda ISO 4217, como «89.95 EUR».', group: 'req', attr: 'price', name: 'Precio', test: p => !val(p, 'price') && 'Falta' },
-  { id: 'brand', rule: 'Obligatoria en productos nuevos, salvo películas, libros y música.', group: 'cond', attr: 'brand', name: 'Marca (productos nuevos)', test: p => { const c = (val(p, 'condition') || 'new').toLowerCase(); return c === 'new' && !val(p, 'brand') && 'Falta'; } },
+  { id: 'brand', rule: 'Obligatoria si el producto tiene una marca o un fabricante claro, sea nuevo o no. Opcional si no la tiene, como libros, películas o música.', group: 'cond', attr: 'brand', name: 'Marca', test: p => !val(p, 'brand') && 'Falta' },
   { id: 'availability_date', rule: 'Obligatoria si la disponibilidad es preorder o backorder.', group: 'cond', attr: 'availability_date', name: 'Fecha de disponibilidad (preventa y bajo pedido)', test: p => /^(preorder|backorder)$/i.test(val(p, 'availability') || '') && !val(p, 'availability_date') && 'Falta' },
 
   // Formato: valores que Google no acepta como están
@@ -371,8 +386,8 @@ const CHECKS = [
   { id: 'hl_val', expect: 'de 2 a 100 puntos, de hasta 150 caracteres', rule: 'Entre 2 y 100 puntos, de hasta 150 caracteres cada uno.', group: 'fmt', attr: 'product_highlight', name: 'Puntos destacados', test: p => { const v = vals(p, 'product_highlight'); if (!v.length) return false; if (v.length < 2) return 'solo 1'; const l = v.find(x => x.length > 150); return l ? `${l.length} caracteres` : false; } },
   { id: 'age_val', expect: 'newborn · infant · toddler · kids · adult', rule: 'Valores: newborn, infant, toddler, kids o adult.', group: 'fmt', attr: 'age_group', name: 'Edad', test: p => { const v = val(p, 'age_group'); return v && !/^(newborn|infant|toddler|kids|adult)$/.test(v) && v; } },
 
-  // Recomendados: no son obligatorios en España, pero ayudan a que Google entienda y muestre el producto
-  { id: 'gtin', rule: 'Si el fabricante le asignó un GTIN, hay que enviarlo; si no, el MPN. Solo con el archivo no sabemos si lo tiene: revísalo.', warn: true, group: 'cond', attr: 'gtin', name: 'GTIN o MPN', test: p => !val(p, 'gtin') && !val(p, 'mpn') && !/^(no|false)$/.test(val(p, 'identifier_exists') || '') && 'Falta' },
+  // Recomendados: Google los recomienda; sin ellos, el producto puede tener visibilidad limitada
+  { id: 'gtin', rule: 'Google lo recomienda si el fabricante le asignó un GTIN: sin él, el producto puede tener visibilidad limitada. Si no tiene GTIN, el MPN; y si no tiene ninguno, identifier_exists con el valor no. Solo con el archivo no sabemos si tu producto tiene GTIN: revísalo.', warn: true, group: 'rec', attr: 'gtin', name: 'GTIN o MPN', test: p => !val(p, 'gtin') && !val(p, 'mpn') && !/^(no|false)$/.test(val(p, 'identifier_exists') || '') && 'Falta' },
 
   // Más allá del mínimo: no son obligatorios, pero explican mejor tu producto
   { id: 'ctx_product_type', group: 'more', attr: 'product_type', name: 'Tipo de producto', rule: 'Tu categoría, con su ruta completa.', test: p => !val(p, 'product_type') && 'Falta' },
@@ -385,28 +400,32 @@ const GROUPS = {
   req: { title: 'Obligatorios', short: 'Obligatorios', text: 'Siempre. Sin ellos, Google no muestra el producto.' },
   cond: { title: 'Condicionales', short: 'Condicionales', text: 'Obligatorios en algunos casos.' },
   fmt: { title: 'Formato', short: 'Formato', text: 'Valores que Google no acepta tal como están.' },
+  rec: { title: 'Recomendados', short: 'Recomendados', text: 'Google los recomienda: sin ellos, el producto puede tener visibilidad limitada.' },
   more: { title: 'Más allá del mínimo', short: 'Más allá del mínimo', text: 'No son obligatorios, pero explican mejor tu producto.' },
 };
 
 const isErr = c => c.group !== 'more' && !c.warn;
 
 function emptyStats() {
-  return { products: 0, bad: 0, ids: new Set(), checks: CHECKS.map(() => ({ n: 0, ex: [] })) };
+  return { products: 0, bad: 0, ids: new Set(), groups: { req: 0, cond: 0, fmt: 0, rec: 0, more: 0 }, checks: CHECKS.map(() => ({ n: 0, ex: [] })) };
 }
 
 function checkProduct(st, p) {
   st.products++;
   let bad = false;
+  const hit = new Set();
   const pid = val(p, 'id') || `(fila ${st.products})`;
   CHECKS.forEach((c, i) => {
     const r = c.test(p, st);
     if (!r) return;
+    hit.add(c.group);
     const s = st.checks[i];
     s.n++;
     if (s.ex.length < 1000) s.ex.push([pid, r === 'Falta' ? '' : String(r)]);
     if (isErr(c)) bad = true;
   });
   if (bad) st.bad++;
+  hit.forEach(g => st.groups[g]++);
 }
 
 // ---------- Interfaz ----------
@@ -447,18 +466,28 @@ async function run(files) {
 function stateOf(c, s) {
   if (!s.n) return ['dot--success', 'Bien'];
   if (c.group === 'fmt') return ['dot--error', 'Incorrecto'];
+  if (c.group === 'rec') return ['dot--warn', 'Revisa'];
   return [isErr(c) ? 'dot--error' : 'dot--faint', 'Falta'];
 }
 
 function render(st, info) {
   results = CHECKS.map((c, i) => ({ ...c, ...st.checks[i] }));
   const fmt = info.mode === 'xml' ? 'XML' : info.sep === '\t' ? 'Texto con tabuladores' : info.sep === ',' ? 'Texto con comas' : 'Texto con punto y coma';
-  const failing = results.filter(r => r.n && isErr(r)).length, errChecks = CHECKS.filter(isErr).length;
+  const pct = Math.round(st.bad / st.products * 100);
+  const used = results.filter(r => r.group === 'more' && r.n < st.products).length, ctxTotal = results.filter(r => r.group === 'more').length;
+  const line = (k, n, text, tone) => `<button class="sum__row" type="button" data-k="${k}"><span class="dot ${n ? tone : 'dot--success'}"></span><b class="${n && tone === 'dot--error' ? 'is-bad' : ''}">${num(n)}</b><span class="sum__txt">${text}</span></button>`;
+  const prod = n => n === 1 ? 'producto' : 'productos';
   $('#metrics').innerHTML =
-    `<div class="metric"><b>${num(st.products)}</b><span>${st.products === 1 ? 'producto en tu feed' : 'productos en tu feed'}</span></div>` +
-    `<div class="metric${st.bad ? ' is-bad' : ''}"><b>${num(st.bad)}</b><span>${st.bad === 1 ? 'producto con algún error' : 'productos con algún error'}</span></div>` +
-    `<div class="metric${failing ? ' is-bad' : ''}"><b>${failing}<small> de ${errChecks}</small></b><span>comprobaciones con errores</span></div>`;
-  $('#period').textContent = `${fmt} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'}`;
+    `<div class="metric metric--main${st.bad ? ' is-bad' : ''}"><b>${num(st.bad)}<small> de ${num(st.products)}</small></b><span>${prod(st.products)} no ${st.bad === 1 ? 'cumple' : 'cumplen'} lo mínimo de Google${st.bad ? ` · el ${pct} %` : ''}</span></div>` +
+    `<div class="metric metric--list">` +
+      line('req', st.groups.req, `${prod(st.groups.req)} sin algún dato obligatorio`, 'dot--error') +
+      line('cond', st.groups.cond, `${prod(st.groups.cond)} sin un dato obligatorio en su caso`, 'dot--error') +
+      line('fmt', st.groups.fmt, `${prod(st.groups.fmt)} con algún formato incorrecto`, 'dot--error') +
+      line('rec', st.groups.rec, `${prod(st.groups.rec)} sin GTIN ni MPN: revisa si lo tienen`, 'dot--warn') +
+      `<button class="sum__row" type="button" data-k="more"><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span><b>${used}<small> de ${ctxTotal}</small></b><span class="sum__txt">atributos de contexto que usas</span></button>` +
+    `</div>`;
+  $('#period').innerHTML = `${esc(fmt)} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'} · Tu feed no sale de tu navegador`;
+  $('#scope').innerHTML = `Según la <a href="${SPEC}" target="_blank" rel="noopener">especificación de datos de producto de Google</a>, revisada el ${REVIEWED}. Revisa el archivo: Merchant Center comprueba además las imágenes, que el precio coincida con tu web y sus políticas, y eso esta herramienta no lo ve. Un producto puede tener más de un tipo de error.`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
   if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
@@ -478,7 +507,8 @@ function groupSummary(k) {
   const rows = results.filter(r => r.group === k), bad = rows.filter(r => r.n);
   if (!bad.length) return `<p class="kind__sum"><span class="dot dot--success"></span>Todo bien</p>`;
   const err = bad.some(isErr);
-  return `<p class="kind__sum${err ? ' is-bad' : ''}"><span class="dot ${err ? 'dot--error' : 'dot--faint'}"></span>${bad.length} de ${rows.length} con ${err ? 'errores' : 'algo que mejorar'}</p>`;
+  const tone = err ? 'dot--error' : k === 'rec' ? 'dot--warn' : 'dot--faint';
+  return `<p class="kind__sum${err ? ' is-bad' : ''}"><span class="dot ${tone}"></span>${bad.length} de ${rows.length} ${err ? 'con errores' : k === 'rec' ? 'para revisar' : 'con algo que mejorar'}</p>`;
 }
 
 // Tabla de productos afectados: los primeros 10 y «Ver más» de 20 en 20
@@ -511,11 +541,15 @@ function renderNav() {
   $('#nav').innerHTML = Object.entries(GROUPS).map(([k, g], i) => {
     const rows = results ? results.filter(r => r.group === k) : [];
     const n = rows.reduce((s, r) => s + (r.n ? 1 : 0), 0);
-    const dot = !n ? 'dot--success' : rows.some(r => r.n && isErr(r)) ? 'dot--error' : 'dot--faint';
+    const dot = !n ? 'dot--success' : rows.some(r => r.n && isErr(r)) ? 'dot--error' : k === 'rec' ? 'dot--warn' : 'dot--faint';
     const tip = !n ? 'Todo bien' : `${n} ${n === 1 ? 'comprobación' : 'comprobaciones'} con problemas`;
     return `<button class="nav ${results ? '' : 'is-locked'}" data-k="${k}" title="${results ? tip : 'Sube primero tu feed'}"><span class="n">0${i + 1}</span><span>${g.short}</span><span class="c">${results ? `<span class="dot ${dot}"></span>` : ''}</span></button>`;
   }).join('');
 }
+$('#metrics').addEventListener('click', e => {
+  const b = e.target.closest('[data-k]');
+  if (b && results) document.getElementById('k-' + b.dataset.k).scrollIntoView({ behavior: 'smooth' });
+});
 $('#nav').addEventListener('click', e => {
   const b = e.target.closest('[data-k]');
   if (b && results) document.getElementById('k-' + b.dataset.k).scrollIntoView({ behavior: 'smooth' });
