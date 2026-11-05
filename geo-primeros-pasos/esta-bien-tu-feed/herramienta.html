@@ -83,16 +83,24 @@
   .metric span { font-size: 13px; color: var(--fg-muted); }
   .metric b small { font-size: 15px; font-weight: 400; letter-spacing: 0; color: var(--fg-muted); }
   .metric.is-bad b { color: #fca5a5; }
-  .metrics { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); }
-  .metric--main { display: flex; flex-direction: column; justify-content: center; }
-  .metric--main b { font-size: 40px; }
-  .metric--list { display: grid; gap: 2px; padding: 12px 14px; }
-  .sum__row { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 6px 52px minmax(0, 1fr); gap: 12px; align-items: center; padding: 6px 8px; border-radius: var(--r-sm); cursor: pointer; font-size: 13px; color: var(--fg); }
-  .sum__row:hover { background: rgba(255, 255, 255, 0.04); }
-  .sum__row b { font: 500 14px var(--mono); color: var(--fg-strong); }
-  .sum__row b.is-bad { color: #fca5a5; }
-  .sum__row b small { font-size: 12px; font-weight: 400; color: var(--fg-muted); }
-  .period { margin: 10px 0 0; font: 12px var(--mono); color: var(--fg-muted); }
+  .metrics { display: block; padding: 22px 22px 8px; }
+  .sum__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .sum__head p { margin: 0; font-size: 18px; color: var(--fg); }
+  .sum__head p b { font-size: 32px; font-weight: 500; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); margin-right: 4px; }
+  .sum__head p b.is-bad { color: #fca5a5; }
+  .sum__pct { flex: none; white-space: nowrap; font: 14px var(--mono); color: var(--fg-muted); }
+  .sum__bar { height: 6px; margin: 14px 0 18px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+  .sum__bar i { display: block; height: 100%; border-radius: inherit; background: var(--error); }
+  .sum__grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0 -22px; border-top: 1px solid var(--border); }
+  .sum__cell { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 16px 18px 14px; cursor: pointer; transition: background-color 150ms var(--ease); }
+  .sum__cell + .sum__cell { border-left: 1px solid var(--border); }
+  .sum__cell:hover { background: rgba(255, 255, 255, 0.03); }
+  .sum__cell b { font-size: 24px; font-weight: 500; line-height: 1; color: var(--fg-strong); }
+  .sum__cell b.is-bad { color: #fca5a5; }
+  .sum__cell b.is-warn { color: #fcd34d; }
+  .sum__cell b small { font-size: 13px; font-weight: 400; color: var(--fg-muted); }
+  .sum__cell > span { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; line-height: 1.4; color: var(--fg-muted); }
+  .sum__cell .dot { flex: none; transform: translateY(-1px); }
   .kind__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
   .kind__head p { margin: 2px 0 0; font-size: 13px; color: var(--fg-muted); }
   .kind__head .kind__sum { display: inline-flex; align-items: center; gap: 8px; flex: none; margin: 0; }
@@ -185,7 +193,8 @@
     .bot__attr { grid-column: 1; grid-row: 2; }
     .bot__n[data-k="n"] { grid-column: 1; grid-row: 3; }
     .kind__head { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .sum__row { grid-template-columns: 6px 40px minmax(0, 1fr); }
+    .sum__grid { grid-template-columns: 1fr 1fr; } .sum__cell + .sum__cell { border-left: 0; } .sum__cell:nth-child(even) { border-left: 1px solid var(--border); } .sum__cell:nth-child(n+3) { border-top: 1px solid var(--border); } .sum__cell:last-child { grid-column: 1 / -1; }
+    .sum__head p { font-size: 15px; }
     .facts { grid-template-columns: 1fr; gap: 4px; } .facts dd + dt { margin-top: 12px; }
     .bot__more { padding: 14px 16px; }
   }
@@ -220,7 +229,6 @@
 
     <div id="result" hidden>
       <div class="metrics" id="metrics"></div>
-      <p class="period" id="period"></p>
       <p class="warn" id="warn" hidden></p>
       <div id="kinds"></div>
     </div>
@@ -474,18 +482,18 @@ function render(st, info) {
   const fmt = info.mode === 'xml' ? 'XML' : info.sep === '\t' ? 'Texto con tabuladores' : info.sep === ',' ? 'Texto con comas' : 'Texto con punto y coma';
   const pct = Math.round(st.bad / st.products * 100);
   const used = results.filter(r => r.group === 'more' && r.n < st.products).length, ctxTotal = results.filter(r => r.group === 'more').length;
-  const line = (k, n, text, tone) => `<button class="sum__row" type="button" data-k="${k}"><span class="dot ${n ? tone : 'dot--success'}"></span><b class="${n && tone === 'dot--error' ? 'is-bad' : ''}">${num(n)}</b><span class="sum__txt">${text}</span></button>`;
   const prod = n => n === 1 ? 'producto' : 'productos';
+  const cell = (k, n, label, tone, extra = '') => `<button class="sum__cell" type="button" data-k="${k}"><b class="${n && tone === 'dot--error' ? 'is-bad' : n && tone === 'dot--warn' ? 'is-warn' : ''}">${num(n)}${extra}</b><span><span class="dot ${n ? tone : 'dot--success'}"></span>${label}</span></button>`;
   $('#metrics').innerHTML =
-    `<div class="metric metric--main${st.bad ? ' is-bad' : ''}"><b>${num(st.bad)}<small> de ${num(st.products)}</small></b><span>${prod(st.products)} no ${st.bad === 1 ? 'cumple' : 'cumplen'} lo mínimo de Google${st.bad ? ` · el ${pct} %` : ''}</span></div>` +
-    `<div class="metric metric--list">` +
-      line('req', st.groups.req, `${prod(st.groups.req)} sin algún dato obligatorio`, 'dot--error') +
-      line('cond', st.groups.cond, `${prod(st.groups.cond)} sin un dato obligatorio en su caso`, 'dot--error') +
-      line('fmt', st.groups.fmt, `${prod(st.groups.fmt)} con algún formato incorrecto`, 'dot--error') +
-      line('rec', st.groups.rec, `${prod(st.groups.rec)} sin GTIN ni MPN: revisa si lo tienen`, 'dot--warn') +
-      `<button class="sum__row" type="button" data-k="more"><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span><b>${used}<small> de ${ctxTotal}</small></b><span class="sum__txt">atributos de contexto que usas</span></button>` +
+    `<div class="sum__head"><p><b class="${st.bad ? 'is-bad' : ''}">${num(st.bad)}</b> de ${num(st.products)} ${prod(st.products)} no ${st.bad === 1 ? 'cumple' : 'cumplen'} lo mínimo de Google</p><span class="sum__pct">${pct} %</span></div>` +
+    `<div class="sum__bar"><i style="width:${pct}%"></i></div>` +
+    `<div class="sum__grid">` +
+      cell('req', st.groups.req, 'Sin un dato obligatorio', 'dot--error') +
+      cell('cond', st.groups.cond, 'Sin un dato obligatorio en su caso', 'dot--error') +
+      cell('fmt', st.groups.fmt, 'Con formato incorrecto', 'dot--error') +
+      cell('rec', st.groups.rec, 'Sin GTIN ni MPN: revísalos', 'dot--warn') +
+      `<button class="sum__cell" type="button" data-k="more"><b>${used}<small> de ${ctxTotal}</small></b><span><span class="dot ${used === ctxTotal ? 'dot--success' : 'dot--faint'}"></span>Atributos de contexto que usas</span></button>` +
     `</div>`;
-  $('#period').innerHTML = `${esc(fmt)} · ${num(st.products)} ${st.products === 1 ? 'producto leído' : 'productos leídos'} · Tu feed no sale de tu navegador`;
   const warn = [];
   if (info.mode === 'text' && info.sep !== '\t') warn.push('Tu archivo va separado por comas o punto y coma. Google pide texto separado por tabuladores (.tsv o .txt) o XML.');
   if (info.mode === 'text' && info.header && !info.header.includes('id')) warn.push('No vemos la columna «id» en la cabecera. Revisa que la primera fila tenga los nombres de los atributos en inglés, como id, title o price.');
