@@ -13,7 +13,7 @@ Son 4 pasos y se hacen por partes, en unas horas en total. Al final tienes la li
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
 4. Mira la lista de webs donde deberías estar.
 
-Abre la [microherramienta](herramienta.html): cada paso te dice qué hacer. Si quieres verlo explicado, está en el [webinar](https://www.youtube.com/watch?v=6g-6_lXTBE4).
+Abre la [microherramienta](herramienta.html): cada paso te dice qué hacer. Si quieres verlo explicado, está en las [diapositivas del webinar](https://nachobenavides.github.io/recursos/geo-primeros-pasos/diapositivas/).
 
 ## Qué hay en la carpeta
 

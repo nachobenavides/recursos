@@ -1,8 +1,8 @@
 # Primeros pasos para salir en ChatGPT y en la IA de Google
 
-Webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Aquí están el vídeo y los ejercicios para ponerlo en práctica después.
+Webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Aquí están las diapositivas y los ejercicios para ponerlo en práctica después.
 
-- **Vídeo:** [en YouTube](https://www.youtube.com/watch?v=6g-6_lXTBE4).
+- **Diapositivas:** [en la web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/diapositivas/).
 - **Versión web:** [nachobenavides.github.io/recursos/geo-primeros-pasos](https://nachobenavides.github.io/recursos/geo-primeros-pasos/).
 
 ## Ejercicios
