@@ -59,7 +59,15 @@
   /* Las diapositivas, en un marco 16:9 como el resto de tarjetas. */
   .video { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--bg-elevated); }
   /* Más ancho que la columna de texto: a 880px las diapositivas se leían demasiado pequeñas. */
-  #diapositivas .video { width: min(1280px, calc(100vw - 48px)); margin-left: 50%; transform: translateX(-50%); }
+  #diapositivas .deck { width: min(1280px, calc(100vw - 48px)); margin-left: 50%; transform: translateX(-50%); }
+  /* Botones propios para pasar: con el teclado dentro del marco había que hacer clic antes y fallaba. */
+  .deck__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+  .deck__nav { display: flex; align-items: center; gap: 6px; }
+  .deck__btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: var(--r-full); background: transparent; color: var(--fg); cursor: pointer; transition: border-color 150ms var(--ease), color 150ms var(--ease); }
+  .deck__btn:hover:not(:disabled) { border-color: var(--border-strong); color: var(--fg-strong); }
+  .deck__btn:disabled { opacity: 0.35; cursor: default; }
+  .deck__count { min-width: 64px; text-align: center; font: 13px var(--mono); color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+  .deck__full { background: transparent; cursor: pointer; font-family: inherit; }
   .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
   /* Los cuatro pasos, en una cuadrícula de tarjetas cortas. */
@@ -100,7 +108,7 @@
 
   @media (max-width: 640px) {
     .wrap { padding: 0 16px; }
-    #diapositivas .video { width: calc(100vw - 32px); }
+    #diapositivas .deck { width: calc(100vw - 32px); }
     .crumbs__in { padding: 0 16px; }
     .hero { padding: 24px 0 40px; }
     .lead { font-size: 17px; }
@@ -141,8 +149,18 @@
   <section id="diapositivas">
     <span class="mono">El webinar</span>
     <h2>Las diapositivas</h2>
-    <div class="video"><iframe src="diapositivas/" title="Diapositivas: Primeros pasos para salir en ChatGPT y en la IA de Google" loading="lazy" allowfullscreen></iframe></div>
-    <p class="hint">Haz clic en ellas y pasa con las flechas del teclado, o <a href="diapositivas/" target="_blank" rel="noopener">ábrelas a pantalla completa</a>.</p>
+    <div class="deck">
+      <div class="video"><iframe id="deck-frame" src="diapositivas/" title="Diapositivas: Primeros pasos para salir en ChatGPT y en la IA de Google" loading="lazy" allowfullscreen></iframe></div>
+      <div class="deck__bar">
+        <div class="deck__nav">
+          <button type="button" class="deck__btn" id="deck-prev" aria-label="Diapositiva anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="deck__count" id="deck-count" aria-live="polite">1 / 51</span>
+          <button type="button" class="deck__btn" id="deck-next" aria-label="Diapositiva siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <button type="button" class="btn btn--secondary deck__full" id="deck-full">Pantalla completa</button>
+      </div>
+    </div>
+    <p class="hint">También puedes pasarlas con las flechas del teclado o <a href="diapositivas/" target="_blank" rel="noopener">abrirlas en otra pestaña</a>.</p>
   </section>
 
   <section id="ejercicios">
@@ -181,5 +199,36 @@
   </section>
 
 </div>
+<script>
+/* Pasar las diapositivas desde fuera del marco: botones, contador, flechas del teclado y pantalla completa. */
+(() => {
+  const frame = document.getElementById('deck-frame');
+  const prev = document.getElementById('deck-prev'), next = document.getElementById('deck-next');
+  const count = document.getElementById('deck-count'), full = document.getElementById('deck-full');
+  const R = () => { try { const r = frame.contentWindow.Reveal; return r && r.isReady() ? r : null; } catch (e) { return null; } };
+  const sync = () => {
+    const r = R(); if (!r) return;
+    count.textContent = (r.getSlidePastCount() + 1) + ' / ' + r.getTotalSlides();
+    prev.disabled = r.isFirstSlide() && !r.availableFragments().prev;
+    next.disabled = r.isLastSlide() && !r.availableFragments().next;
+  };
+  const hook = () => {
+    const r = R(); if (!r) return setTimeout(hook, 200);
+    ['slidechanged', 'fragmentshown', 'fragmenthidden'].forEach((e) => r.on(e, sync));
+    sync();
+  };
+  frame.addEventListener('load', hook); hook();
+  prev.addEventListener('click', () => R()?.prev());
+  next.addEventListener('click', () => R()?.next());
+  full.addEventListener('click', () => (frame.requestFullscreen || frame.webkitRequestFullscreen || (() => window.open(frame.src)))?.call(frame));
+  // Flechas del teclado en la página, mientras las diapositivas se vean en pantalla.
+  let visible = false;
+  new IntersectionObserver(([e]) => { visible = e.intersectionRatio > 0.5; }, { threshold: [0, 0.5, 1] }).observe(frame);
+  document.addEventListener('keydown', (e) => {
+    if (!visible || e.altKey || e.ctrlKey || e.metaKey || /input|textarea|select/i.test(document.activeElement?.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.key === 'ArrowRight' ? R()?.next() : R()?.prev(); }
+  });
+})();
+</script>
 </body>
 </html>
