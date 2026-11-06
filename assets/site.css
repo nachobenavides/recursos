@@ -89,7 +89,7 @@ img { max-width: 100%; }
   .row { display: grid; grid-template-columns: 32px minmax(0, 250px) minmax(0, 1fr); align-items: baseline; gap: 20px; padding: 18px 44px 18px 4px; text-decoration: none; transition: background-color 150ms var(--ease); }
   .row:hover { background: rgba(255, 255, 255, 0.025); }
   .row__n { font: 13px var(--mono); letter-spacing: 0.08em; color: rgba(163, 163, 163, 0.7); }
-  .row strong { font-size: 16px; font-weight: 500; color: var(--fg-strong); }
+  .row strong { font-size: 16px; font-weight: 400; letter-spacing: 0.2px; color: var(--fg-strong); }
   .row__desc { font-size: 14px; color: var(--fg-muted); }
   .row__go { position: absolute; color: var(--fg-muted); transition: transform 150ms var(--ease), color 150ms var(--ease); right: 8px; top: 50%; transform: translateY(-50%); }
   .row:hover .row__go { color: var(--fg-strong); transform: translate(3px, -50%); }

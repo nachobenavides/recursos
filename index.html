@@ -86,7 +86,7 @@
   /* Cada charla en una sola línea: el título y dónde fue. */
   .list a { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 20px; padding: 15px 4px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background-color 150ms var(--ease); }
   .list a:hover { background: rgba(255, 255, 255, 0.03); }
-  .list strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .list strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 400; letter-spacing: 0.2px; color: var(--fg-strong); }
   .list .ev { font-size: 13px; color: var(--fg-muted); white-space: nowrap; }
   @media (max-width: 640px) { .list a { grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 14px 4px; } .list .ev { font-size: 13px; } .list strong { white-space: normal; } }
   /* Cabecera única: marca, quién da las charlas, de qué va la página y sus perfiles. */
