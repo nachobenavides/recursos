@@ -3,139 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="../../favicon.ico" sizes="32x32">
-<link rel="icon" type="image/png" sizes="192x192" href="../../favicon-192.png">
-<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
-<title>¿Está bien tu feed? · Ejercicio · #RaiolaWebinar</title>
-<meta name="description" content="Ejercicio del webinar de Raiola Networks para comprobar tu feed de productos con las reglas de Google Merchant Center.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0b0b0b; --bg-elevated: #111111; --border: #2b2b2b; --border-strong: #404040;
-    --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
-    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
-    --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
-    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-full: 9999px;
-    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.18);
-    --ease: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
-  a { color: var(--fg-strong); }
-  .mono { font-family: var(--mono); font-size: 11px; letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px; }
-
-  /* Barra fija y fina con la miga de pan para volver al listado de charlas. */
-  .crumbs { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); background: rgba(11, 11, 11, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-  .crumbs__in { max-width: 880px; margin: 0 auto; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--fg-muted); white-space: nowrap; }
-  .crumbs a { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); text-decoration: none; }
-  .crumbs a:hover { color: var(--fg-strong); }
-  .crumbs img { width: 22px; height: 22px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
-  .crumbs__mid { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .crumbs [aria-current] { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-
-  .hero { padding: 56px 0 48px; }
-  h1 { margin: 14px 0 16px; max-width: 760px; font-size: clamp(32px, 5vw, 48px); font-weight: 500; line-height: 1.02; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
-  .lead { margin: 0; max-width: 620px; font-size: 19px; line-height: 1.5; color: var(--fg); }
-  .actions { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 22px; border-radius: var(--r-full); font-size: 15px; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease); }
-  .btn--primary { background: var(--fg-strong); color: var(--bg); box-shadow: var(--shadow-key); }
-  .btn--primary:hover { background: var(--fg); }
-  .btn--secondary { border: 1px solid var(--border); color: var(--fg); }
-  .btn--secondary:hover { border-color: var(--border-strong); color: var(--fg-strong); }
-  /* Quién organiza y quién da el webinar, con sus logotipos en blanco. */
-  .orgs { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 16px; margin-top: 40px; }
-  .orgs a { display: inline-flex; opacity: 0.85; transition: opacity 150ms var(--ease); }
-  .orgs a:hover { opacity: 1; }
-  .org-raiola { height: 24px; width: auto; }
-  .org-blinders { height: 22px; width: auto; }
-  .hint { margin: 14px 0 0; font-size: 13px; color: var(--fg-muted); }
-
-  section { padding: 48px 0; border-top: 1px solid var(--border); }
-  .wrap > section:last-child { padding-bottom: 80px; }
-  h2 { margin: 10px 0 24px; font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
-
-  /* El webinar, en un vídeo 16:9 con el mismo marco que el resto de tarjetas. */
-  .video { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--bg-elevated); }
-  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-
-  /* Los cuatro pasos, en una cuadrícula de tarjetas cortas. */
-  .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .steps li { padding: 20px 22px 22px; border: 1px solid var(--border); border-radius: var(--r-lg); background: rgba(255, 255, 255, 0.02); }
-  .steps .n { font: 11px var(--mono); letter-spacing: 0.12em; color: var(--fg-muted); }
-  .steps h3 { margin: 10px 0 6px; font-size: 17px; font-weight: 500; color: var(--fg-strong); }
-  .steps p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg-muted); }
-
-  .links { display: flex; flex-wrap: wrap; gap: 10px; }
-
-  /* Aviso: qué es y qué no es esta herramienta. */
-  /* Aviso destacado bajo la cabecera: qué es y qué no es, antes de abrir la herramienta. */
-  .notice { max-width: 620px; margin-top: 32px; padding: 18px 20px; border: 1px solid var(--border-strong); border-left: 2px solid var(--fg-strong); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.04); }
-  .notice strong { display: block; margin-bottom: 6px; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
-  .notice p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--fg); }
-  .notice p + p { margin-top: 4px; color: var(--fg-muted); }
-
-  footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 32px 0 48px; border-top: 1px solid var(--border); }
-  .author { display: flex; align-items: center; gap: 14px; text-decoration: none; }
-  .author img { width: 40px; height: 40px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
-  .author p { margin: 0; font-size: 14px; color: var(--fg-muted); line-height: 1.4; }
-  .author strong { font-weight: 500; color: var(--fg-strong); }
-  .author:hover strong { text-decoration: underline; }
-  .social { display: flex; gap: 18px; }
-  .social a { font-size: 13px; color: var(--fg-muted); text-decoration: none; transition: color 150ms var(--ease); }
-  .social a:hover { color: var(--fg-strong); }
-
-  @media (max-width: 640px) {
-    .wrap { padding: 0 16px; }
-    .crumbs__in { padding: 0 16px; }
-    .hero { padding: 24px 0 40px; }
-    .lead { font-size: 17px; }
-    .actions .btn { flex: 1 1 100%; }
-    .steps { grid-template-columns: 1fr; }
-  }
-</style>
-<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
-<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<title>¿Está bien tu feed?</title>
+<!-- Esta dirección sale en los QR de las diapositivas y en los enlaces del webinar: lleva directa a la herramienta. -->
+<link rel="canonical" href="https://nachobenavides.github.io/recursos/geo-primeros-pasos/esta-bien-tu-feed/herramienta.html">
+<meta name="robots" content="noindex, follow">
+<meta http-equiv="refresh" content="0; url=herramienta.html">
+<script>location.replace('herramienta.html' + location.search + location.hash)</script>
+<style>body{margin:0;background:#0b0b0b;color:#a3a3a3;font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:grid;place-items:center;min-height:100vh}a{color:#f5f5f5}</style>
 </head>
 <body>
-<nav class="crumbs" aria-label="Estás en">
-  <div class="crumbs__in">
-    <a href="../../"><img src="data:image/jpeg;base64,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" alt="">Charlas</a>
-    <span aria-hidden="true">/</span>
-    <a href="../" class="crumbs__mid">Primeros pasos para salir en ChatGPT y en la IA de Google</a>
-    <span aria-hidden="true">/</span>
-    <span aria-current="page">¿Está bien tu feed?</span>
-  </div>
-</nav>
-<div class="wrap">
-
-  <div class="hero">
-    <span class="mono">Ejercicio · #RaiolaWebinar</span>
-    <h1>¿Está bien tu feed?</h1>
-    <p class="lead">Comprueba tu feed de productos con las reglas de Google Merchant Center, con una microherramienta gratuita.</p>
-    <div class="actions">
-      <a class="btn btn--primary" href="herramienta.html">Abrir la microherramienta</a>
-    </div>
-    <div class="notice">
-      <strong>Antes de empezar</strong>
-      <p>Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener.</p>
-      <p>Revisa las reglas principales de la <a href="https://support.google.com/merchants/answer/7052112?hl=es" target="_blank" rel="noopener">especificación de Google</a>, no todas, a 5 de noviembre de 2026. Solo lee el archivo: Merchant Center revisa además las imágenes, tu web y sus políticas. Tu feed no sale de tu navegador.</p>
-    </div>
-  </div>
-
-  <section>
-    <span class="mono">Cómo es</span>
-    <h2>Cuatro pasos</h2>
-    <ol class="steps">
-      <li><span class="n">01</span><h3>Tu feed</h3><p>Descarga el archivo de productos que envías a Merchant Center, o el que genera tu plugin.</p></li>
-      <li><span class="n">02</span><h3>Súbelo</h3><p>Suéltalo en la microherramienta. Lee XML y texto con tabuladores, también en .gz.</p></li>
-      <li><span class="n">03</span><h3>Errores</h3><p>Qué falta y qué valores no acepta Google, producto a producto.</p></li>
-      <li><span class="n">04</span><h3>Corrígelos en origen</h3><p>En tu tienda o en tu plugin, para que salgan bien en todos los canales.</p></li>
-    </ol>
-  </section>
-
-</div>
+<p><a href="herramienta.html">Abrir «¿Está bien tu feed?»</a></p>
 </body>
 </html>

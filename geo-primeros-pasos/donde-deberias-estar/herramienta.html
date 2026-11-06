@@ -257,6 +257,11 @@
     .app { grid-template-columns: minmax(0, 1fr); } aside { position: static; height: auto; } .side-foot { margin-top: 20px; } footer.credit { flex-direction: column; gap: 6px; } .rank-head { flex-wrap: wrap; } .seg button { white-space: nowrap; }
     main { margin: 0 8px 8px; padding: 0 16px; } footer.credit, .intro { margin: 0 -16px; padding: 16px; } .intro__card { margin-left: 0; } .metrics { grid-template-columns: 1fr; } .metric + .metric { border-left: 0; border-top: 1px solid var(--border); }
   }
+
+  /* Aviso de alcance bajo el título: qué revisa, a qué fecha y qué no puede ver. */
+  .intro__note { margin: 12px 0 0; max-width: 760px; font-size: 13px; line-height: 1.55; color: var(--fg-muted); }
+  .intro__note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .side-note { margin: 0 0 12px; padding: 0 12px; font-size: 12px; line-height: 1.5; color: var(--fg-muted); }
 </style>
 <!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
 <script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
@@ -264,11 +269,12 @@
 <body>
 <div class="app">
   <aside>
-    <a class="side-brand" href="./"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Volver al ejercicio</a>
+    <a class="side-brand" href="../"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Volver a la charla</a>
     <div class="side-title mono">Pasos</div>
     <nav id="nav"></nav>
     <div class="side-foot">
       <div class="side-title mono">Tu trabajo</div>
+      <p class="side-note">Lo que apuntas se guarda solo en tu navegador: descárgalo para no perderlo. Es para practicar, sin soporte.</p>
       <button class="nav" id="export-json">Descargar mi trabajo</button>
       <button class="nav" id="import-json">Abrir un trabajo guardado</button>
       <button class="nav" id="reset">Empezar con otra URL</button>

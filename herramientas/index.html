@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="../favicon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<title>Herramientas · Nacho Benavides</title>
+<meta name="description" content="Las herramientas de las charlas de Nacho Benavides para revisar tu web: bots de IA, robots.txt, logs y feed de productos.">
+<style>
+  .page-head { padding: 64px 0 48px; }
+  .page-head h1 { margin: 0 0 14px; font-size: clamp(34px, 5.2vw, 54px); font-weight: 500; line-height: 1.03; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .page-head p { margin: 0; max-width: 560px; font-size: 17px; line-height: 1.55; color: var(--fg-muted); }
+  .page-head p strong { font-weight: 500; color: var(--fg-strong); }
+
+  /* De dónde sale cada grupo: el título enlazado y, debajo, qué fue, dónde y cuándo. */
+  /* La cercanía hace el trabajo: la charla pegada a sus herramientas y mucho aire entre una charla y la siguiente. */
+  .group { padding: 0 0 72px; }
+  .thanks { margin-bottom: 48px; }
+  .group__head { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; padding-bottom: 16px; }
+  .group__head h2 { margin: 0; font-size: 22px; font-weight: 500; line-height: 1.3; letter-spacing: var(--tracking-tightest); }
+  .group__head h2 a { color: var(--fg-strong); text-decoration: none; }
+  .group__head h2 a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--border-strong); }
+  .group__pill { flex: none; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 13px; color: var(--fg); text-decoration: none; white-space: nowrap; transition: border-color 150ms var(--ease), color 150ms var(--ease); }
+  .group__pill:hover { border-color: var(--border-strong); color: var(--fg-strong); }
+  .group__meta { margin: 4px 0 0; font-size: 14px; color: var(--fg-muted); }
+  .group__meta a { color: var(--fg-muted); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .group__meta a:hover { color: var(--fg-strong); }
+
+  @media (max-width: 760px) {
+    .page-head { padding: 36px 0 36px; }
+    .group__head { grid-template-columns: 1fr; }
+    .group__head { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head__in">
+    <a class="brand" href="../" aria-label="Nacho Benavides · Recursos de mis charlas">
+      <img class="brand__logo" src="../assets/blinders.png" alt="Blinders">
+      <span class="brand__sep" aria-hidden="true"></span>
+      <span class="brand__me"><img src="../assets/nacho.jpg" alt="">Nacho Benavides</span>
+    </a>
+    <nav class="site-nav" aria-label="Menú"><ul class="site-nav__links"><li><a href="../#charlas">Charlas</a></li><li><a href="../herramientas/" aria-current="page">Herramientas</a></li><li><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Sobre mí</a></li><li><a href="../#invitame">Contacto</a></li></ul><div class="site-social" aria-label="Perfiles de Nacho Benavides"><a href="https://www.linkedin.com/in/nacho-benavides/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+<a href="https://twitter.com/nacho_benavides" aria-label="X" title="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg></a>
+<a href="https://instagram.com/nachobenavidesr" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+<a href="https://github.com/nachobenavides" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.82-.26.82-.57v-2.04c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3.98a11.5 11.5 0 0 1 6 0c2.28-1.3 3.29-.98 3.29-.98.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.57A12 12 0 0 0 12 .3"/></svg></a></div></nav>
+    <details class="site-menu">
+      <summary>Menú</summary>
+      <div class="site-menu__panel"><ul class="site-nav__links"><li><a href="../#charlas">Charlas</a></li><li><a href="../herramientas/" aria-current="page">Herramientas</a></li><li><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Sobre mí</a></li><li><a href="../#invitame">Contacto</a></li></ul><div class="site-social" aria-label="Perfiles de Nacho Benavides"><a href="https://www.linkedin.com/in/nacho-benavides/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+<a href="https://twitter.com/nacho_benavides" aria-label="X" title="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg></a>
+<a href="https://instagram.com/nachobenavidesr" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+<a href="https://github.com/nachobenavides" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.82-.26.82-.57v-2.04c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3.98a11.5 11.5 0 0 1 6 0c2.28-1.3 3.29-.98 3.29-.98.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.57A12 12 0 0 0 12 .3"/></svg></a></div></div>
+    </details>
+  </div>
+</header>
+<main class="wrap">
+  <div class="page-head">
+    <h1>Herramientas <span class="block__count">4</span></h1>
+    <p>Para aplicar en tu web lo que cuento en mis charlas. <strong>Gratis y sin registro.</strong> Sin soporte: son para aprender.</p>
+  </div>
+  <aside class="thanks">
+      <img src="../assets/nacho.jpg" alt="">
+      <p><strong>Si te sirven, me hace ilusión que me sigas.</strong> En Instagram o en el YouTube de Blinders. Y si no, que las disfrutes igual.</p>
+      <div class="thanks__links">
+        <a href="https://instagram.com/nachobenavidesr" aria-label="Instagram · Nacho Benavides" title="Instagram" target="_blank" rel="noopener" data-goatcounter-click="seguir-instagram-herramientas" data-goatcounter-title="Seguir · Instagram · herramientas"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.youtube.com/@blindersgroup" aria-label="Canal de YouTube de Blinders" title="YouTube de Blinders" target="_blank" rel="noopener" data-goatcounter-click="seguir-youtube-herramientas" data-goatcounter-title="Seguir · YouTube · herramientas"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+      </div>
+    </aside>
+    <section class="group">
+      <div class="group__head">
+        <div>
+          <h2><a href="../geo-primeros-pasos/">Primeros pasos para salir en ChatGPT y en la IA de Google</a></h2>
+          <p class="group__meta">Webinar en Raiola Networks · 5 de noviembre de 2026</p>
+        </div>
+        <a class="group__pill" href="../geo-primeros-pasos/">Ver la charla</a>
+      </div>
+      <ul class="rows">
+      <li>
+        <a class="row" href="../geo-primeros-pasos/donde-deberias-estar/herramienta.html">
+          <span class="row__n">01</span>
+          <strong>Dónde deberías estar</strong>
+          <span class="row__desc">Las webs que cita la IA cuando preguntan por lo que vendes.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="row" href="../geo-primeros-pasos/pueden-entrar-los-bots/herramienta.html">
+          <span class="row__n">02</span>
+          <strong>¿Pueden entrar los bots de IA?</strong>
+          <span class="row__desc">Qué le dice tu robots.txt a cada bot de IA.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="row" href="../geo-primeros-pasos/quien-te-visita/herramienta.html">
+          <span class="row__n">03</span>
+          <strong>¿Quién te visita?</strong>
+          <span class="row__desc">Qué bots de IA entran en tu web, según tus logs.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="row" href="../geo-primeros-pasos/esta-bien-tu-feed/herramienta.html">
+          <span class="row__n">04</span>
+          <strong>¿Está bien tu feed?</strong>
+          <span class="row__desc">Tu feed de productos, con las reglas de Google Merchant Center.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+    </ul>
+    </section>
+</main>
+
+<footer class="site-foot">
+  <div class="site-foot__in">
+    <span>Nacho Benavides · <a href="https://blindersgroup.com/" target="_blank" rel="noopener">Blinders Group</a></span>
+    <a href="#">Volver arriba <span aria-hidden="true">↑</span></a>
+  </div>
+</footer>
+</body>
+</html>
