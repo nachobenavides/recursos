@@ -4,7 +4,7 @@ Material de trabajo de mis charlas y webinars, para hacer los ejercicios con cal
 
 | Recurso | Charla |
 |---|---|
-| [Primeros pasos para salir en ChatGPT y en la IA de Google](geo-primeros-pasos/) · [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/) | Webinar de Raiola Networks (#RaiolaWebinar) · [vídeo](https://www.youtube.com/watch?v=6g-6_lXTBE4) |
+| [Primeros pasos para salir en ChatGPT y en la IA de Google](geo-primeros-pasos/) · [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/) | Webinar de Raiola Networks (#RaiolaWebinar) · [vídeo, con registro](https://webinars.raiola.link/acceso/) |
 
 ## Cómo está organizado
 
