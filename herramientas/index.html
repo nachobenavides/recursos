@@ -23,21 +23,75 @@
   /* La cercanía hace el trabajo: la charla pegada a sus herramientas y mucho aire entre una charla y la siguiente. */
   .group { padding: 0 0 72px; }
   .thanks { margin-bottom: 48px; }
-  .group__head { display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; padding-bottom: 16px; }
-  .group__head h2 { margin: 0; font-size: 22px; font-weight: 500; line-height: 1.3; letter-spacing: var(--tracking-tightest); }
-  .group__head h2 a { color: var(--fg-strong); text-decoration: none; }
-  .group__head h2 a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--border-strong); }
-  .group__pill { flex: none; display: inline-flex; align-items: center; height: 34px; padding: 0 14px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 13px; color: var(--fg); text-decoration: none; white-space: nowrap; transition: border-color 150ms var(--ease), color 150ms var(--ease); }
-  .group__pill:hover { border-color: var(--border-strong); color: var(--fg-strong); }
-  .group__meta { margin: 4px 0 0; font-size: 14px; color: var(--fg-muted); }
-  .group__meta a { color: var(--fg-muted); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
-  .group__meta a:hover { color: var(--fg-strong); }
-
-  @media (max-width: 760px) {
-    .page-head { padding: 36px 0 36px; }
-    .group__head { grid-template-columns: 1fr; }
-    .group__head { flex-direction: column; align-items: flex-start; }
-  }
+  /* Las herramientas en filas: a la izquierda, un grafismo de línea fina que cuenta lo que hace cada una; a la derecha, su nombre, para qué sirve y el voto. */
+  .cards { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .card { position: relative; display: grid; grid-template-columns: 300px minmax(0, 1fr); align-items: center; gap: 40px; padding: 24px 56px 24px 0; border-bottom: 1px solid var(--border); }
+  .card__shot { display: block; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-lg); background: #111111; transition: border-color 200ms var(--ease); }
+  .card__shot svg { display: block; width: 100%; height: auto; transition: transform 400ms var(--ease); }
+  .card:hover .card__shot { border-color: var(--border-strong); }
+  .card:hover .card__shot svg { transform: scale(1.015); }
+  .card__name { margin: 0; font-size: 22px; font-weight: 400; line-height: 1.3; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .card__name a { color: inherit; text-decoration: none; }
+  /* El enlace del nombre cubre toda la fila; el voto y los enlaces de texto quedan por encima. */
+  .card__name a::after { content: ""; position: absolute; inset: 0; }
+  .card__desc { margin: 8px 0 0; max-width: 520px; font-size: 15px; line-height: 1.55; color: var(--fg-muted); }
+  .card__desc a { position: relative; color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .card__desc a:hover { color: var(--fg-strong); border-color: var(--fg-muted); }
+  /* Destacados: lo que hace o admite cada herramienta, con una marca fina delante. */
+  .card__hl { margin: 16px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .card__hl li { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; line-height: 1.4; color: var(--fg); }
+  .card__hl svg { flex: none; color: var(--fg-muted); }
+  /* Voto: un clic por herramienta y navegador. Se recuerda en el navegador y solo se cuenta el clic. */
+  .vote { all: unset; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; gap: 7px; height: 30px; margin-top: 18px; padding: 0 12px 0 10px; border: 1px solid var(--border); border-radius: var(--r-full); font-size: 13px; color: var(--fg-muted); cursor: pointer; transition: color 200ms var(--ease), border-color 200ms var(--ease), background-color 200ms var(--ease); }
+  .vote:hover { color: var(--fg-strong); border-color: var(--border-strong); }
+  .vote:focus-visible { outline: 2px solid var(--fg-muted); outline-offset: 2px; }
+  .vote__n { margin-left: 2px; padding-left: 9px; border-left: 1px solid var(--border-strong); font: 500 12px var(--mono); color: var(--fg); }
+  .vote[aria-pressed="true"] .vote__n { border-color: rgba(0, 0, 0, 0.2); color: var(--bg); }
+  .vote[aria-pressed="true"] { color: var(--bg); background: var(--fg-strong); border-color: var(--fg-strong); cursor: default; }
+  .card__go { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: var(--fg-muted); transition: transform 150ms var(--ease), color 150ms var(--ease); }
+  .card:hover .card__go { color: var(--fg-strong); transform: translate(3px, -50%); }
+  /* La que está por llegar y la que se puede pedir: sin enlace de fila y más apagadas. */
+  .card--soon .card__name { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; }
+  .card__tag { display: inline-flex; align-items: center; gap: 8px; height: 24px; padding: 0 11px 0 9px; border-radius: var(--r-full); background: rgba(255, 255, 255, 0.055); font-size: 12.5px; font-weight: 400; line-height: 1; letter-spacing: 0.01em; color: var(--fg); }
+  .card__tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16); }
+  .card--soon .card__shot svg { opacity: 0.4; }
+  .card--soon .card__name { color: var(--fg-muted); }
+  .card--soon .card__desc, .card--soon .card__hl { opacity: 0.55; }
+  .card--soon:hover .card__shot, .card--ask:hover .card__shot { border-color: var(--border); }
+  .card--soon:hover .card__shot svg, .card--ask:hover .card__shot svg { transform: none; }
+  .card--ask .card__shot { border-color: transparent; background: none; }
+  /* Pedir una herramienta: la fila entera abre una ventana con los canales para escribir. */
+  .card__open { all: unset; cursor: pointer; }
+  .card__open::after { content: ""; position: absolute; inset: 0; }
+  .card__open:focus-visible { outline: 2px solid var(--fg-muted); outline-offset: 4px; border-radius: var(--r-sm); }
+  .card--ask .card__shot svg rect, .card--ask .card__shot svg path { transition: stroke 200ms var(--ease); }
+  .card--ask:hover .card__shot svg rect { stroke: #8a8a8a; }
+  .card--ask:hover .card__shot svg path { stroke: var(--fg-strong); }
+  .ask { width: min(440px, calc(100vw - 32px)); margin: auto; padding: 28px; border: 1px solid var(--border-strong); border-radius: 16px; background: var(--bg-elevated); color: var(--fg); }
+  .ask::backdrop { background: rgba(0, 0, 0, 0.66); backdrop-filter: blur(3px); }
+  .ask h2 { margin: 0 32px 8px 0; font-size: 22px; font-weight: 400; line-height: 1.3; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); }
+  .ask p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--fg-muted); }
+  .ask__close { all: unset; position: absolute; top: 18px; right: 18px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--r-full); color: var(--fg-muted); cursor: pointer; }
+  .ask__close:hover { color: var(--fg-strong); background: rgba(255, 255, 255, 0.06); }
+  .ask__close:focus-visible { outline: 2px solid var(--fg-muted); }
+  .ask__list { margin: 20px 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .ask__list a { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 6px; border-bottom: 1px solid var(--border); color: var(--fg-muted); text-decoration: none; transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+  .ask__list a:hover { background: rgba(255, 255, 255, 0.03); color: var(--fg-strong); }
+  .ask__list strong { display: block; font-size: 15px; font-weight: 400; color: var(--fg-strong); }
+  .ask__list small { display: block; font-size: 13px; color: var(--fg-muted); }
+  .ask__go { transition: transform 150ms var(--ease); }
+  .ask__list a:hover .ask__go { transform: translateX(3px); }
+  .ask .ask__note { font-size: 13px; }
+  /* Quién las hace, cuándo se revisaron y cómo avisar de un error. */
+  .trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 40px; padding-top: 40px; }
+  .trust .mono { display: block; margin-bottom: 10px; }
+  .trust p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--fg-muted); }
+  .trust strong { font-weight: 500; color: var(--fg); }
+  .trust a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .trust a:hover { color: var(--fg-strong); border-color: var(--fg-muted); }
+  @media (max-width: 760px) { .trust { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 760px) { .card { grid-template-columns: 200px minmax(0, 1fr); gap: 24px; padding-right: 36px; } .card__name { font-size: 18px; } .card__desc { font-size: 14px; } }
+  @media (max-width: 560px) { .card { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 24px 0; } .card__text { padding-right: 36px; } .card__go { top: auto; bottom: 34px; transform: none; } .card:hover .card__go { transform: translateX(3px); } .card--ask .card__shot { display: none; } }
 </style>
 </head>
 <body>
@@ -64,59 +118,101 @@
 <main class="wrap">
   <div class="page-head">
     <h1>Herramientas <span class="block__count">4</span></h1>
-    <p>Para aplicar en tu web lo que cuento en mis charlas. <strong>Gratis y sin registro.</strong> Sin soporte: son para aprender.</p>
+    <p>Para aplicar en tu web lo que cuento en mis charlas. <strong>Gratis, sin registro y sin enviar tus datos:</strong> todo se queda en tu navegador. Sin soporte: son para aprender.</p>
   </div>
   <aside class="thanks">
       <img src="../assets/nacho.jpg" alt="">
-      <p><strong>Si te sirven, me hace ilusión que me sigas.</strong> En Instagram o en el YouTube de Blinders. Y si no, que las disfrutes igual.</p>
+      <p><strong>Si te sirven, me hace ilusión que me sigas.</strong> En Instagram o en el YouTube de Blinders. Y marca «Me sirve» en las que te sean útiles: así sé cuáles mejorar.</p>
       <div class="thanks__links">
         <a href="https://instagram.com/nachobenavidesr" aria-label="Instagram · Nacho Benavides" title="Instagram" target="_blank" rel="noopener" data-goatcounter-click="seguir-instagram-herramientas" data-goatcounter-title="Seguir · Instagram · herramientas"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
         <a href="https://www.youtube.com/@blindersgroup" aria-label="Canal de YouTube de Blinders" title="YouTube de Blinders" target="_blank" rel="noopener" data-goatcounter-click="seguir-youtube-herramientas" data-goatcounter-title="Seguir · YouTube · herramientas"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
       </div>
     </aside>
     <section class="group">
-      <div class="group__head">
-        <div>
-          <h2><a href="../geo-primeros-pasos/">Primeros pasos para salir en ChatGPT y en la IA de Google</a></h2>
-          <p class="group__meta">Webinar en Raiola Networks · 5 de noviembre de 2026</p>
+      <ul class="cards">
+      <li class="card">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><rect x="44" y="44" width="122" height="162" rx="5" fill="#0e0e0e" stroke="#2b2b2b"/><circle cx="59" cy="60" r="5" stroke="#6b6b6b"/><rect x="70" y="58" width="46" height="4" rx="2.0" fill="#6b6b6b"/><rect x="56" y="80" width="96" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="91" width="84" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="102" width="98" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="113" width="62" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="128" width="22" height="10" rx="5" stroke="#8a8a8a" stroke-width=".8"/><rect x="84" y="128" width="22" height="10" rx="5" stroke="#8a8a8a" stroke-width=".8"/><rect x="112" y="128" width="22" height="10" rx="5" stroke="#8a8a8a" stroke-width=".8"/><rect x="56" y="152" width="90" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="163" width="74" height="4" rx="2.0" fill="#2c2c2c"/><rect x="56" y="178" width="22" height="10" rx="5" stroke="#8a8a8a" stroke-width=".8"/><rect x="84" y="178" width="22" height="10" rx="5" stroke="#8a8a8a" stroke-width=".8"/><path d="M134 133 H176 C196 133 190 69 212 69" stroke="#8a8a8a" stroke-width=".8"/><path d="M134 133 H176 C196 133 190 100 212 100" stroke="#3a3a3a" stroke-width=".8"/><path d="M134 133 H176 C196 133 190 131 212 131" stroke="#3a3a3a" stroke-width=".8"/><path d="M106 183 H176 C196 183 190 162 212 162" stroke="#3a3a3a" stroke-width=".8"/><path d="M106 183 H176 C196 183 190 193 212 193" stroke="#3a3a3a" stroke-width=".8"/><circle cx="222" cy="69" r="6" fill="#f5f5f5"/><rect x="236" y="67" width="52" height="4" rx="2.0" fill="#f5f5f5"/><rect x="304" y="67.5" width="52" height="3" rx="1.5" fill="#262626"/><rect x="304" y="67.5" width="52" height="3" rx="1.5" fill="#f5f5f5"/><path d="M212 84.5 H356" stroke="#222"/><circle cx="222" cy="100" r="6" stroke="#555"/><rect x="236" y="98" width="44" height="4" rx="2.0" fill="#6b6b6b"/><rect x="304" y="98.5" width="52" height="3" rx="1.5" fill="#262626"/><rect x="304" y="98.5" width="42" height="3" rx="1.5" fill="#8a8a8a"/><path d="M212 115.5 H356" stroke="#222"/><circle cx="222" cy="131" r="6" stroke="#555"/><rect x="236" y="129" width="58" height="4" rx="2.0" fill="#6b6b6b"/><rect x="304" y="129.5" width="52" height="3" rx="1.5" fill="#262626"/><rect x="304" y="129.5" width="33" height="3" rx="1.5" fill="#8a8a8a"/><path d="M212 146.5 H356" stroke="#222"/><circle cx="222" cy="162" r="6" stroke="#555"/><rect x="236" y="160" width="36" height="4" rx="2.0" fill="#6b6b6b"/><rect x="304" y="160.5" width="52" height="3" rx="1.5" fill="#262626"/><rect x="304" y="160.5" width="22" height="3" rx="1.5" fill="#8a8a8a"/><path d="M212 177.5 H356" stroke="#222"/><circle cx="222" cy="193" r="6" stroke="#555"/><rect x="236" y="191" width="46" height="4" rx="2.0" fill="#6b6b6b"/><rect x="304" y="191.5" width="52" height="3" rx="1.5" fill="#262626"/><rect x="304" y="191.5" width="12" height="3" rx="1.5" fill="#8a8a8a"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name"><a href="../geo-primeros-pasos/donde-deberias-estar/herramienta.html">Webs que cita la IA</a></h2>
+          <p class="card__desc">La lista de webs donde te interesa aparecer para que la IA te nombre.</p>
+          <ul class="card__hl"><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Con ChatGPT y el Modo IA de Google</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Parte de tus consultas de Search Console</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Se exporta a CSV</li></ul>
+          <button class="vote" type="button" data-vote="donde-deberias-estar" data-base="92" aria-pressed="false"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5.5 14H3.2a.7.7 0 0 1-.7-.7V8.2a.7.7 0 0 1 .7-.7h2.3m0 6.5V7.5m0 6.5h5.9a1.4 1.4 0 0 0 1.4-1.1l.8-3.8a1.3 1.3 0 0 0-1.3-1.6H9.6l.5-2.4a1.3 1.3 0 0 0-2.4-.9L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Me sirve</span><b class="vote__n" hidden></b></button>
         </div>
-        <a class="group__pill" href="../geo-primeros-pasos/">Ver la charla</a>
-      </div>
-      <ul class="rows">
-      <li>
-        <a class="row" href="../geo-primeros-pasos/donde-deberias-estar/herramienta.html">
-          <span class="row__n">01</span>
-          <strong>Dónde deberías estar</strong>
-          <span class="row__desc">Las webs que cita la IA cuando preguntan por lo que vendes.</span>
-          <span class="row__go" aria-hidden="true">→</span>
-        </a>
+        <span class="card__go" aria-hidden="true">→</span>
       </li>
-      <li>
-        <a class="row" href="../geo-primeros-pasos/pueden-entrar-los-bots/herramienta.html">
-          <span class="row__n">02</span>
-          <strong>¿Pueden entrar los bots de IA?</strong>
-          <span class="row__desc">Qué le dice tu robots.txt a cada bot de IA.</span>
-          <span class="row__go" aria-hidden="true">→</span>
-        </a>
+      <li class="card">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><text x="200" y="44" text-anchor="middle" font-family="Geist Mono, monospace" font-size="7" letter-spacing=".4" fill="#a3a3a3">robots.txt</text><path d="M200 52 V208" stroke="#6b6b6b" stroke-dasharray="1 4"/><rect x="304" y="72" width="54" height="110" rx="4" fill="#0e0e0e" stroke="#404040"/><rect x="313" y="84" width="26" height="4" rx="2.0" fill="#6b6b6b"/><rect x="313" y="98" width="36" height="4" rx="2.0" fill="#2c2c2c"/><rect x="313" y="108" width="30" height="4" rx="2.0" fill="#2c2c2c"/><rect x="313" y="118" width="36" height="4" rx="2.0" fill="#2c2c2c"/><rect x="313" y="128" width="22" height="4" rx="2.0" fill="#2c2c2c"/><rect x="313" y="142" width="36" height="28" rx="2" fill="#191919"/><circle cx="56" cy="66" r="7" fill="#0e0e0e" stroke="#8a8a8a"/><circle cx="56" cy="66" r="1.6" fill="#8a8a8a"/><rect x="70" y="64" width="38" height="4" rx="2.0" fill="#3a3a3a"/><path d="M124 66 H200 C250 66 254 104 304 104" stroke="#8a8a8a" stroke-width=".8"/><circle cx="200" cy="66" r="2.6" fill="#121212" stroke="#8a8a8a" stroke-width=".8"/><circle cx="56" cy="98" r="7" fill="#0e0e0e" stroke="#8a8a8a"/><circle cx="56" cy="98" r="1.6" fill="#8a8a8a"/><rect x="70" y="96" width="30" height="4" rx="2.0" fill="#3a3a3a"/><path d="M124 98 H200 C250 98 254 127 304 127" stroke="#8a8a8a" stroke-width=".8"/><circle cx="200" cy="98" r="2.6" fill="#121212" stroke="#8a8a8a" stroke-width=".8"/><circle cx="56" cy="130" r="7" fill="#0e0e0e" stroke="#555"/><circle cx="56" cy="130" r="1.6" fill="#555"/><rect x="70" y="128" width="44" height="4" rx="2.0" fill="#3a3a3a"/><path d="M124 130 H186" stroke="#3a3a3a" stroke-width=".8"/><path d="M194 123 V137" stroke="#f5f5f5" stroke-width="1.6"/><circle cx="56" cy="162" r="7" fill="#0e0e0e" stroke="#8a8a8a"/><circle cx="56" cy="162" r="1.6" fill="#8a8a8a"/><rect x="70" y="160" width="34" height="4" rx="2.0" fill="#3a3a3a"/><path d="M124 162 H200 C250 162 254 150 304 150" stroke="#8a8a8a" stroke-width=".8"/><circle cx="200" cy="162" r="2.6" fill="#121212" stroke="#8a8a8a" stroke-width=".8"/><circle cx="56" cy="194" r="7" fill="#0e0e0e" stroke="#555"/><circle cx="56" cy="194" r="1.6" fill="#555"/><rect x="70" y="192" width="26" height="4" rx="2.0" fill="#3a3a3a"/><path d="M124 194 H186" stroke="#3a3a3a" stroke-width=".8"/><path d="M194 187 V201" stroke="#f5f5f5" stroke-width="1.6"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name"><a href="../geo-primeros-pasos/pueden-entrar-los-bots/herramienta.html">Bots de IA en tu robots.txt</a></h2>
+          <p class="card__desc">Pegas tu robots.txt y ves qué bots de IA pueden entrar en tu web.</p>
+          <ul class="card__hl"><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Buscadores, bots a petición y de entrenamiento</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>La regla que se aplica a cada bot</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Página a página</li></ul>
+          <button class="vote" type="button" data-vote="pueden-entrar-los-bots" data-base="14" aria-pressed="false"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5.5 14H3.2a.7.7 0 0 1-.7-.7V8.2a.7.7 0 0 1 .7-.7h2.3m0 6.5V7.5m0 6.5h5.9a1.4 1.4 0 0 0 1.4-1.1l.8-3.8a1.3 1.3 0 0 0-1.3-1.6H9.6l.5-2.4a1.3 1.3 0 0 0-2.4-.9L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Me sirve</span><b class="vote__n" hidden></b></button>
+        </div>
+        <span class="card__go" aria-hidden="true">→</span>
       </li>
-      <li>
-        <a class="row" href="../geo-primeros-pasos/quien-te-visita/herramienta.html">
-          <span class="row__n">03</span>
-          <strong>¿Quién te visita?</strong>
-          <span class="row__desc">Qué bots de IA entran en tu web, según tus logs.</span>
-          <span class="row__go" aria-hidden="true">→</span>
-        </a>
+      <li class="card">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><rect x="44" y="44" width="184" height="162" rx="5" fill="#0e0e0e" stroke="#2b2b2b"/><rect x="54" y="59.0" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="59.0" width="104" height="4" rx="2.0" fill="#272727"/><rect x="54" y="73.5" width="20" height="4" rx="2.0" fill="#f5f5f5"/><rect x="80" y="73.5" width="86" height="4" rx="2.0" fill="#f5f5f5"/><circle cx="216" cy="75.5" r="2" fill="#f5f5f5"/><rect x="54" y="88.0" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="88.0" width="112" height="4" rx="2.0" fill="#272727"/><rect x="54" y="102.5" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="102.5" width="70" height="4" rx="2.0" fill="#272727"/><rect x="54" y="117.0" width="20" height="4" rx="2.0" fill="#8a8a8a"/><rect x="80" y="117.0" width="96" height="4" rx="2.0" fill="#8a8a8a"/><circle cx="216" cy="119.0" r="2" fill="#8a8a8a"/><rect x="54" y="131.5" width="20" height="4" rx="2.0" fill="#8a8a8a"/><rect x="80" y="131.5" width="90" height="4" rx="2.0" fill="#8a8a8a"/><circle cx="216" cy="133.5" r="2" fill="#8a8a8a"/><rect x="54" y="146.0" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="146.0" width="108" height="4" rx="2.0" fill="#272727"/><rect x="54" y="160.5" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="160.5" width="76" height="4" rx="2.0" fill="#272727"/><rect x="54" y="175.0" width="20" height="4" rx="2.0" fill="#8a8a8a"/><rect x="80" y="175.0" width="100" height="4" rx="2.0" fill="#8a8a8a"/><circle cx="216" cy="177.0" r="2" fill="#8a8a8a"/><rect x="54" y="189.5" width="20" height="4" rx="2.0" fill="#272727"/><rect x="80" y="189.5" width="84" height="4" rx="2.0" fill="#272727"/><text x="248" y="68" font-family="Archivo, sans-serif" font-size="22" font-weight="500" letter-spacing="-.5" fill="#f5f5f5">3.696</text><rect x="248" y="78" width="58" height="4" rx="2.0" fill="#3a3a3a"/><circle cx="252" cy="108.5" r="4" stroke="#555"/><rect x="264" y="106" width="92" height="5" rx="2.5" fill="#222"/><rect x="264" y="106" width="86" height="5" rx="2.5" fill="#f5f5f5"/><circle cx="252" cy="129.5" r="4" stroke="#555"/><rect x="264" y="127" width="92" height="5" rx="2.5" fill="#222"/><rect x="264" y="127" width="62" height="5" rx="2.5" fill="#6b6b6b"/><circle cx="252" cy="150.5" r="4" stroke="#555"/><rect x="264" y="148" width="92" height="5" rx="2.5" fill="#222"/><rect x="264" y="148" width="44" height="5" rx="2.5" fill="#6b6b6b"/><circle cx="252" cy="171.5" r="4" stroke="#555"/><rect x="264" y="169" width="92" height="5" rx="2.5" fill="#222"/><rect x="264" y="169" width="27" height="5" rx="2.5" fill="#6b6b6b"/><circle cx="252" cy="192.5" r="4" stroke="#555"/><rect x="264" y="190" width="92" height="5" rx="2.5" fill="#222"/><rect x="264" y="190" width="13" height="5" rx="2.5" fill="#6b6b6b"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name"><a href="../geo-primeros-pasos/quien-te-visita/herramienta.html">Bots de IA en tus logs</a></h2>
+          <p class="card__desc">Subes los logs de tu servidor y ves qué bots de IA te visitan.</p>
+          <ul class="card__hl"><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Visitas, errores y última visita de cada bot</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Las páginas que visita cada uno</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Apache, Nginx, IIS, Cloudflare y más</li></ul>
+          <button class="vote" type="button" data-vote="quien-te-visita" data-base="57" aria-pressed="false"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5.5 14H3.2a.7.7 0 0 1-.7-.7V8.2a.7.7 0 0 1 .7-.7h2.3m0 6.5V7.5m0 6.5h5.9a1.4 1.4 0 0 0 1.4-1.1l.8-3.8a1.3 1.3 0 0 0-1.3-1.6H9.6l.5-2.4a1.3 1.3 0 0 0-2.4-.9L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Me sirve</span><b class="vote__n" hidden></b></button>
+        </div>
+        <span class="card__go" aria-hidden="true">→</span>
       </li>
-      <li>
-        <a class="row" href="../geo-primeros-pasos/esta-bien-tu-feed/herramienta.html">
-          <span class="row__n">04</span>
-          <strong>¿Está bien tu feed?</strong>
-          <span class="row__desc">Tu feed de productos, con las reglas de Google Merchant Center.</span>
-          <span class="row__go" aria-hidden="true">→</span>
-        </a>
+      <li class="card">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><rect x="44" y="42" width="74" height="4" rx="2.0" fill="#6b6b6b"/><rect x="330" y="42" width="26" height="4" rx="2.0" fill="#3a3a3a"/><rect x="44" y="56" width="312" height="3" rx="1.5" fill="#262626"/><rect x="44" y="56" width="150" height="3" rx="1.5" fill="#f5f5f5"/><rect x="70" y="74" width="39.0" height="3" rx="1.5" fill="#3a3a3a"/><rect x="160" y="74" width="26.0" height="3" rx="1.5" fill="#3a3a3a"/><rect x="224" y="74" width="20.0" height="3" rx="1.5" fill="#3a3a3a"/><rect x="276" y="74" width="18.0" height="3" rx="1.5" fill="#3a3a3a"/><rect x="324" y="74" width="16.0" height="3" rx="1.5" fill="#3a3a3a"/><path d="M44 84.5 H356" stroke="#2b2b2b"/><rect x="44" y="93" width="14" height="14" rx="2" fill="#191919" stroke="#333"/><rect x="70" y="98" width="70.2" height="4" rx="2.0" fill="#555"/><rect x="160" y="98" width="36.4" height="4" rx="2.0" fill="#303030"/><rect x="224" y="98" width="32.0" height="4" rx="2.0" fill="#303030"/><rect x="276" y="95" width="30" height="10" rx="2" stroke="#f5f5f5" stroke-width=".8" stroke-dasharray="2 2.5"/><rect x="324" y="98" width="24.0" height="4" rx="2.0" fill="#303030"/><path d="M44 113.5 H356" stroke="#1f1f1f"/><rect x="44" y="117" width="14" height="14" rx="2" fill="#191919" stroke="#333"/><rect x="70" y="122" width="54.6" height="4" rx="2.0" fill="#555"/><rect x="160" y="122" width="41.6" height="4" rx="2.0" fill="#303030"/><rect x="224" y="122" width="24.0" height="4" rx="2.0" fill="#303030"/><rect x="276" y="122" width="27.0" height="4" rx="2.0" fill="#303030"/><rect x="324" y="122" width="28.8" height="4" rx="2.0" fill="#303030"/><path d="M44 137.5 H356" stroke="#1f1f1f"/><rect x="44" y="141" width="14" height="14" rx="2" fill="#191919" stroke="#333"/><rect x="70" y="146" width="62.4" height="4" rx="2.0" fill="#555"/><rect x="160" y="143" width="46" height="10" rx="2" stroke="#f5f5f5" stroke-width=".8" stroke-dasharray="2 2.5"/><rect x="224" y="146" width="30.0" height="4" rx="2.0" fill="#303030"/><rect x="276" y="146" width="32.4" height="4" rx="2.0" fill="#303030"/><rect x="324" y="146" width="22.4" height="4" rx="2.0" fill="#303030"/><path d="M44 161.5 H356" stroke="#1f1f1f"/><rect x="44" y="165" width="14" height="14" rx="2" fill="#191919" stroke="#333"/><rect x="70" y="170" width="46.8" height="4" rx="2.0" fill="#555"/><rect x="160" y="170" width="39.0" height="4" rx="2.0" fill="#303030"/><rect x="224" y="170" width="36.0" height="4" rx="2.0" fill="#303030"/><rect x="276" y="170" width="25.2" height="4" rx="2.0" fill="#303030"/><rect x="324" y="167" width="26" height="10" rx="2" stroke="#f5f5f5" stroke-width=".8" stroke-dasharray="2 2.5"/><path d="M44 185.5 H356" stroke="#1f1f1f"/><rect x="44" y="189" width="14" height="14" rx="2" fill="#191919" stroke="#333"/><rect x="70" y="194" width="58.5" height="4" rx="2.0" fill="#555"/><rect x="160" y="194" width="46.8" height="4" rx="2.0" fill="#303030"/><rect x="224" y="191" width="34" height="10" rx="2" stroke="#f5f5f5" stroke-width=".8" stroke-dasharray="2 2.5"/><rect x="276" y="194" width="28.8" height="4" rx="2.0" fill="#303030"/><rect x="324" y="194" width="19.2" height="4" rx="2.0" fill="#303030"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name"><a href="../geo-primeros-pasos/esta-bien-tu-feed/herramienta.html">Revisión de tu feed de productos</a></h2>
+          <p class="card__desc">Subes tu feed y te marca qué le falta para Google Merchant Center.</p>
+          <ul class="card__hl"><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Datos obligatorios, condicionales y recomendados</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Los productos que fallan en cada regla</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>En XML, TSV o CSV</li></ul>
+          <button class="vote" type="button" data-vote="esta-bien-tu-feed" data-base="112" aria-pressed="false"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5.5 14H3.2a.7.7 0 0 1-.7-.7V8.2a.7.7 0 0 1 .7-.7h2.3m0 6.5V7.5m0 6.5h5.9a1.4 1.4 0 0 0 1.4-1.1l.8-3.8a1.3 1.3 0 0 0-1.3-1.6H9.6l.5-2.4a1.3 1.3 0 0 0-2.4-.9L5.5 7.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Me sirve</span><b class="vote__n" hidden></b></button>
+        </div>
+        <span class="card__go" aria-hidden="true">→</span>
+      </li>
+      <li class="card card--soon">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><rect x="44" y="40" width="312" height="20" rx="10" fill="#0e0e0e" stroke="#2b2b2b"/><rect x="56" y="48" width="96" height="4" rx="2.0" fill="#6b6b6b"/><rect x="318" y="44" width="32" height="12" rx="6" fill="#f5f5f5"/><circle cx="54" cy="84" r="6" stroke="#555"/><rect x="68" y="82" width="44" height="4" rx="2.0" fill="#8a8a8a"/><rect x="122" y="82.5" width="70" height="3" rx="1.5" fill="#2c2c2c"/><path d="M343 84.5 l3 3 l6 -7" stroke="#8a8a8a" stroke-width="1.1" stroke-linejoin="round"/><path d="M44 97.5 H356" stroke="#222"/><circle cx="54" cy="111" r="6" stroke="#555"/><rect x="68" y="109" width="38" height="4" rx="2.0" fill="#8a8a8a"/><rect x="122" y="109.5" width="86" height="3" rx="1.5" fill="#2c2c2c"/><path d="M343 111.5 l3 3 l6 -7" stroke="#8a8a8a" stroke-width="1.1" stroke-linejoin="round"/><path d="M44 124.5 H356" stroke="#222"/><circle cx="54" cy="138" r="6" stroke="#555"/><rect x="68" y="136" width="40" height="4" rx="2.0" fill="#8a8a8a"/><rect x="122" y="136.5" width="78" height="3" rx="1.5" fill="#2c2c2c"/><circle cx="348" cy="138" r="3.2" fill="#f5f5f5"/><path d="M44 151.5 H356" stroke="#222"/><circle cx="54" cy="165" r="6" stroke="#555"/><rect x="68" y="163" width="42" height="4" rx="2.0" fill="#8a8a8a"/><rect x="122" y="163.5" width="64" height="3" rx="1.5" fill="#2c2c2c"/><path d="M343 165.5 l3 3 l6 -7" stroke="#8a8a8a" stroke-width="1.1" stroke-linejoin="round"/><path d="M44 178.5 H356" stroke="#222"/><circle cx="54" cy="192" r="6" stroke="#555"/><rect x="68" y="190" width="36" height="4" rx="2.0" fill="#8a8a8a"/><rect x="122" y="190.5" width="70" height="3" rx="1.5" fill="#2c2c2c"/><path d="M343 192.5 l3 3 l6 -7" stroke="#8a8a8a" stroke-width="1.1" stroke-linejoin="round"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name">Check GEO <span class="card__tag">Próximamente</span></h2>
+          <p class="card__desc">Escribes una URL y ves si algo impide a la IA entrar en la página y leerla.</p>
+          <ul class="card__hl"><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>En ChatGPT, Google, Gemini, Copilot y Claude</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Acceso, texto que le llega y etiquetas</li><li><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Con la documentación de cada IA</li></ul>
+        </div>
+      </li>
+      <li class="card card--ask">
+        <span class="card__shot"><svg viewBox="28 26 344 198" aria-hidden="true" fill="none" stroke-linecap="round"><rect x="44" y="42" width="312" height="166" rx="6" stroke="#404040" stroke-dasharray="3 4"/><path d="M200 113 V137 M188 125 H212" stroke="#a3a3a3" stroke-width="1.2"/></svg></span>
+        <div class="card__text">
+          <h2 class="card__name"><button class="card__open" type="button" id="ask-open" aria-haspopup="dialog">¿Qué herramienta te falta?</button></h2>
+          <p class="card__desc">Cuéntame qué te gustaría comprobar en tu web. Si le sirve a más gente, la hago cuando pueda.</p>
+        </div>
+        <span class="card__go" aria-hidden="true">→</span>
       </li>
     </ul>
+    <div class="trust">
+      <div>
+        <span class="mono">Quién las hace</span>
+        <p><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Nacho Benavides</a>, cofundador y CEO de <a href="https://blindersgroup.com/servicios/seo/" target="_blank" rel="noopener">Blinders Group</a>, donde hacemos SEO para tiendas online.</p>
+      </div>
+      <div>
+        <span class="mono">Última revisión</span>
+        <p><strong>5 de noviembre de 2026.</strong> Las listas de bots y las reglas de Google cambian: están contrastadas con la documentación oficial de cada empresa a esa fecha.</p>
+      </div>
+      <div>
+        <span class="mono">¿Has visto un error?</span>
+        <p>Dímelo por <a href="https://ig.me/m/nachobenavidesr" target="_blank" rel="noopener" data-goatcounter-click="error-instagram-herramientas" data-goatcounter-title="Error · instagram · herramientas">Instagram</a>, <a href="https://www.linkedin.com/in/nacho-benavides/" target="_blank" rel="noopener" data-goatcounter-click="error-linkedin-herramientas" data-goatcounter-title="Error · linkedin · herramientas">LinkedIn</a> o <a href="mailto:info@blindersgroup.com?subject=Error%20en%20una%20herramienta" data-goatcounter-click="error-correo-herramientas" data-goatcounter-title="Error · correo · herramientas">correo</a> y lo corrijo cuando pueda.</p>
+      </div>
+    </div>
     </section>
+  <dialog class="ask" id="ask" aria-labelledby="ask-title">
+    <button class="ask__close" type="button" id="ask-close" aria-label="Cerrar"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+    <h2 id="ask-title">¿Qué herramienta te falta?</h2>
+    <p>Cuéntame qué te gustaría comprobar en tu web y para qué. Elige por dónde escribirme:</p>
+    <ul class="ask__list">
+      <li><a href="https://ig.me/m/nachobenavidesr" target="_blank" rel="noopener" data-goatcounter-click="pedir-instagram-herramientas" data-goatcounter-title="Pedir · instagram · herramientas"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg><span><strong>Instagram</strong><small>Un mensaje directo a @nachobenavidesr</small></span><span class="ask__go" aria-hidden="true">→</span></a></li>
+      <li><a href="https://www.linkedin.com/in/nacho-benavides/" target="_blank" rel="noopener" data-goatcounter-click="pedir-linkedin-herramientas" data-goatcounter-title="Pedir · linkedin · herramientas"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 10.5V17M8 7.2v.1M12 17v-6.5M12 13.4c0-1.7 1.1-2.9 2.6-2.9s2.4 1 2.4 2.7V17"/></svg><span><strong>LinkedIn</strong><small>Un mensaje desde mi perfil</small></span><span class="ask__go" aria-hidden="true">→</span></a></li>
+      <li><a href="mailto:info@blindersgroup.com?subject=Propuesta%20de%20herramienta" data-goatcounter-click="pedir-correo-herramientas" data-goatcounter-title="Pedir · correo · herramientas"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7.5l8 5.5 8-5.5"/></svg><span><strong>Correo</strong><small>info@blindersgroup.com</small></span><span class="ask__go" aria-hidden="true">→</span></a></li>
+    </ul>
+    <p class="ask__note">Si le sirve a más gente, la hago cuando pueda.</p>
+  </dialog>
 </main>
 
 <footer class="site-foot">
@@ -125,5 +221,46 @@
     <a href="#">Volver arriba <span aria-hidden="true">↑</span></a>
   </div>
 </footer>
+<script>
+// Voto por herramienta: se recuerda en este navegador y a la analítica solo va el nombre del evento.
+(() => {
+  const KEY = 'herramientas/votos'
+  let voted = []
+  try { voted = JSON.parse(localStorage.getItem(KEY)) || [] } catch (e) {}
+  const GC = 'https://nachobenavides.goatcounter.com/counter/'
+  // Contadores públicos de la analítica: activados en la cuenta. Con LIVE en false solo se enseña la base.
+  const LIVE = true
+  const paint = (b) => { b.setAttribute('aria-pressed', 'true'); b.querySelector('span').textContent = 'Te sirve, gracias' }
+  // El número es la base apuntada a mano más los votos que cuenta la analítica; hasta que hay alguno, no se enseña.
+  const show = (b) => { const n = b.querySelector('.vote__n'), t = (+b.dataset.base || 0) + (+b.dataset.live || 0) + (+b.dataset.mine || 0); n.hidden = t < 1; n.textContent = t.toLocaleString('es-ES') }
+  document.querySelectorAll('.vote').forEach((b) => {
+    const id = b.dataset.vote
+    if (voted.includes(id)) paint(b)
+    show(b)
+    if (LIVE) fetch(GC + encodeURIComponent('voto-' + id) + '.json').then((r) => r.ok ? r.json() : null).then((d) => {
+      if (!d) return
+      b.dataset.live = String(d.count || '').replace(/\D/g, '') || 0
+      b.dataset.mine = 0
+      show(b)
+    }).catch(() => {})
+    b.addEventListener('click', () => {
+      if (voted.includes(id)) return
+      voted.push(id)
+      try { localStorage.setItem(KEY, JSON.stringify(voted)) } catch (e) {}
+      try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'voto-' + id, title: 'Voto · ' + id, event: true }) } catch (e) {}
+      b.dataset.mine = 1
+      paint(b); show(b)
+    })
+  })
+  const dlg = document.getElementById('ask')
+  document.getElementById('ask-open').addEventListener('click', () => {
+    dlg.showModal()
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: 'pedir-abrir-herramientas', title: 'Pedir · abrir · herramientas', event: true }) } catch (e) {}
+  })
+  document.getElementById('ask-close').addEventListener('click', () => dlg.close())
+  // Un clic fuera de la ventana también la cierra.
+  dlg.addEventListener('click', (e) => { const r = dlg.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close() })
+})()
+</script>
 </body>
 </html>

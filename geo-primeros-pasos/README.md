@@ -9,7 +9,7 @@ Webinar de Raiola Networks (#RaiolaWebinar) con Blinders. Aquí están las diapo
 
 | Ejercicio | Para qué |
 |---|---|
-| [Dónde deberías estar](donde-deberias-estar/) | Sacar la lista de webs que cita la IA cuando preguntan por lo que vendes. |
-| [¿Pueden entrar los bots de IA?](pueden-entrar-los-bots/) | Comprobar, bot por bot, qué le dice tu robots.txt a cada bot de IA. |
-| [¿Quién te visita?](quien-te-visita/) | Ver en tus logs qué bots de IA entran en tu web, a qué páginas y qué les respondes. |
-| [¿Está bien tu feed?](esta-bien-tu-feed/) | Comprobar tu feed de productos con las reglas de Google Merchant Center. |
+| [Webs que cita la IA](donde-deberias-estar/) | Sacar la lista de webs que cita la IA cuando preguntan por lo que vendes. |
+| [Bots de IA en tu robots.txt](pueden-entrar-los-bots/) | Comprobar, bot por bot, qué le dice tu robots.txt a cada bot de IA. |
+| [Bots de IA en tus logs](quien-te-visita/) | Ver en tus logs qué bots de IA entran en tu web, a qué páginas y qué les respondes. |
+| [Revisión de tu feed de productos](esta-bien-tu-feed/) | Comprobar tu feed de productos con las reglas de Google Merchant Center. |

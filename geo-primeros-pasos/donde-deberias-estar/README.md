@@ -1,4 +1,4 @@
-# Dónde deberías estar
+# Webs que cita la IA
 
 Un ejercicio para hacer con calma, con tu propia marca: averiguar en qué webs te interesa aparecer para que la IA te nombre.
 
