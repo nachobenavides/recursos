@@ -1,6 +1,6 @@
 # Dónde deberías estar
 
-Ejercicio del webinar [Primeros pasos para salir en ChatGPT y en la IA de Google](../) (#RaiolaWebinar). Es para hacerlo con calma después de la charla, con tu propia marca.
+Un ejercicio para hacer con calma, con tu propia marca: averiguar en qué webs te interesa aparecer para que la IA te nombre.
 
 Cuando alguien pregunta a ChatGPT o al Modo IA de Google por tu sector, la respuesta se apoya sobre todo en lo que publican otras webs: comparativas, reseñas, medios o foros. El ejercicio sirve para sacar la lista de las que cita la IA cuando preguntan por lo que vendes: ahí es donde te interesa aparecer.
 
@@ -13,7 +13,7 @@ Son 4 pasos y se hacen por partes, en unas horas en total. Al final tienes la li
 3. Haz esas preguntas en ChatGPT y en el Modo IA de Google y apunta qué webs citan.
 4. Mira la lista de webs donde deberías estar.
 
-Abre la [microherramienta](herramienta.html): cada paso te dice qué hacer. Si quieres verlo explicado, está en las [diapositivas del webinar](https://nachobenavides.github.io/recursos/geo-primeros-pasos/diapositivas/).
+Abre la [microherramienta](herramienta.html): cada paso te dice qué hacer.
 
 ## Qué hay en la carpeta
 
@@ -30,7 +30,7 @@ Lo que apuntas en la herramienta se guarda en ese navegador, en ese ordenador. P
 
 ## Aviso
 
-Es una microherramienta para practicar lo que vimos en la charla, no un producto: no tiene soporte ni se va a mantener.
+Es una microherramienta para practicar, no un producto: no tiene soporte ni se va a mantener.
 
 ## Una regla antes de empezar
 
@@ -38,4 +38,4 @@ Es una microherramienta para practicar lo que vimos en la charla, no un producto
 
 ---
 
-Hecho por [Blinders](https://blindersgroup.com) para el webinar de Raiola Networks, noviembre de 2026.
+Hecho por [Blinders](https://blindersgroup.com). Hay más en el [índice de herramientas](https://nachobenavides.github.io/recursos/herramientas/).
