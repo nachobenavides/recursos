@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check GEO: comprueba gratis si tu web puede salir en la IA</title>
+<meta name="description" content="Check GEO es un microcheck gratuito: escribe una URL y mira si algo impide a ChatGPT, Google, Gemini, Copilot y Claude entrar en la página y leerla. Sin registro.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Check GEO: ¿puede salir tu web en la IA?">
+<meta property="og:description" content="Microcheck gratuito de GEO. Escribe una URL y mira si algo impide a ChatGPT, Google, Gemini, Copilot y Claude entrar en la página y leerla.">
+<meta property="og:locale" content="es_ES">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Check GEO","applicationCategory":"BusinessApplication","operatingSystem":"Cualquiera, en el navegador","inLanguage":"es","dateModified":"2026-11-18","description":"Microcheck gratuito de GEO: comprueba si algo impide a ChatGPT, Google, Gemini, Copilot y Claude entrar en una página y leerla.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Person","name":"Nacho Benavides","url":"https://blindersgroup.com/acerca-de/nacho-benavides/"},"publisher":{"@type":"Organization","name":"Blinders","url":"https://blindersgroup.com/"}}
+</script>
+<link rel="icon" href="../../favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="../../favicon-192.png">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<style>
+  /* La línea gráfica es la de la web de Blinders (repo blinders-web-design, src/styles/tailwind.css):
+     neutros sobre #0b0b0b, Archivo 500 con tracking negativo, Geist Mono para etiquetas, rejillas de 1 px,
+     ventanas de mentira, puntos de estado de 6 px y color solo para los estados. */
+  :root {
+    --bg: #0b0b0b; --bg-elevated: #111111; --bg-window: #0d0d0d; --border: #2b2b2b; --border-strong: #404040;
+    --fg: #d4d4d4; --fg-muted: #a3a3a3; --fg-strong: #f5f5f5;
+    --success: #10b981; --warn: #f59e0b; --error: #ef4444;
+    --sans: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'Geist Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    --tracking-eyebrow: 0.18em; --tracking-tightest: -0.025em;
+    --r-sm: 4px; --r-md: 8px; --r-lg: 12px; --r-full: 9999px;
+    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.18);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1); --ease-out: cubic-bezier(0, 0, 0.2, 1); --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+    --col: 1152px; --gutter: 24px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; min-height: 100dvh; display: flex; flex-direction: column; background: var(--bg); color: var(--fg); font: 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  a { color: var(--fg-strong); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--fg-strong); }
+  code { font: 13px var(--mono); color: var(--fg-strong); overflow-wrap: anywhere; }
+  .mono { font: 500 11px var(--mono); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
+  .wrap { width: 100%; max-width: var(--col); margin: 0 auto; padding: 0 var(--gutter); }
+  .logo { filter: brightness(0) invert(1); object-fit: contain; }
+
+  /* Puntos de estado */
+  .sd { flex: none; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--fg-muted) 30%, transparent); color: var(--fg-muted); transition: background-color 500ms var(--ease); }
+  .sd--md { width: 8px; height: 8px; }
+  .sd--ok { background: var(--success); color: var(--success); } .sd--aviso { background: var(--warn); color: var(--warn); } .sd--fallo { background: var(--error); color: var(--error); } .sd--nd { background: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .sd--glow { animation: dot-glow 1.4s ease-in-out infinite; background: var(--fg-strong); color: var(--fg-strong); }
+  @keyframes dot-glow { 0%, 100% { opacity: 0.45; box-shadow: 0 0 0 0 transparent; } 50% { opacity: 1; box-shadow: 0 0 7px 1.5px currentColor; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Barra superior */
+  .top { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .top .wrap { height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .top__brand { display: flex; align-items: center; gap: 12px; color: var(--fg-strong); text-decoration: none; }
+  .top__logo { height: 17px; width: auto; }
+  .top__me { display: flex; align-items: center; gap: 9px; padding-left: 14px; border-left: 1px solid var(--border-strong); font-size: 15px; font-weight: 500; letter-spacing: -0.012em; }
+  .top__me img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+  .top__me, .top__more { white-space: nowrap; }
+  .top__more { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--fg-muted); text-decoration: none; transition: color 150ms var(--ease); }
+  .top__more:hover { color: var(--fg-strong); }
+  .top__more svg { width: 14px; height: 14px; transition: transform 200ms var(--ease-spring); }
+  .top__more:hover svg { transform: translate(1.5px, -1.5px); }
+  .tag { display: inline-flex; align-items: center; gap: 9px; height: 30px; padding: 0 13px; border: 1px solid var(--border); border-radius: var(--r-full); background: rgba(255, 255, 255, 0.04); font-size: 13px; color: var(--fg); }
+
+  /* Apertura: el texto a la izquierda, el panel de las IA a la derecha */
+  .hero { position: relative; padding-block: 72px 80px; }
+  .hero__grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 72px; align-items: start; }
+  .hero__grid > div:first-child { padding-top: 28px; }
+  /* El H1 lleva el nombre de la herramienta y la pregunta, seguidos y en dos tonos: «Check GEO: ¿puede salir tu web en la IA?».
+     Con el resultado, el nombre se retira, la pregunta pasa a ser la respuesta y encima sale la etiqueta con el punto de estado. */
+  h1 { max-width: 17ch; margin: 0; font-size: clamp(32px, 3.9vw, 50px); font-weight: 500; line-height: 1.08; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .h1__name { color: var(--fg-muted); }
+  .lead { max-width: 36ch; margin: 20px 0 0; font-size: 18px; line-height: 1.5; color: color-mix(in srgb, var(--fg-strong) 85%, transparent); text-wrap: balance; }
+
+  .form { display: flex; align-items: center; max-width: 480px; margin: 36px 0 0; padding: 5px; border: 1px solid var(--border-strong); border-radius: var(--r-full); background: rgba(255, 255, 255, 0.04); transition: border-color 150ms var(--ease), background-color 150ms var(--ease); }
+  .form:focus-within { border-color: var(--fg-strong); background: rgba(255, 255, 255, 0.06); }
+  .form input { flex: 1; min-width: 0; height: 44px; padding: 0 8px 0 18px; border: 0; background: transparent; color: var(--fg-strong); font: 16px var(--sans); outline: none; }
+  .form input::placeholder { color: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .btn { height: 44px; padding: 0 22px; border: 0; border-radius: var(--r-full); background: var(--fg-strong); color: var(--bg); font: 500 15px var(--sans); cursor: pointer; white-space: nowrap; box-shadow: var(--shadow-key); transition: background-color 150ms var(--ease), opacity 150ms var(--ease); }
+  .btn:hover { background: #fff; }
+  .btn:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: 3px; }
+  .btn[disabled] { opacity: 0.55; cursor: progress; }
+  .btn--ghost { height: 34px; padding: 0 14px; border: 1px solid var(--border-strong); background: transparent; color: var(--fg-strong); font-size: 13px; box-shadow: none; }
+  .btn--ghost:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--fg-muted); }
+  .hint { margin: 16px 0 0 18px; font-size: 13px; color: var(--fg-muted); }
+  .hint span { margin: 0 7px; color: color-mix(in srgb, var(--fg-muted) 60%, transparent); }
+  .msg { display: flex; align-items: baseline; gap: 10px; max-width: 480px; margin: 18px 0 0 18px; font-size: 15px; color: var(--fg-strong); text-wrap: pretty; }
+  .msg .sd { position: relative; top: -2px; }
+
+  /* La ventana: una fila por IA, con su isotipo */
+  .win { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, var(--border) 60%, transparent); border-radius: var(--r-lg); background: var(--bg-window); }
+  .hero .win::before { content: ''; position: absolute; inset: -40% -20% auto; height: 70%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.05), transparent); pointer-events: none; }
+  .win__bar { position: relative; display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 16px; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); }
+  .win__dots { display: flex; gap: 6px; }
+  .win__dots i { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in srgb, var(--fg-muted) 25%, transparent); }
+  .win__spacer { flex: none; width: 39px; }
+  .win__url { flex: 1; min-width: 0; max-width: 62%; margin: 0 auto; height: 28px; padding: 0 12px; border-radius: var(--r-sm); background: rgba(255, 255, 255, 0.04); font: 11px/28px var(--mono); color: var(--fg-muted); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .win__title { font: 11px var(--mono); color: var(--fg-muted); }
+  .win__meta { display: flex; align-items: center; gap: 8px; min-width: 96px; justify-content: flex-end; font: 500 10px var(--mono); letter-spacing: var(--tracking-eyebrow); text-transform: uppercase; color: var(--fg-muted); }
+  .win__meta--right { margin-left: auto; min-width: 0; }
+
+  .rows { position: relative; margin: 0; padding: 0; list-style: none; }
+  .row { border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); }
+  .row:first-child { border-top: 0; }
+  .row__head { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 14px; width: 100%; min-height: 56px; padding: 10px 20px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; }
+  button.row__head { cursor: pointer; transition: background-color 150ms var(--ease); }
+  button.row__head:hover { background: rgba(255, 255, 255, 0.03); }
+  button.row__head:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: -2px; }
+  .row__logo { width: 20px; height: 20px; object-fit: contain; opacity: 0.85; transition: opacity 500ms var(--ease); }
+  .row__name { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; letter-spacing: -0.012em; color: var(--fg-muted); transition: color 500ms var(--ease); }
+  .row__name small { margin-left: 10px; font-size: 13px; font-weight: 400; letter-spacing: 0; color: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .row__state { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--fg-strong); white-space: nowrap; }
+  .row__state b { font-weight: 500; }
+  .row__more { width: 12px; margin-left: 4px; font: 400 16px/1 var(--mono); text-align: center; color: var(--fg-muted); transition: transform 200ms var(--ease-spring); }
+  .row.is-open .row__more { transform: rotate(45deg); }
+  .row.is-on .row__logo { opacity: 1; } .row.is-on .row__name { color: var(--fg-strong); }
+  .row.is-in .row__state { animation: rise 400ms var(--ease-spring) both; }
+  .row__why { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 300ms var(--ease-spring); }
+  .row.is-open .row__why { grid-template-rows: 1fr; }
+  .row__why > div { overflow: hidden; }
+  .row__why p { max-width: 58ch; margin: 0; padding: 0 20px 0 54px; font-size: 15px; color: var(--fg); text-wrap: pretty; }
+  .row__why p:last-child { padding-bottom: 18px; }
+  .row__why p + p { margin-top: 8px; }
+  .win__foot { position: relative; padding: 14px 20px; border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); font-size: 13px; color: var(--fg-muted); text-wrap: pretty; }
+  .win__foot strong { font-weight: 500; color: var(--fg-strong); }
+  /* La respuesta, dentro de la ventana: la columna de la izquierda no cambia nunca. */
+  .win__verdict { position: relative; padding: 22px 20px 20px; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); animation: rise 500ms var(--ease-spring) both; }
+  .win__v { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: clamp(20px, 2.1vw, 25px); font-weight: 500; line-height: 1.18; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .win__v .sd { position: relative; top: -3px; }
+  .win__vsub { margin: 8px 0 0 20px; font-size: 14px; color: var(--fg-muted); text-wrap: pretty; }
+  /* Al pie, el paso siguiente: bajar al análisis. */
+  .win__go { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px 12px 20px; border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); font-size: 15px; font-weight: 500; letter-spacing: -0.012em; color: var(--fg-strong); text-decoration: none; transition: background-color 150ms var(--ease); }
+  .win__go:hover { background: rgba(255, 255, 255, 0.03); }
+  .win__go span { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--border-strong); border-radius: 50%; transition: background-color 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease); }
+  .win__go svg { width: 15px; height: 15px; transition: transform 250ms var(--ease-spring); }
+  .win__go:hover span { background: var(--fg-strong); border-color: var(--fg-strong); color: var(--bg); }
+  .win__go:hover svg { transform: translateY(2px); }
+  .win__go:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: -3px; }
+  .hint button { padding: 0; border: 0; border-bottom: 1px solid var(--border-strong); background: none; color: var(--fg-strong); font: inherit; cursor: pointer; transition: border-color 150ms var(--ease); }
+  .hint button:hover { border-color: var(--fg-strong); }
+  /* La nota de Nacho, bajo el campo, cuando hay resultado: su foto y dos frases, sin firma. */
+  .nota { display: flex; align-items: flex-start; gap: 12px; max-width: 480px; margin: 32px 0 0; padding-top: 22px; border-top: 1px solid var(--border); animation: rise 500ms var(--ease-spring) 200ms both; }
+  .nota img { flex: none; width: 30px; height: 30px; margin-top: 2px; border-radius: 50%; object-fit: cover; }
+  .nota p { margin: 0; font-size: 14px; color: var(--fg); text-wrap: pretty; }
+  .nota strong { font-weight: 500; color: var(--fg-strong); }
+  /* La respuesta, dentro de la ventana: la columna de la izquierda no cambia nunca. */
+  .win__verdict { position: relative; padding: 22px 20px 20px; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); animation: rise 500ms var(--ease-spring) both; }
+  .win__v { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: clamp(20px, 2.1vw, 25px); font-weight: 500; line-height: 1.18; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .win__v .sd { position: relative; top: -3px; }
+  .win__vsub { margin: 8px 0 0 20px; font-size: 14px; color: var(--fg-muted); text-wrap: pretty; }
+  /* Al pie, el paso siguiente: bajar al análisis. */
+  .win__go { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px 12px 20px; border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); font-size: 15px; font-weight: 500; letter-spacing: -0.012em; color: var(--fg-strong); text-decoration: none; transition: background-color 150ms var(--ease); }
+  .win__go:hover { background: rgba(255, 255, 255, 0.03); }
+  .win__go span { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--border-strong); border-radius: 50%; transition: background-color 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease); }
+  .win__go svg { width: 15px; height: 15px; transition: transform 250ms var(--ease-spring); }
+  .win__go:hover span { background: var(--fg-strong); border-color: var(--fg-strong); color: var(--bg); }
+  .win__go:hover svg { transform: translateY(2px); }
+  .win__go:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: -3px; }
+  .hint button { padding: 0; border: 0; border-bottom: 1px solid var(--border-strong); background: none; color: var(--fg-strong); font: inherit; cursor: pointer; transition: border-color 150ms var(--ease); }
+  .hint button:hover { border-color: var(--fg-strong); }
+  /* La nota de Nacho al pie de la ventana: su foto y dos frases, sin firma. */
+
+  /* La respuesta */
+  .results { padding-block: 0 72px; scroll-margin-top: 60px; }
+  .verdict { padding: 56px 0 64px; border-top: 1px solid var(--border); animation: rise 500ms var(--ease-spring) both; }
+  .verdict__eyebrow { display: flex; align-items: center; gap: 10px; margin: 0; }
+  .verdict h2 { max-width: 20ch; margin: 18px 0 0; font-size: clamp(34px, 5vw, 60px); font-weight: 500; line-height: 1.05; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .verdict p { max-width: 52ch; margin: 20px 0 0; font-size: 19px; line-height: 1.5; color: color-mix(in srgb, var(--fg-strong) 85%, transparent); text-wrap: pretty; }
+
+  /* Tramos: el nombre a la izquierda, el contenido a la derecha */
+  .tramo { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 40px; padding: 48px 0; border-top: 1px solid var(--border); animation: rise 500ms var(--ease-spring) both; }
+  .tramo:nth-of-type(2) { animation-delay: 80ms; } .tramo:nth-of-type(3) { animation-delay: 160ms; } .tramo:nth-of-type(4) { animation-delay: 240ms; }
+  .tramo__label { align-self: start; position: sticky; top: 84px; }
+  .tramo h3 { margin: 0; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .tramo__body { min-width: 0; max-width: 720px; }
+  .tramo--intro { animation: none; }
+  .tramo--intro h2 { margin: 0; font-size: 26px; font-weight: 500; line-height: 1.15; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0; padding: 0; list-style: none; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .tres li { padding: 20px 22px 22px; }
+  .tres li + li { border-left: 1px solid var(--border); }
+  .tres h3 { font-size: 17px; letter-spacing: -0.012em; }
+  .tres p { margin: 8px 0 0; font-size: 14px; color: var(--fg-muted); text-wrap: pretty; }
+  .note { max-width: 62ch; margin: 16px 0 0; font-size: 14px; color: var(--fg-muted); text-wrap: pretty; }
+
+  /* Lo que le llega a la IA: la conclusión con una sola barra (cuánto de lo que se ve está en el código)
+     y una ventana con lo que recibe, que lleva dentro el buscador de un dato. Dos piezas, no más. */
+  .llega__t { display: flex; align-items: baseline; gap: 12px; margin: 0; font-size: 22px; font-weight: 500; line-height: 1.2; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .llega__t .sd { position: relative; top: -3px; }
+  .meter { margin: 26px 0 0; }
+  .meter__nums { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; font-size: 14px; color: var(--fg-muted); }
+  .meter__nums b { margin-right: 4px; font: 500 26px/1 var(--mono); letter-spacing: -0.02em; color: var(--fg-strong); font-variant-numeric: tabular-nums; }
+  .metric__bar { height: 3px; margin-top: 14px; border-radius: 3px; background: var(--border); overflow: hidden; }
+  .metric__bar i { display: block; height: 100%; width: 0; min-width: 6px; border-radius: 3px; background: var(--fg-strong); transition: width 900ms var(--ease-spring) 150ms; }
+  /* La barra lleva el mismo color que el punto de la conclusión: verde si llega, ámbar si llega poco o nada. */
+  .metric__bar--ok i { background: var(--success); }
+  .metric__bar--aviso { background: color-mix(in srgb, var(--warn) 22%, var(--border)); }
+  .metric__bar--aviso i { background: var(--warn); }
+  .llega__s { max-width: 60ch; margin: 16px 0 0; font-size: 15px; color: var(--fg-muted); text-wrap: pretty; }
+  .llega__s .btn { display: block; margin-top: 10px; }
+  .reads { margin-top: 32px; }
+  .reads .win__title { font-family: var(--sans); font-size: 13px; }
+  .reads__body { padding: 20px 20px 22px; }
+  .reads__title { margin: 0 0 8px; font-size: 16px; font-weight: 500; color: var(--fg-strong); overflow-wrap: anywhere; }
+  .reads__text { max-width: 64ch; margin: 0; font-size: 15px; line-height: 1.6; color: var(--fg-muted); overflow-wrap: anywhere; }
+  .reads__text.is-clamped { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+  .reads__mas { margin: 10px 0 0; padding: 0; border: 0; border-bottom: 1px solid var(--border-strong); background: none; color: var(--fg-strong); font: 13px var(--sans); cursor: pointer; }
+  .reads__mas:hover { border-color: var(--fg-strong); }
+  .reads__none { margin: 0; font: 13px/1.75 var(--mono); color: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .reads__none::after { content: '▍'; margin-left: 4px; animation: blink 1.1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* El buscador de un dato, al pie de la ventana: se busca en lo que recibe la IA. */
+  .find { margin: 0; padding: 18px 20px 20px; border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent); }
+  .find label { display: block; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .find__row { display: flex; align-items: center; max-width: 460px; margin: 12px 0 0; padding: 4px; border: 1px solid var(--border-strong); border-radius: var(--r-full); background: rgba(255, 255, 255, 0.04); }
+  .find__row:focus-within { border-color: var(--fg-strong); }
+  .find__row input { flex: 1; min-width: 0; height: 36px; padding: 0 8px 0 14px; border: 0; background: transparent; color: var(--fg-strong); font: 15px var(--sans); outline: none; }
+  .find__row input::placeholder { color: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .find__row .btn { height: 36px; padding: 0 16px; font-size: 14px; }
+  .find__out { display: flex; align-items: baseline; gap: 10px; max-width: 60ch; margin: 14px 0 0; font-size: 15px; color: var(--fg-strong); text-wrap: pretty; }
+  .find__out .sd { position: relative; top: -2px; }
+
+  /* Qué hacer */
+  .todo { margin: 0; padding: 0; list-style: none; counter-reset: paso; }
+  .todo li { display: grid; grid-template-columns: 28px minmax(0, 1fr); padding: 16px 0; border-top: 1px solid var(--border); counter-increment: paso; font-size: 17px; color: var(--fg-strong); text-wrap: pretty; }
+  .todo li:first-child { border-top: 0; padding-top: 0; }
+  /* Con varios pasos, un número sencillo delante (distinto del número del tramo). Con uno solo, el texto y nada más. */
+  .todo li::before { content: counter(paso) '.'; font-size: 17px; color: var(--fg-muted); }
+  .todo--uno li { grid-template-columns: 1fr; }
+  .todo--uno li::before { content: none; }
+  .todo__solo { max-width: 60ch; margin: 0; font-size: 17px; color: var(--fg-strong); text-wrap: pretty; }
+  .copy { margin-top: 28px; }
+  .copy pre { margin: 0; padding: 18px 20px 20px; font: 13px/1.75 var(--mono); color: var(--fg); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  /* Lo que no se ve desde fuera, el detalle técnico y las fuentes: listas que se abren */
+  .fold { border-top: 1px solid var(--border); }
+  .fold:first-child { border-top: 0; }
+  .fold summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; font-size: 17px; font-weight: 500; letter-spacing: -0.012em; color: var(--fg-strong); cursor: pointer; list-style: none; }
+  .fold:first-child summary { padding-top: 0; }
+  .fold summary::-webkit-details-marker { display: none; }
+  .fold summary::after { content: '+'; flex: none; font: 400 18px/1 var(--mono); color: var(--fg-muted); transition: transform 200ms var(--ease-spring); }
+  .fold[open] summary::after { transform: rotate(45deg); }
+  .fold summary:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: 3px; }
+  .fold > p { max-width: 60ch; margin: 0; padding: 0 0 18px; font-size: 15px; color: var(--fg); text-wrap: pretty; }
+  .fold__body { padding: 0 0 22px; }
+  /* Datos técnicos: dos grupos con la misma rejilla (220 px para el nombre, el resto para el valor),
+     cabeceras en caja normal y lo que es código, en letra de código. */
+  .tbl-scroll { overflow-x: auto; }
+  .tech h4 { margin: 0 0 14px; font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .tech h4:not(:first-child) { margin-top: 40px; }
+  .tech table { width: 100%; min-width: 480px; margin: 0; border-collapse: collapse; table-layout: fixed; font-size: 14px; }
+  .tech thead th { padding: 0 12px 10px 0; text-align: left; font-size: 13px; font-weight: 400; color: var(--fg-muted); }
+  .tech thead th:first-child { width: 220px; }
+  .tech tbody th, .tech td { padding: 12px 12px 12px 0; border-top: 1px solid var(--border); text-align: left; vertical-align: top; font-weight: 400; }
+  .tech tbody th code { font-size: 13px; }
+  .tech tbody th small { display: block; margin-top: 2px; font-size: 13px; color: var(--fg-muted); }
+  .tech td code { display: block; margin-top: 4px; font-size: 12px; color: var(--fg-muted); }
+  .st { display: inline-flex; align-items: center; gap: 8px; color: var(--fg-strong); }
+  .st::before { content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: color-mix(in srgb, var(--fg-muted) 70%, transparent); }
+  .st--ok::before { background: var(--success); } .st--aviso::before { background: var(--warn); } .st--fallo::before { background: var(--error); }
+  .tech__no { color: var(--fg-muted); }
+  .tech__rb { max-width: 60ch; margin: 0 0 16px; font-size: 14px; color: var(--fg); }
+  dl.facts dt code { font-size: 13px; }
+  .tech .note { margin: 14px 0 0; }
+  dl.facts { display: grid; grid-template-columns: 220px minmax(0, 1fr); margin: 0; font-size: 14px; }
+  dl.facts dt { padding: 12px 12px 12px 0; border-top: 1px solid var(--border); color: var(--fg-muted); }
+  dl.facts dd { margin: 0; padding: 12px 0; border-top: 1px solid var(--border); color: var(--fg-strong); overflow-wrap: anywhere; }
+  dl.facts dd code { font-size: 13px; }
+
+  /* El cierre: una sola línea que es entera un enlace. La frase a la izquierda; a la derecha, a dónde lleva y una flecha
+     en un círculo que se llena al pasar el cursor. Sin párrafos, sin caja y sin logo. */
+  .foot { margin-top: auto; border-top: 1px solid var(--border); transition: background-color 300ms var(--ease); }
+  .foot:hover { background: rgba(255, 255, 255, 0.02); }
+  .foot__cta { display: flex; align-items: center; justify-content: space-between; gap: 32px; padding-top: 44px; padding-bottom: 44px; text-decoration: none; }
+  .foot__soft { display: block; color: var(--fg-muted); }
+  .foot__big { font-size: clamp(20px, 2.2vw, 26px); font-weight: 500; line-height: 1.15; letter-spacing: var(--tracking-tightest); color: var(--fg-strong); text-wrap: balance; }
+  .foot__go { flex: none; display: inline-flex; align-items: center; gap: 16px; font-size: 15px; color: var(--fg-muted); transition: color 200ms var(--ease); }
+  .foot__arrow { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--border-strong); border-radius: 50%; color: var(--fg-strong); transition: background-color 200ms var(--ease), border-color 200ms var(--ease), color 200ms var(--ease); }
+  .foot__arrow svg { width: 17px; height: 17px; transition: transform 250ms var(--ease-spring); }
+  .foot__cta:hover .foot__go { color: var(--fg-strong); }
+  .foot__cta:hover .foot__arrow { background: var(--fg-strong); border-color: var(--fg-strong); color: var(--bg); }
+  .foot__cta:hover .foot__arrow svg { transform: translate(1.5px, -1.5px); }
+  .foot__cta:focus-visible { outline: 2px solid var(--fg-strong); outline-offset: -4px; }
+
+  @media (max-width: 960px) {
+    .hero { padding-block: 48px 56px; }
+    .hero__grid { grid-template-columns: 1fr; gap: 44px; }
+    .hero__grid > div:first-child { padding-top: 0; }
+    .tramo { grid-template-columns: 1fr; gap: 20px; padding: 40px 0; }
+    .tramo__label { position: static; }
+    .verdict { padding: 44px 0 48px; }
+  }
+  @media (max-width: 600px) {
+    :root { --gutter: 20px; }
+    /* En el móvil no caben el logo, el nombre y el enlace: el nombre se queda en la foto. */
+    .top__name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .top__me { gap: 0; }
+    .lead { font-size: 18px; }
+    .row__head { gap: 14px; padding: 12px 16px; }
+    .row__why p { padding-left: 50px; padding-right: 16px; }
+    .row__name small { display: none; }
+    .foot__cta { padding-top: 32px; padding-bottom: 32px; gap: 20px; }
+    .foot__go { font-size: 0; gap: 0; }
+    .tres { grid-template-columns: 1fr; }
+    .tres li + li { border-left: 0; border-top: 1px solid var(--border); }
+    .tech table { min-width: 0; table-layout: auto; }
+    .tech thead { display: none; }
+    .tech tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; padding: 14px 0; border-top: 1px solid var(--border); }
+    .tech tbody th, .tech tbody td { padding: 0; border: 0; }
+    .tech tbody th { grid-column: 1 / -1; }
+    .tech tbody td[data-l]::before { content: attr(data-l); display: block; margin-bottom: 2px; font-size: 12px; color: var(--fg-muted); }
+    dl.facts { grid-template-columns: 1fr; }
+    dl.facts dt { padding-bottom: 0; }
+    dl.facts dd { border-top: 0; padding-top: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <span class="top__brand"><img class="top__logo" src="../../assets/blinders.png" alt="Blinders"><span class="top__me"><img src="../../assets/nacho.jpg" alt="" width="26" height="26"><span class="top__name">Nacho Benavides</span></span></span>
+    <a class="top__more" href="https://nachobenavides.github.io/recursos/">Más recursos<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero__grid">
+      <div>
+        <h1><span class="h1__name">Check GEO:</span> <span id="titulo">¿puede salir tu web en la IA?</span></h1>
+        <p class="lead" id="lead">Escribe una URL y mira si algo impide a la IA entrar en la página y leerla.</p>
+        <form class="form" id="form" novalidate>
+          <input id="url" name="url" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="https://tuweb.com/tu-pagina" aria-label="URL de la página">
+          <button class="btn" id="go" type="submit">Comprobar</button>
+        </form>
+        <p class="hint" id="hint">Gratis y sin registro</p>
+        <div class="msg" id="msg" role="status" aria-live="polite" hidden></div>
+        <div class="nota" id="nota" hidden></div>
+      </div>
+      <div class="win" id="panel" aria-live="polite">
+        <div class="win__bar">
+          <span class="win__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="win__url" id="panel-url"></span>
+          <span class="win__spacer" aria-hidden="true"></span>
+        </div>
+        <div class="win__verdict" id="panel-verdict" hidden></div>
+        <ul class="rows" id="rows"></ul>
+        <div class="win__foot" id="panel-foot" hidden></div>
+        <a class="win__go" id="panel-go" href="#results" hidden>Ver el detalle<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg></span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="intro">
+    <div class="tramo tramo--intro">
+      <div class="tramo__label"><h2>Qué comprueba Check GEO</h2></div>
+      <div class="tramo__body">
+        <ul class="tres">
+          <li><h3>¿Le dejan entrar?</h3><p>El fichero robots.txt de tu web, bot a bot.</p></li>
+          <li><h3>¿Le llega el texto?</h3><p>Lo que hay en el código frente a lo que tú ves en pantalla.</p></li>
+          <li><h3>¿Piden que no la usen?</h3><p>Las etiquetas que sacan una página de la IA, como «noindex».</p></li>
+        </ul>
+        <p class="note">En cinco IA: ChatGPT, Google, Gemini, Copilot y Claude. Cada respuesta sale de la documentación de la propia IA. <span id="revisado">Reglas revisadas el 18 de noviembre de 2026.</span></p>
+      </div>
+    </div>
+    <div class="tramo tramo--intro">
+      <div class="tramo__label"><h2>Lo que no se ve desde fuera</h2></div>
+      <div class="tramo__body" id="nosve">
+        <details class="fold"><summary>Si el cortafuegos o el hosting paran al bot de verdad</summary><p>OpenAI pide, además del robots.txt, que el hosting y la CDN dejen pasar las direcciones de su bot. Nuestra visita no sale de esas direcciones, así que no podemos verlo. Lo sabe quien lleva tu web.</p></details>
+        <details class="fold"><summary>Si la página está guardada en Google y en Bing</summary><p>Hace falta para salir en Google, Gemini y Copilot. Solo puedes verlo tú: en Search Console y en Bing Webmaster Tools, con la inspección de URL.</p></details>
+        <details class="fold"><summary>Si has excluido tu web de la IA de Google</summary><p>Search Console tiene un ajuste, «IA generativa», que saca una web de AI Overviews y del modo IA. Viene activado para salir; compruébalo en la configuración de tu propiedad.</p></details>
+        <details class="fold"><summary>Si alguien ha bloqueado la URL en Bing</summary><p>Bing Webmaster Tools permite ocultar una URL de Bing y de Copilot durante 90 días.</p></details>
+        <details class="fold"><summary>Si la IA te elige</summary><p>Poder salir no es salir. Que la IA te nombre depende de tu contenido y de lo que otras webs digan de ti.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="results wrap" id="results" hidden></section>
+</main>
+
+<footer class="foot">
+  <a class="foot__cta wrap" href="https://blindersgroup.com/servicios/seo/auditoria/" target="_blank" rel="noopener">
+    <span class="foot__big"><span class="foot__soft">Check GEO es una revisión rápida.</span> Una auditoría SEO/GEO va mucho más allá.</span>
+    <span class="foot__go">La hacemos en Blinders<span class="foot__arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></span></span>
+  </a>
+</footer>
+
+<!-- La página vive en GitHub Pages; la comprobación la hace el Worker de Cloudflare, que acepta peticiones desde nachobenavides.github.io. -->
+<script>window.CHECK_GEO_API = 'https://check-geo.check-geo.workers.dev';</script>
+<script>
+const API = (window.CHECK_GEO_API || '') + '/api/check';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const lista = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1];
+const num = n => n.toLocaleString('es-ES');
+const PILL = { ok: 'Puede salir', aviso: 'Con dudas', fallo: 'No puede', nd: 'Sin comprobar' };
+
+// Las IA del panel, con su isotipo (los del design system de la web de Blinders, en silueta).
+// El de Copilot no está allí: viene del paquete público @lobehub/icons-static-svg (descargado el 16/11/2026, con permiso de Nacho).
+// Van siempre en su color (el de ChatGPT es blanco: su marca no tiene otro).
+const IAS_UI = [
+  { id: 'chatgpt', nombre: 'ChatGPT', nota: 'Cuando busca en internet', logo: 'openai', mono: true },
+  { id: 'google', nombre: 'Google', nota: 'AI Overviews y modo IA', logo: 'google-color' },
+  { id: 'gemini', nombre: 'Gemini', nota: 'La app de IA de Google', logo: 'gemini-color' },
+  { id: 'copilot', nombre: 'Copilot', nota: 'La IA de Microsoft', logo: 'copilot-color' },
+  { id: 'claude', nombre: 'Claude', nota: 'Cuando busca en internet', logo: 'claude-color' },
+];
+
+function setMsg(text) {
+  const m = $('msg');
+  if (!text) { m.hidden = true; return; }
+  m.innerHTML = `<i class="sd sd--md sd--fallo"></i><span>${esc(text)}</span>`; m.hidden = false;
+}
+
+// La columna de la izquierda no cambia con el resultado: la respuesta va dentro de la ventana.
+// Lo único que cambia es la línea de debajo del campo, que pasa a ofrecer otra comprobación.
+const HINT = 'Gratis y sin registro';
+function otraUrl() {
+  $('url').value = ''; $('results').hidden = true; $('intro').hidden = false; setMsg('');
+  $('hint').textContent = HINT; pintaPanel('espera'); $('url').focus();
+  history.replaceState(null, '', location.pathname);
+}
+
+const ERRORES = {
+  vacia: 'Escribe la URL de una página, por ejemplo tuweb.com/servicios.',
+  invalida: 'Esa URL no parece una página web pública. Prueba con algo como tuweb.com/servicios.',
+  red: 'No hemos podido abrir esa página. Comprueba que la URL está bien escrita y que la web funciona.',
+  tiempo: 'La página ha tardado demasiado en responder. Prueba otra vez en un momento.',
+  redirecciones: 'La página redirige demasiadas veces seguidas y no hemos llegado a ninguna parte.',
+  interno: 'Algo ha fallado al comprobarla. Prueba otra vez en un momento.',
+  limite: 'Hay muchas comprobaciones a la vez desde tu conexión. Prueba otra vez dentro de un minuto.',
+};
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = $('url').value.trim();
+  if (!v) return setMsg(ERRORES.vacia);
+  setMsg(''); $('go').disabled = true; $('go').textContent = 'Comprobando';
+  $('results').hidden = true; $('intro').hidden = false; $('hint').textContent = HINT; pintaPanel('comprobando', null, v);
+  const t0 = Date.now();
+  // Si pasan cinco segundos, se dice que la web tarda: sin eso parece que se ha colgado.
+  const lenta = setTimeout(() => { $('hint').textContent = 'Esta web tarda en responder. Unos segundos más…'; }, 5000);
+  try {
+    const res = await fetch(API + '?url=' + encodeURIComponent(v));
+    const data = await res.json();
+    // Que la comprobación se vea: como mínimo, lo que tarda en recorrer las cinco filas.
+    await new Promise(r => setTimeout(r, Math.max(0, 1100 - (Date.now() - t0))));
+    clearTimeout(lenta); $('hint').textContent = HINT;
+    if (data.error) { pintaPanel('espera'); setMsg(ERRORES[data.error] || ERRORES.interno); }
+    else render(data);
+  } catch { clearTimeout(lenta); $('hint').textContent = HINT; pintaPanel('espera'); setMsg(ERRORES.interno); }
+  $('go').disabled = false; $('go').textContent = 'Comprobar';
+});
+
+// ---------- La respuesta ----------
+// Las IA a las que el robots.txt les dice algo: es lo único que se sabe cuando la web no nos deja ver la página.
+const porRobots = d => d.ias.filter(i => i.motivos.some(m => ['robots', 'robots_caido', 'google_extended'].includes(m.c)));
+function titular(d) {
+  const v = d.veredicto, cuantas = { 5: 'cinco', 6: 'seis' }[d.ias.length] || d.ias.length;
+  if (d.pagina.protegida) return v.noPueden.length
+    ? [`No puede salir en ${lista(v.noPueden)}.`, 'Lo dice el fichero robots.txt de la web. El resto no lo hemos podido comprobar, porque la web no deja pasar visitas automáticas como la nuestra.']
+    : porRobots(d).length
+    ? ['No hemos podido ver esta página.', `La web no deja pasar visitas automáticas como la nuestra. Lo único que hemos leído es su fichero robots.txt, que cierra la puerta ${porRobots(d).length > 1 ? 'a los bots' : 'al bot'} de ${lista(porRobots(d).map(i => i.nombre))}.`]
+    : d.pagina.sinRespuesta
+    ? ['No hemos podido ver esta página.', 'La web no ha contestado a nuestra visita: tarda demasiado o corta las visitas automáticas. Comprueba también que la URL está bien escrita.']
+    : ['No hemos podido ver esta página.', 'La web no deja pasar visitas automáticas como la nuestra, así que no podemos comprobarla desde aquí. No es un fallo de la web, y tampoco dice si deja pasar a las IA.'];
+  if (v.nivel === 'ok') return ['Sí, puede salir.', `No hemos encontrado nada que impida a estas ${cuantas} IA entrar en la página y leerla.`];
+  if (v.nivel === 'fallo') return [
+    v.noPueden.length === d.ias.length ? `No puede salir en ninguna de las ${cuantas}.` : `No puede salir en ${lista(v.noPueden)}.`,
+    'Debajo tienes el motivo en cada una y qué hacer.'];
+  if (v.nivel === 'aviso' && v.sinTexto) return ['A la IA le llega esta página sin texto.', 'Puede nombrarte por lo que otras webs digan de ti, pero no por lo que dice esta página.'];
+  if (v.nivel === 'aviso' && v.aMedias) return ['A la IA le llega esta página a medias.', `En pantalla hay ${num(d.leer.pantalla.palabras)} palabras; en el código que recibe un bot, ${num(d.leer.palabras)}. El resto lo carga JavaScript.`];
+  if (v.nivel === 'aviso') return ['Puede salir, con dudas.', `Nada se lo impide del todo, pero hay algo que revisar en ${lista(v.conDudas)}.`];
+  return ['No lo hemos podido comprobar.', d.pagina.protegida
+    ? 'La web tiene una protección contra visitas automáticas y no nos ha dejado ver la página. No es un fallo de la web.'
+    : 'La URL no devuelve una página web que podamos leer.'];
+}
+
+// El motivo, dicho para quien no es técnico. Cada frase sale de la documentación de esa IA.
+function motivo(ia, m) {
+  switch (m.c) {
+    case 'robots_caido': return `El fichero robots.txt de la web da error (${m.estado}). La norma dice que, mientras falle, un bot no debe entrar. Si es un fallo momentáneo, se arregla solo: vuelve a comprobarlo más tarde.`;
+    case 'robots': return ({
+      chatgpt: 'El robots.txt de la web le cierra la puerta a su bot de búsqueda. OpenAI dice que así la web no sale en sus respuestas de búsqueda, aunque puede aparecer como enlace de navegación.',
+      google: 'El robots.txt de la web le cierra la puerta a Googlebot. Sin leer la página, Google no puede enseñarla con su texto.',
+      gemini: 'El robots.txt de la web le cierra la puerta a Googlebot, y Gemini responde con lo que Google tiene guardado.',
+      copilot: 'El robots.txt de la web le cierra la puerta al bot de Bing, y Copilot trabaja sobre lo que Bing ha leído.',
+      claude: 'El robots.txt de la web le cierra la puerta a su bot de búsqueda. Anthropic dice que así no guarda el contenido de la web para su búsqueda y que eso puede reducir su visibilidad; no dice que deje de salir.',
+    })[ia.id];
+    case 'google_extended': return 'El robots.txt de la web bloquea «Google-Extended». Google dice que así no usa la web para responder en la aplicación de Gemini.' + (m.cloudflare ? ' Lo ha puesto el ajuste de Cloudflare para bots de IA.' : '');
+    case 'canonica': return 'La página dice que su versión principal es otra URL. La que Google guarda es esa otra, no esta.';
+    case 'error': return `La página responde con un error (${m.estado}).`;
+    case 'protegida': return 'La web no nos ha dejado ver la página, así que no sabemos qué recibe.';
+    case 'no_html': return 'La URL no devuelve una página web.';
+    case 'vacia': return 'A su bot le llega la página casi sin texto, porque no ejecuta JavaScript. Está medido por Vercel y MERJ, y lo comprobamos nosotros el 16 de noviembre de 2026.';
+    case 'parcial': return `Le llegan ${num(m.de)} de las ${num(m.total)} palabras que se ven en pantalla. El resto lo carga JavaScript. ` + ({
+      no: 'Su bot no lo ejecuta: está medido por Vercel y MERJ, y lo comprobamos nosotros el 16 de noviembre de 2026.',
+      sin_medir: 'No sabemos si su bot de búsqueda lo ejecuta: Anthropic no lo dice.',
+      si: 'Google sí lo ejecuta, pero después, en una cola.',
+      bing: 'Bing lo ejecuta, pero avisa de que el contenido que no consiga montar puede no usarse en las respuestas.' })[m.js];
+    case 'vacia_claude': return 'Le llega la página casi sin texto. No sabemos si su bot de búsqueda ejecuta JavaScript: Anthropic no lo dice, y la medición de 2024 fue de su bot de entrenamiento, que no lo ejecutaba.';
+    case 'vacia_google': return 'Le llega la página casi sin texto. Google sí ejecuta JavaScript, pero después, en una cola.';
+    case 'vacia_copilot': return 'Le llega la página casi sin texto. Bing ejecuta JavaScript, pero avisa de que el contenido que no consiga montar puede no usarse en las respuestas.';
+    case 'noindex': return 'La página pide que no la guarden («noindex»). ' + ({
+      google: 'Google solo usa en su IA páginas que tiene guardadas.',
+      gemini: 'Gemini responde con lo que Google tiene guardado.',
+      copilot: 'Copilot trabaja sobre lo que Bing tiene guardado.' })[ia.id];
+    case 'noindex_nd': return 'La página pide a los buscadores que no la guarden («noindex»). Sus documentos no dicen qué hace con esa petición.';
+    case 'nosnippet': return 'La página pide que no se enseñe su texto («nosnippet»). Google solo usa en su IA páginas que puede enseñar con su texto.';
+    case 'nosnippet_copilot': return 'La página pide que no se enseñe su texto («nosnippet»). Microsoft dice que eso puede limitar la calidad con la que Copilot la cita.';
+    case 'noarchive': return 'La página lleva la etiqueta «noarchive». Microsoft dice que así no la usa en las respuestas de Copilot. Dejará de leerla el 1 de marzo de 2027.';
+    case 'nocache': return 'La página lleva la etiqueta «nocache». Microsoft dice que así Copilot solo usa su URL, su título y su fragmento. Dejará de leerla el 1 de marzo de 2027.';
+    case 'ai_grounding': return m.vigente
+      ? 'La página pide a Microsoft que no la use para responder («ai-grounding:disallow»). Microsoft lo aplica desde el 1 de febrero de 2027.'
+      : 'La página pide a Microsoft que no la use para responder («ai-grounding:disallow»). Hoy no cambia nada: Microsoft empieza a aplicarlo el 1 de febrero de 2027, y desde entonces no saldrá en Copilot.';
+  }
+  return '';
+}
+
+// La fuente de cada motivo, enlazada junto a él: quién lo dice y dónde.
+const F = {
+  openai: ['OpenAI', 'https://developers.openai.com/api/docs/bots'],
+  anthropic: ['Anthropic', 'https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler'],
+  googleIa: ['Google', 'https://developers.google.com/search/docs/appearance/ai-features'],
+  googleReq: ['Google', 'https://developers.google.com/search/docs/essentials/technical'],
+  googleExt: ['Google', 'https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers'],
+  googleJs: ['Google', 'https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics'],
+  googleCanon: ['Google', 'https://developers.google.com/search/docs/crawling-indexing/canonicalization'],
+  googleMeta: ['Google', 'https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag'],
+  bing: ['Microsoft', 'https://www.bing.com/webmasters/help/webmaster-guidelines-30fba23a'],
+  bingMeta: ['Microsoft', 'https://www.bing.com/webmasters/help/robots-meta-tags-and-attributes-that-bing-supports-5198d240'],
+  bing2027: ['Microsoft', 'https://blogs.bing.com/search/2026/10/your-content-your-choice-clearer-preferences-for-training-and-grounding/'],
+  rfc: ['RFC 9309', 'https://www.rfc-editor.org/rfc/rfc9309.html'],
+  vercel: ['Vercel y MERJ', 'https://vercel.com/blog/the-rise-of-the-ai-crawler'],
+};
+function fuente(ia, m) {
+  const deLaIa = { chatgpt: F.openai, claude: F.anthropic, google: F.googleReq, gemini: F.googleReq, copilot: F.bing }[ia.id];
+  const f = {
+    robots: deLaIa, robots_caido: F.rfc, google_extended: F.googleExt, canonica: F.googleCanon,
+    vacia: F.vercel, vacia_claude: F.vercel, vacia_google: F.googleJs, vacia_copilot: F.bing,
+    parcial: { no: F.vercel, sin_medir: F.vercel, si: F.googleJs, bing: F.bing }[m.js],
+    noindex: ia.id === 'copilot' ? F.bing : F.googleIa, noindex_nd: deLaIa,
+    nosnippet: F.googleMeta, nosnippet_copilot: F.bing, noarchive: F.bingMeta, nocache: F.bingMeta, ai_grounding: F.bing2027,
+  }[m.c];
+  return f ? ` <a class="src" href="${f[1]}" target="_blank" rel="noopener">Fuente: ${f[0]} <span aria-hidden="true">↗</span></a>` : '';
+}
+
+// ---------- El panel: una fila por IA ----------
+// La etiqueta de cada fila. Cuando la página depende de JavaScript, dice de qué dudamos en cada IA en vez de «Con dudas».
+const etiqueta = ia => {
+  const es = c => ia.motivos.some(m => m.c === c), parcial = js => ia.motivos.some(m => m.c === 'parcial' && m.js === js);
+  if (ia.nivel !== 'aviso') return PILL[ia.nivel];
+  if (es('robots')) return 'No lee tu página';
+  if (es('vacia')) return 'Le llega sin texto';
+  if (parcial('no')) return 'Le llega a medias';
+  if (es('vacia_google') || es('vacia_copilot') || parcial('si') || parcial('bing')) return 'Puede tardar en leerla';
+  if (es('vacia_claude') || parcial('sin_medir')) return 'No sabemos si la lee';
+  return PILL.aviso;
+};
+
+function fila(ui, ia, i, modo) {
+  const why = ia ? ia.motivos.filter(m => m.c !== 'protegida').map(m => `<p>${motivo(ia, m)}${fuente(ia, m)}</p>`).join('') : '';
+  const estado = ia
+    ? `<span class="row__state" style="animation-delay:${i * 110}ms"><b>${etiqueta(ia)}</b><i class="sd sd--md sd--${ia.nivel}"></i>${why ? '<span class="row__more" aria-hidden="true">+</span>' : ''}</span>`
+    : `<span class="row__state"><i class="sd sd--md${modo === 'comprobando' ? ' sd--glow' : ''}" style="animation-delay:${i * 180}ms"></i></span>`;
+  const head = `<img class="row__logo${ui.mono ? ' logo' : ''}" src="logos/${ui.logo}.svg" alt="" width="22" height="22"><span class="row__name">${ui.nombre}<small>${ui.nota}</small></span>${estado}`;
+  return `<li class="row${ia ? ' is-on is-in' : ''}">${why
+    ? `<button class="row__head" type="button" aria-expanded="false">${head}</button><div class="row__why"><div>${why}</div></div>`
+    : `<div class="row__head">${head}</div>`}</li>`;
+}
+
+// El robots.txt: leído, no existe (la web responde 404 o parecido) o no lo hemos podido leer.
+const robotsLeido = d => { const r = d.entrar.robotsTxt; return r.existe || r.caido ? 'si' : (r.estado >= 400 && r.estado < 500 && ![401, 403, 429].includes(r.estado)) ? 'no_tiene' : 'no_leido'; };
+// Lo que el check no ve, dicho al pie del panel. Si la visita con el nombre del bot da rechazo, se dice aquí.
+const rechazados = d => d.entrar.bots.filter(b => b.prueba === 'rechazada' && b.robots.permitido);
+const VISTO = d => { const r = rechazados(d); return r.length ? ` Una visita con el nombre ${r.length > 1 ? 'de los bots' : 'del bot'} de ${lista(r.map(b => b.empresa))} ha sido rechazada, y la que lleva el nombre de Googlebot no: puede ser un bloqueo a los bots de la IA.` : ''; };
+
+function pintaPanel(modo, d, direccion) {
+  const corta = u => String(u).replace(/^https?:\/\//, '').replace(/\/$/, '');
+  $('panel-url').textContent = d ? corta(d.urlFinal) : corta(direccion || $('url').value.trim());
+  $('rows').innerHTML = IAS_UI.map((ui, i) => fila(ui, d ? d.ias.find(x => x.id === ui.id) : null, i, modo)).join('');
+  const foot = $('panel-foot');
+  $('panel-verdict').hidden = !d; $('panel-go').hidden = !d;
+  if (d) {
+    const [frase, sub] = titular(d);
+    $('panel-verdict').innerHTML = `<p class="win__v"><i class="sd sd--md sd--${d.veredicto.nivel}"></i><span>${esc(frase)}</span></p><p class="win__vsub">${esc(sub)}</p>`;
+  }
+  foot.hidden = true;
+  if (!d) { $('nota').hidden = true; return; }
+  // Cuando la web no nos deja verla, el pie de la ventana dice qué es lo único que hemos leído.
+  // En los demás casos no hay pie: la nota de Nacho va en la columna de la izquierda, bajo el campo.
+  foot.hidden = !d.pagina.protegida;
+  foot.textContent = robotsLeido(d) === 'no_leido' ? 'Tampoco hemos podido leer su fichero robots.txt.'
+    : robotsLeido(d) === 'no_tiene' ? 'La web no tiene fichero robots.txt, así que por ahí no cierra la puerta a ninguna IA.'
+    : porRobots(d).length ? 'Lo único que hemos podido leer es el fichero robots.txt de la web.' : 'Lo único que hemos podido leer es el fichero robots.txt de la web, y no cierra la puerta a ninguna de las cinco IA.';
+  $('nota').hidden = d.pagina.protegida;
+  $('nota').innerHTML = `<img src="../../assets/nacho.jpg" alt="Nacho Benavides" width="30" height="30"><p><strong>Poder salir no es salir,</strong> y desde fuera no se ve todo: el cortafuegos de tu web, por ejemplo. Si necesitas un análisis a fondo, háblalo con tu responsable de SEO.</p>`;
+  const filas = [...$('rows').querySelectorAll('.row')];
+  filas.forEach(li => { const b = li.querySelector('button.row__head'); if (b) b.addEventListener('click', () => b.setAttribute('aria-expanded', li.classList.toggle('is-open'))); });
+}
+
+// ---------- Lo que lee una IA ----------
+const ventana = (titulo, cuerpo, meta = '', clase = '') => `<div class="win ${clase}"><div class="win__bar"><span class="win__dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win__title">${titulo}</span>${meta ? `<span class="win__meta win__meta--right">${meta}</span>` : ''}</div>${cuerpo}</div>`;
+
+function loQueLee(d) {
+  const l = d.leer;
+  if (l.nivel === 'nd') return '<p class="note" style="margin-top:0">No hemos podido ver la página, así que no sabemos qué recibe la IA.</p>';
+  const p = l.pantalla || {}, comparada = p.estado === 'ok' && !d.pagina.cortada;
+  // 1. La conclusión y, debajo, una sola barra: cuánto de lo que se ve en pantalla está en el código.
+  const [nivel, frase, porque] = d.pagina.cortada ? ['nd', 'No hemos podido contar todo el texto.', 'La página pesa más de 1 MB, que es lo máximo que leemos.']
+    : l.nivel === 'fallo' ? ['aviso', 'A la IA le llega la página sin texto.', 'El texto que ves lo carga JavaScript, y un bot que no lo ejecuta no lo recibe.']
+    : l.nivel === 'aviso' ? ['aviso', 'A la IA le llega solo una parte del texto.', 'El resto lo carga JavaScript, y un bot que no lo ejecuta no lo recibe.']
+    : comparada ? ['ok', 'A la IA le llega el texto de tu página.', 'Está en el código, sin depender de JavaScript.' + (l.palabras > p.palabras ? ' En el código hay algo más que en pantalla porque incluye texto plegado, como los menús.' : '')]
+    : ['nd', 'Esto es lo que hay en el código.', (p.estado === 'incompleta' ? 'Esta vez no vale la comparación con la pantalla: el navegador que usamos ha visto mucho menos texto del que hay en el código. O la página estaba a medio cargar, o lleva mucho texto plegado.' : 'Ahora no hemos podido compararlo con la pantalla: el navegador que usamos atiende una página cada 10 segundos.') + ' <button class="btn btn--ghost" type="button" id="reintentar">Volver a comparar</button>'];
+  const pal = n => n === 1 ? 'palabra' : 'palabras';
+  const medida = comparada
+    ? `<div class="meter">
+        <div class="meter__nums">
+          <span><b class="metric__value" data-n="${l.palabras}">0</b> ${pal(l.palabras)} en el código</span>
+          <span><b class="metric__value" data-n="${p.palabras}">0</b> en pantalla</span>
+        </div>
+        <div class="metric__bar metric__bar--${nivel}"><i data-w="${Math.min(100, Math.round(l.palabras / Math.max(p.palabras, 1) * 100))}"></i></div>
+      </div>`
+    : `<div class="meter"><div class="meter__nums"><span><b class="metric__value" data-n="${l.palabras}">0</b> ${pal(l.palabras)} en el código</span></div></div>`;
+  const llega = `<div class="llega">
+      <p class="llega__t"><i class="sd sd--md sd--${nivel}"></i><span>${frase}</span></p>
+      ${medida}
+      <p class="llega__s">${porque}</p>
+    </div>`;
+  // 2. Lo que recibe la IA, tal cual, y dentro el buscador: se busca un dato en ese mismo texto.
+  const largo = l.extracto.length > 220;
+  const texto = l.palabras
+    ? `<p class="reads__text${largo ? ' is-clamped' : ''}" id="extracto">${esc(l.extracto)}${l.extracto.length >= 380 ? '…' : ''}</p>${largo ? '<button class="reads__mas" type="button" id="ver-mas" aria-expanded="false">Ver más</button>' : ''}`
+    : '<p class="reads__none">Nada más</p>';
+  const recibe = `<div class="win reads">
+      <div class="win__bar"><span class="win__dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="win__title">Lo que recibe la IA</span></div>
+      <div class="reads__body">${l.title ? `<p class="reads__title">${esc(l.title)}</p>` : ''}${texto}</div>
+      <form class="find" id="busca" novalidate>
+        <label for="q">Busca aquí algo que veas en tu página</label>
+        <div class="find__row"><input id="q" type="text" autocomplete="off" spellcheck="false" maxlength="120" placeholder="Un precio, un teléfono, un nombre…"><button class="btn" type="submit">Buscar</button></div>
+        <p class="find__out" id="q-out" role="status" aria-live="polite" hidden></p>
+      </form>
+    </div>`;
+  return `${llega}${recibe}`;
+}
+
+// ---------- Lo que no se ve desde fuera ----------
+function noSeVe(d) {
+  // El texto está escrito una sola vez, en la página (se ve también antes de comprobar nada). Aquí se copia y, si una
+  // visita con el nombre del bot ha sido rechazada y la de Googlebot no, se añade al primer punto.
+  const caja = document.createElement('div');
+  caja.innerHTML = $('nosve').innerHTML;
+  caja.querySelectorAll('details').forEach(x => x.removeAttribute('open'));
+  if (!d.pagina.protegida && VISTO(d)) caja.querySelector('details p').insertAdjacentText('beforeend', VISTO(d));
+  return caja.innerHTML;
+}
+
+// ---------- Qué hacer ----------
+function queHacer(d) {
+  const tiene = c => d.ias.some(i => i.motivos.some(m => m.c === c));
+  const con = c => d.ias.filter(i => i.motivos.some(m => m.c === c));
+  // Los pasos son solo lo seguro, lo que hay que arreglar. Lo que no se puede saber desde fuera («dudas») no se
+  // repite como lista: va en el mensaje para quien lleva la web, en un apartado «Para confirmar».
+  const pasos = [], tecnico = [], dudas = [], tecnicoDudas = [];
+  if (tiene('robots_caido')) {
+    pasos.push('Avisa ya a quien lleva tu web: el fichero robots.txt da error, y eso afecta a toda la web, no solo a esta página.');
+    tecnico.push(`El robots.txt responde con un ${d.entrar.robotsTxt.estado}. Mientras falle, los bots que siguen la norma (RFC 9309) no rastrean nada.`);
+  }
+  if (tiene('robots')) {
+    const ias = con('robots');
+    pasos.push(`Pide a quien lleva tu web que deje entrar ${ias.length > 1 ? 'a los bots' : 'al bot'} de ${lista(ias.map(i => i.nombre))} en el fichero robots.txt.`);
+    tecnico.push(`El robots.txt bloquea a ${lista([...new Set(ias.map(i => i.bot))])} en esta URL${ias[0].motivos.find(m => m.c === 'robots').regla ? ` (regla: ${ias[0].motivos.find(m => m.c === 'robots').regla})` : ''}.`);
+  }
+  if (tiene('google_extended')) {
+    const cf = d.entrar.googleExtended.cloudflare;
+    pasos.push(cf ? 'Si quieres que Gemini use tu web para responder, pide que quiten el bloqueo de «Google-Extended». Lo ha puesto Cloudflare: se cambia en su ajuste para bots de IA, no en tu robots.txt.' : 'Si quieres que Gemini use tu web para responder, pide que quiten el bloqueo de «Google-Extended» en el fichero robots.txt.');
+    tecnico.push('El robots.txt bloquea Google-Extended en esta URL. No afecta a la búsqueda de Google, pero sí a que Gemini use la web para responder.' + (cf ? ' El bloqueo está dentro del bloque que añade Cloudflare (entre «BEGIN Cloudflare Managed content» y «END»): se quita en el panel de Cloudflare, en los ajustes de bots de IA.' : ''));
+  }
+  if (tiene('error')) {
+    pasos.push('Comprueba que la URL es la correcta. Si lo es, avisa a quien lleva tu web: la página da error.');
+    tecnico.push(`La URL responde con un ${d.pagina.estado}.`);
+  }
+  if (rechazados(d).length) {
+    const r = rechazados(d);
+    dudas.push('Si el cortafuegos, la CDN o el hosting dejan pasar a los bots de la IA.');
+    tecnicoDudas.push(`Una petición con el user-agent de ${lista(r.map(b => b.token))} recibe un ${r[0].estado || 'rechazo'}; con el de Googlebot y con el de un navegador, un 200. No es concluyente (no sale de las IP del bot), pero la web distingue: conviene revisar cortafuegos, CDN y hosting.`);
+  }
+  if (d.veredicto.sinTexto || d.veredicto.aMedias) {
+    pasos.push('Pide a quien desarrolla tu web que el contenido llegue ya escrito en el código de la página, sin depender de JavaScript.');
+    tecnico.push(`El HTML llega con ${num(d.leer.palabras)} palabras de texto${d.leer.pantalla && d.leer.pantalla.estado === 'ok' ? `; con JavaScript, la página enseña ${num(d.leer.pantalla.palabras)}` : ''}: el contenido se monta con JavaScript. Hace falta que llegue en el HTML (renderizado en servidor o prerrenderizado).`);
+  }
+  if (tiene('noindex') || tiene('noindex_nd')) {
+    pasos.push('Si quieres que esta página se encuentre, pide que quiten la etiqueta «noindex».');
+    tecnico.push('La página lleva noindex (etiqueta meta robots o cabecera X-Robots-Tag).');
+  }
+  if (tiene('canonica')) {
+    dudas.push('Si es a propósito que esta página señale a otra como su versión principal.');
+    tecnicoDudas.push(`La canónica apunta a otra URL: ${d.salir.canonical}.`);
+  }
+  if (tiene('nosnippet') || tiene('nosnippet_copilot')) {
+    pasos.push(tiene('nosnippet') ? 'Si quieres salir en las respuestas de Google, pide que quiten la etiqueta «nosnippet».' : 'Si quieres que Copilot cite bien tu página, pide que quiten la etiqueta «nosnippet».');
+    tecnico.push('La página lleva nosnippet o max-snippet:0.');
+  }
+  if (tiene('noarchive') || tiene('nocache')) {
+    pasos.push('Si quieres salir en Copilot, pide que quiten las etiquetas «noarchive» y «nocache».');
+    tecnico.push(`La página lleva ${tiene('nocache') ? 'nocache' : 'noarchive'}, que limita su uso en Copilot hasta marzo de 2027.`);
+  }
+  if (tiene('ai_grounding')) {
+    pasos.push('Si quieres seguir saliendo en Copilot a partir de febrero de 2027, pide que quiten la preferencia «ai-grounding:disallow» de la página.');
+    tecnico.push('La página lleva ai-grounding:disallow para Bingbot. Microsoft la aplica desde el 1 de febrero de 2027: desde entonces no usará la página en las respuestas de Copilot.');
+  }
+  if (tiene('protegida')) {
+    dudas.push('Si la protección contra visitas automáticas deja pasar a los bots de búsqueda de la IA.');
+    tecnicoDudas.push(`${d.pagina.sinRespuesta ? 'La web no contesta a una visita automática (sin respuesta en 9 segundos, o conexión cortada)' : `La web frena las visitas automáticas${d.pagina.estado >= 400 ? ` (respuesta ${d.pagina.estado})` : ''}`}. ¿Deja pasar a OAI-SearchBot, Googlebot, bingbot y Claude-SearchBot?`);
+  }
+  if (!pasos.length && !dudas.length) return '';
+  const fecha = new Date(d.revisado).toLocaleDateString('es-ES');
+  const mensaje = `Hola. He comprobado esta página con el Check GEO (${fecha}):\n${d.urlFinal}${tecnico.length ? `\n\nLo que ha salido:\n${tecnico.map(t => '- ' + t).join('\n')}` : ''}${tecnicoDudas.length ? `\n\nPara confirmar:\n${tecnicoDudas.map(t => '- ' + t).join('\n')}` : ''}\n\n¿Podéis revisarlo? Gracias.`;
+  return `${pasos.length ? `<ol class="todo${pasos.length === 1 ? ' todo--uno' : ''}">${pasos.map(p => `<li><span>${p}</span></li>`).join('')}</ol>` : ''}
+    ${!pasos.length ? `<p class="todo__solo">${d.pagina.protegida ? 'No hemos podido ver la página, así que no sabemos si hay algo que arreglar. Quien lleva tu web sí puede decírtelo: envíale este mensaje.' : 'No hemos visto nada que arreglar, pero hay algo que solo puede confirmar quien lleva tu web. Envíale este mensaje.'}</p>` : ''}
+    ${ventana('Mensaje para quien lleva tu web', `<pre id="mensaje">${esc(mensaje)}</pre>`, '<button class="btn btn--ghost" type="button" id="copiar">Copiar</button>', 'copy')}`;
+}
+
+// ---------- Datos técnicos ----------
+// A la vista, no plegados: lo que ha visto el check, bot a bot, y los datos de la página.
+function detalle(d) {
+  const e = d.entrar, s = d.salir;
+  const fila = b => {
+    const r = robotsLeido(d) === 'no_leido' ? '<span class="tech__no">Sin leer</span>' : b.robots.permitido ? '<span class="st st--ok">Puede entrar</span>' : `<span class="st st--fallo">Bloqueado</span>${b.robots.regla ? `<code>${esc(b.robots.regla)}</code>` : ''}`;
+    const cod403 = b.estado ? ' (' + b.estado + ')' : '';
+    const p = { entra: '<span class="st st--ok">Entra</span>', rechazada: `<span class="st st--aviso">Rechazada${cod403}</span>`,
+      rechazada_general: `<span class="tech__no">Rechazada${cod403}</span>`, nd: '<span class="tech__no">Sin comprobar</span>' }[b.prueba];
+    return `<tr><th scope="row"><code>${esc(b.token)}</code><small>${esc(b.producto)}</small></th><td data-l="En el robots.txt">${r}</td><td data-l="Visita con su nombre">${p}</td></tr>`;
+  };
+  const cod = v => `<code>${esc(v)}</code>`, gris = v => ` <span class="tech__no">${v}</span>`;
+  // Solo lo que el check usa para decidir, y todo lo que busca, lo encuentre o no: así se ve qué se ha mirado.
+  const rb = e.robotsTxt.caido ? `Da error ${cod(e.robotsTxt.estado)}: mientras falle, un bot no debe entrar.` : robotsLeido(d) === 'si' ? '' : robotsLeido(d) === 'no_tiene' ? 'La web no tiene robots.txt: nada cierra la puerta a ningún bot.' : 'No hemos podido leer el robots.txt de la web, así que no sabemos qué dice de cada bot.';
+  const ge = e.googleExtended;
+  const filaGE = `<tr><th scope="row"><code>Google-Extended</code><small>Gemini. No visita la web: es solo una regla</small></th><td data-l="En el robots.txt">${robotsLeido(d) === 'no_leido' ? '<span class="tech__no">Sin leer</span>' : ge.permitido ? '<span class="st st--ok">Permitido</span>' : `<span class="st st--fallo">Bloqueado</span>${ge.regla ? `<code>${esc(ge.regla)}</code>` : ''}`}</td><td data-l="Visita con su nombre"><span class="tech__no">No visita</span></td></tr>`;
+  const t = s.etiquetas, quien = { todos: 'para todos los buscadores', google: 'solo para Google', bing: 'solo para Bing' };
+  // Las etiquetas que sí lleva, cada una en su fila; las que no, juntas en una línea. Si no lleva ninguna, una sola fila.
+  let hechos = [['Respuesta', d.pagina.sinRespuesta ? '<span class="tech__no">Sin respuesta</span>' : cod(d.pagina.estado)]];
+  // La redirección solo se enseña si acaba en otro dominio o en otra ruta: pasar a https o a www no es un dato.
+  const sitio = u => { try { const x = new URL(u); return x.hostname.replace(/^www\./, '') + x.pathname.replace(/\/$/, '') + x.search; } catch { return u; } };
+  if (d.urlFinal && sitio(d.url) !== sitio(d.urlFinal)) hechos.unshift(['Redirige a', cod(d.urlFinal) + gris('Lo que se ha comprobado es esta URL, no la que escribiste.')]);
+  if (t) {
+    const buscadas = [
+      ['noindex', t.noindex, 'fallo'], ['nosnippet', t.nosnippet, t.nosnippet === 'bing' ? 'aviso' : 'fallo'],
+      ['noarchive', t.noarchive && !t.nocache, t.archiveVigente ? 'fallo' : ''], ['nocache', t.nocache, t.archiveVigente ? 'aviso' : ''], ['ai-grounding', t.grounding, 'aviso'],
+    ];
+    const si = buscadas.filter(x => x[1]), no = buscadas.filter(x => !x[1]).map(x => cod(x[0]));
+    for (const [nombre, v, efecto] of si)
+      hechos.push([cod(nombre), (efecto ? `<span class="st st--${efecto}">${nombre === 'ai-grounding' ? esc(v) : 'La lleva'}</span>` : '<span class="tech__no">La lleva</span>') + (quien[v] ? gris(quien[v]) : '') + (efecto ? '' : gris('Microsoft ya no la lee en la página desde el 1 de marzo de 2027.'))]);
+    hechos.push(si.length
+      ? ['No lleva', no.join(', ')]
+      : ['Etiquetas que limitan a la IA', 'Ninguna' + gris(`Se buscan ${lista(no)}.`)]);
+    hechos.push(['Canónica', s.canonical ? cod(s.canonical) + gris(s.canonicaOtra ? 'Es otra URL.' : 'Es esta misma URL.') : '<span class="tech__no">No tiene</span>']);
+    if (s.directivas || s.directivasBing) hechos.push(['Etiquetas, tal cual', cod([...new Set([s.directivas, s.directivasBing].filter(Boolean))].join(' · '))]);
+  }
+  return `<div class="tech">
+      <h4>El robots.txt y los bots</h4>
+      ${rb ? `<p class="tech__rb">${rb}</p>` : ''}
+      <div class="tbl-scroll"><table>
+        <thead><tr><th scope="col">Bot</th><th scope="col">En el robots.txt</th><th scope="col">Visita con su nombre</th></tr></thead>
+        <tbody>${e.bots.map(fila).join('')}${filaGE}</tbody>
+      </table></div>
+      <p class="note">${e.bots.filter(b => b.prueba === 'rechazada_general').length > 1 ? 'La web rechaza cualquier visita con nombre de bot que no venga de sus direcciones, también la de Googlebot. Es una protección contra impostores y no dice nada de la IA.' : 'La visita lleva el nombre del bot, pero sale de nuestro servidor, no de sus direcciones: no cuenta para la respuesta. La de Googlebot sirve de referencia.'}</p>
+      ${e.msnbot ? `<p class="note">El robots.txt cierra la puerta a <code>msnbot</code>, el nombre antiguo del bot de Bing${e.msnbot.regla ? ` (<code>${esc(e.msnbot.regla)}</code>)` : ''}, y no nombra a <code>bingbot</code>. Microsoft decía en 2012 que Bingbot también lo obedece y no lo ha confirmado después: no cuenta para la respuesta.</p>` : ''}
+      <h4>La página</h4>
+      <dl class="facts">${hechos.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      <p class="note">${$('revisado').textContent}</p>
+    </div>`;
+}
+
+
+const tramo = (titulo, cuerpo) => `<section class="tramo"><div class="tramo__label"><h3>${titulo}</h3></div><div class="tramo__body">${cuerpo}</div></section>`;
+
+function render(d) {
+  // Si se ha comprobado una portada, la invitación es a probar otra página: una ficha o un servicio suelen estar hechos de otra manera.
+  const portada = (() => { try { const x = new URL(d.urlFinal); return x.pathname === '/' && !x.search; } catch { return false; } })();
+  $('hint').innerHTML = `<button type="button" id="otra">${portada ? 'Probar con otra página de tu web' : 'Comprobar otra URL'}</button>`;
+  $('otra').addEventListener('click', otraUrl);
+  pintaPanel('hecho', d);
+  // El detalle, por orden de utilidad: qué hacer (si hay algo que hacer), lo que le llega a la IA,
+  // los datos técnicos, a la vista, y al final lo que no se ve desde fuera.
+  const tramos = [];
+  const pasos = queHacer(d);
+  if (pasos) tramos.push(['Qué hacer', pasos]);
+  if (!d.pagina.protegida) tramos.push(['Lo que le llega a la IA', loQueLee(d)]);
+  tramos.push(['Datos técnicos', detalle(d)]);
+  tramos.push(['Lo que no se ve desde fuera', noSeVe(d)]);
+  $('results').innerHTML = tramos.map(([t, c]) => tramo(t, c)).join('');
+  $('results').hidden = false; $('intro').hidden = true;
+
+  // Las cifras suben desde cero y las barras se llenan.
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('results').querySelectorAll('.metric__value').forEach(el => {
+    const n = +el.dataset.n, t0 = performance.now(), dur = 900;
+    if (quieto || !n) { el.textContent = num(n); return; }
+    const paso = t => { const x = Math.min(1, (t - t0) / dur), e = 1 - (1 - x) ** 3; el.textContent = num(Math.round(n * e)); if (x < 1) requestAnimationFrame(paso); };
+    requestAnimationFrame(paso);
+  });
+  requestAnimationFrame(() => $('results').querySelectorAll('.metric__bar i').forEach(el => { el.style.width = el.dataset.w + '%'; }));
+
+  const copiar = $('copiar');
+  if (copiar) copiar.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($('mensaje').textContent); copiar.textContent = 'Copiado'; }
+    catch { copiar.textContent = 'Selecciónalo y cópialo'; }
+    setTimeout(() => { copiar.textContent = 'Copiar'; }, 2500);
+  });
+  const verMas = $('ver-mas');
+  if (verMas) verMas.addEventListener('click', () => { const abierto = !$('extracto').classList.toggle('is-clamped'); verMas.textContent = abierto ? 'Ver menos' : 'Ver más'; verMas.setAttribute('aria-expanded', abierto); });
+  const reintentar = $('reintentar');
+  if (reintentar) reintentar.addEventListener('click', () => $('form').requestSubmit());
+  const busca = $('busca');
+  if (busca) busca.addEventListener('submit', async e => {
+    e.preventDefault();
+    const q = $('q').value.trim(), out = $('q-out');
+    const pinta = (nivel, texto) => { out.innerHTML = `<i class="sd sd--md sd--${nivel}"></i><span>${texto}</span>`; out.hidden = false; };
+    if (q.length < 3) return pinta('nd', 'Escribe al menos tres letras o números.');
+    pinta('nd', 'Buscando…');
+    try {
+      const r = await (await fetch(API.replace('/api/check', '/api/busca'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: d.urlFinal, q }) })).json();
+      const cita = `«${esc(r.consulta || q)}»`;
+      if (r.error) pinta('nd', r.error === 'corta' ? 'Escribe al menos tres letras o números.' : ERRORES[r.error] || ERRORES.interno);
+      else if (r.resultado === 'texto') pinta('ok', `Sí. ${cita} está en lo que recibe la IA.`);
+      else if (r.resultado === 'codigo') pinta('aviso', `A medias. ${cita} está en el código, pero dentro de un script, no como texto. Una IA que no ejecuta JavaScript puede no leerlo.`);
+      else if (r.resultado === 'no') pinta('fallo', `No. ${cita} no está en lo que recibe la IA. Si tú lo ves en pantalla, lo carga JavaScript.`);
+      else pinta('nd', 'No hemos podido ver la página.');
+    } catch { pinta('nd', ERRORES.interno); }
+  });
+  // En móvil la ventana queda debajo del campo: se lleva a la vista. En escritorio ya se ve y no se mueve nada.
+  $('panel').scrollIntoView({ behavior: quieto ? 'auto' : 'smooth', block: 'nearest' });
+}
+
+pintaPanel('espera');
+// Mientras se escribe, la URL va apareciendo en la barra de la ventana.
+$('url').addEventListener('input', () => { if (!$('go').disabled) $('panel-url').textContent = $('url').value.trim().replace(/^https?:\/\//, '').replace(/\/$/, ''); });
+// Si la dirección llega en la URL (?url=…), se comprueba al cargar.
+const inicial = new URLSearchParams(location.search).get('url');
+if (inicial) { $('url').value = inicial; $('form').requestSubmit(); }
+</script>
+</body>
+</html>
