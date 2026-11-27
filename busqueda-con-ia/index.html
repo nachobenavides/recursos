@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" type="image/png" sizes="192x192" href="../favicon-192.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<!-- Analítica sin cookies (GoatCounter): solo cuenta visitas, sin datos personales -->
+<script data-goatcounter="https://nachobenavides.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<title>Aprovecha la revolución de la búsqueda con IA · Nacho Benavides</title>
+<meta name="description" content="Diapositivas y herramientas de la charla de Talent Land España 2026: cómo decide la IA a quién recomienda, por qué casi todo sigue siendo buen SEO y tres errores que dejan tu web fuera de sus respuestas.">
+<link rel="canonical" href="https://nachobenavides.github.io/recursos/busqueda-con-ia/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aprovecha la revolución de la búsqueda con IA">
+<meta property="og:description" content="Diapositivas y herramientas de la charla de Nacho Benavides en Talent Land España 2026.">
+<meta property="og:locale" content="es_ES">
+<meta property="og:url" content="https://nachobenavides.github.io/recursos/busqueda-con-ia/">
+<meta property="og:site_name" content="Nacho Benavides">
+<meta property="og:image" content="https://nachobenavides.github.io/recursos/busqueda-con-ia/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Portada de la charla «Aprovecha la revolución de la búsqueda con IA», de Nacho Benavides en Talent Land España 2026.">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  /* Las diapositivas arriba del todo, que es a lo que se viene. Debajo, los datos de la charla como una ficha discreta. */
+  .talk { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; margin: 24px 0 0; border-top: 1px solid var(--border); }
+  .talk__item { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 20px 22px 0; font-size: 14px; line-height: 1.45; color: var(--fg); }
+  .talk__item + .talk__item { border-left: 1px solid var(--border); }
+  .talk__item:first-child { padding-left: 0; }
+  .talk__item:last-child { padding-right: 0; }
+  .talk__item .mono { font-size: 10px; }
+  .talk h1 { margin: 0; font-size: 14px; font-weight: 400; line-height: 1.45; letter-spacing: 0; color: var(--fg); }
+  .talk__item a { color: var(--fg); text-decoration: none; transition: color 150ms var(--ease); }
+  .talk__item a:hover { color: var(--fg-strong); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--border-strong); }
+  .talk__who { display: inline-flex; align-items: center; gap: 8px; }
+  .talk__who img { width: 20px; height: 20px; border-radius: var(--r-full); object-fit: cover; filter: grayscale(1); }
+  #diapositivas { padding: 32px 0 0; border-top: 0; }
+  /* Tu opinión, justo después de ver la charla. */
+  .feedback { margin: 0; padding: 24px 0 0; font-size: 14px; line-height: 1.6; color: var(--fg-muted); }
+  .feedback strong { font-weight: 500; color: var(--fg); }
+  .feedback a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .feedback a:hover { color: var(--fg-strong); border-color: var(--fg-muted); }
+  .talk + .block { border-top: 0; padding-top: 64px; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Diapositivas: el visor ocupa la columna entera. */
+  .video { position: relative; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--bg-elevated); }
+  .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .deck__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+  .deck__nav { display: flex; align-items: center; gap: 6px; }
+  #deck-full { margin-left: 6px; }
+  .btn__count { font: 12px var(--mono); color: var(--fg-muted); }
+  .deck__btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: var(--r-full); background: transparent; color: var(--fg); cursor: pointer; transition: border-color 150ms var(--ease), color 150ms var(--ease); }
+  .deck__btn:hover:not(:disabled) { border-color: var(--border-strong); color: var(--fg-strong); }
+  .deck__btn:disabled { opacity: 0.35; cursor: default; }
+  .deck__count { min-width: 64px; text-align: center; font: 13px var(--mono); color: var(--fg-muted); font-variant-numeric: tabular-nums; }
+  .deck__more { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .block__lead strong { font-weight: 500; color: var(--fg-strong); }
+  #herramientas .thanks { max-width: 760px; margin: 0 0 28px; }
+
+  /* Más charlas: en filas, como el listado de la portada. */
+  .more { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--border); }
+  .more a { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 20px; padding: 15px 4px; border-bottom: 1px solid var(--border); text-decoration: none; transition: background-color 150ms var(--ease); }
+  .more a:hover { background: rgba(255, 255, 255, 0.025); }
+  .more strong { font-size: 15px; font-weight: 500; color: var(--fg-strong); }
+  .more__ev { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--fg-muted); white-space: nowrap; }
+  .block__foot { margin: 20px 0 0; }
+  .block__foot a { font-size: 14px; color: var(--fg-muted); text-decoration: none; }
+  .block__foot a:hover { color: var(--fg-strong); }
+
+  @media (max-width: 760px) {
+    .talk { display: grid; grid-template-columns: 1fr 1fr; margin-top: 20px; } .talk__item { padding: 16px 0 0; white-space: normal; } .talk__item + .talk__item { border-left: 0; } .talk__item--title { grid-column: 1 / -1; } #diapositivas { padding-top: 16px; }
+    .deck__more { width: 100%; } .deck__more .btn { flex: 1 1 auto; }
+    .more a { grid-template-columns: 1fr; gap: 2px; padding: 14px 4px; }
+    .block { padding: 44px 0; }
+  }
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="site-head__in">
+    <a class="brand" href="../" aria-label="Nacho Benavides · Recursos de mis charlas">
+      <img class="brand__logo" src="../assets/blinders.png" alt="Blinders">
+      <span class="brand__sep" aria-hidden="true"></span>
+      <span class="brand__me"><img src="../assets/nacho.jpg" alt="">Nacho Benavides</span>
+    </a>
+    <nav class="site-nav" aria-label="Menú"><ul class="site-nav__links"><li><a href="../#charlas" aria-current="page">Charlas</a></li><li><a href="../herramientas/">Herramientas</a></li><li><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Sobre mí</a></li><li><a href="../#invitame">Contacto</a></li></ul><div class="site-social" aria-label="Perfiles de Nacho Benavides"><a href="https://www.linkedin.com/in/nacho-benavides/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+<a href="https://twitter.com/nacho_benavides" aria-label="X" title="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg></a>
+<a href="https://instagram.com/nachobenavidesr" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+<a href="https://github.com/nachobenavides" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.82-.26.82-.57v-2.04c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3.98a11.5 11.5 0 0 1 6 0c2.28-1.3 3.29-.98 3.29-.98.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.57A12 12 0 0 0 12 .3"/></svg></a></div></nav>
+    <details class="site-menu">
+      <summary>Menú</summary>
+      <div class="site-menu__panel"><ul class="site-nav__links"><li><a href="../#charlas" aria-current="page">Charlas</a></li><li><a href="../herramientas/">Herramientas</a></li><li><a href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener">Sobre mí</a></li><li><a href="../#invitame">Contacto</a></li></ul><div class="site-social" aria-label="Perfiles de Nacho Benavides"><a href="https://www.linkedin.com/in/nacho-benavides/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+<a href="https://twitter.com/nacho_benavides" aria-label="X" title="X" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.93zm-1.29 19.5h2.04L6.49 3.24H4.3z"/></svg></a>
+<a href="https://instagram.com/nachobenavidesr" aria-label="Instagram" title="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+<a href="https://github.com/nachobenavides" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.82-.26.82-.57v-2.04c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3.98a11.5 11.5 0 0 1 6 0c2.28-1.3 3.29-.98 3.29-.98.64 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.57A12 12 0 0 0 12 .3"/></svg></a></div></div>
+    </details>
+  </div>
+</header>
+<main class="wrap">
+
+  <section class="block" id="diapositivas">
+    <h2 class="visually-hidden">Diapositivas</h2>
+    <div class="deck">
+      <div class="video"><iframe id="deck-frame" src="diapositivas/" title="Diapositivas: Aprovecha la revolución de la búsqueda con IA" loading="lazy" allowfullscreen></iframe></div>
+      <div class="deck__bar">
+        <div class="deck__nav">
+          <button type="button" class="deck__btn" id="deck-prev" aria-label="Diapositiva anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span class="deck__count" id="deck-count" aria-live="polite">1 / 24</span>
+          <button type="button" class="deck__btn" id="deck-next" aria-label="Diapositiva siguiente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+          <button type="button" class="deck__btn" id="deck-full" aria-label="Ver a pantalla completa" title="Pantalla completa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+        </div>
+        <div class="deck__more">
+          <a class="btn btn--secondary" href="#herramientas">Herramientas <span class="btn__count">2</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="feedback"><strong>¿Qué te ha parecido la charla?</strong> Cuéntamelo por <a href="https://ig.me/m/nachobenavidesr" target="_blank" rel="noopener" data-goatcounter-click="opinion-instagram-busqueda-con-ia" data-goatcounter-title="Opinión · instagram · busqueda-con-ia">Instagram</a>, <a href="https://www.linkedin.com/in/nacho-benavides/" target="_blank" rel="noopener" data-goatcounter-click="opinion-linkedin-busqueda-con-ia" data-goatcounter-title="Opinión · linkedin · busqueda-con-ia">LinkedIn</a> o <a href="mailto:info@blindersgroup.com?subject=Opini%C3%B3n%20sobre%20la%20charla%20%C2%ABAprovecha%20la%20revoluci%C3%B3n%20de%20la%20b%C3%BAsqueda%20con%20IA%C2%BB" data-goatcounter-click="opinion-correo-busqueda-con-ia" data-goatcounter-title="Opinión · correo · busqueda-con-ia">correo</a>: cualquier comentario es bienvenido.</p>
+  <div class="talk">
+    <div class="talk__item talk__item--title"><span class="mono">Charla</span><h1>Aprovecha la revolución de la búsqueda con IA</h1></div>
+    <div class="talk__item"><span class="mono">Dónde</span><span><a href="https://talent-land.es/" target="_blank" rel="noopener">Talent Land España</a>, Málaga</span></div>
+    <div class="talk__item"><span class="mono">Cuándo</span><time datetime="2026-11-24">24 de noviembre de 2026</time></div>
+    <div class="talk__item"><span class="mono">Ponente</span><a class="talk__who" href="https://blindersgroup.com/acerca-de/nacho-benavides/" target="_blank" rel="noopener"><img src="../assets/nacho.jpg" alt="">Nacho Benavides</a></div>
+  </div>
+
+  <section class="block" id="herramientas">
+    <h2 class="block__title">Herramientas <span class="block__count">2</span></h2>
+    <aside class="thanks">
+      <img src="../assets/nacho.jpg" alt="">
+      <p><strong>Gratis y sin registro, para aplicar en tu web lo que vimos.</strong> Si te sirven, me hace ilusión que me sigas en Instagram o en el YouTube de Blinders. Y si no, que las disfrutes igual.</p>
+      <div class="thanks__links">
+        <a href="https://instagram.com/nachobenavidesr" aria-label="Instagram · Nacho Benavides" title="Instagram" target="_blank" rel="noopener" data-goatcounter-click="seguir-instagram-busqueda-con-ia" data-goatcounter-title="Seguir · Instagram · busqueda-con-ia"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.youtube.com/@blindersgroup" aria-label="Canal de YouTube de Blinders" title="YouTube de Blinders" target="_blank" rel="noopener" data-goatcounter-click="seguir-youtube-busqueda-con-ia" data-goatcounter-title="Seguir · YouTube · busqueda-con-ia"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg></a>
+      </div>
+    </aside>
+    <ul class="rows">
+      <li>
+        <a class="row" href="../geo-primeros-pasos/donde-deberias-estar/herramienta.html">
+          <span class="row__n">01</span>
+          <strong>Webs que cita la IA</strong>
+          <span class="row__desc">La lista de webs donde te interesa aparecer para que la IA te nombre.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="row" href="../herramientas/check-geo/">
+          <span class="row__n">02</span>
+          <strong>Check GEO</strong>
+          <span class="row__desc">Escribes una URL y ves si algo impide a la IA entrar en la página y leerla.</span>
+          <span class="row__go" aria-hidden="true">→</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+
+</main>
+<aside class="invite" aria-label="Invitar a Nacho a un evento">
+  <p class="invite__in">¿Quieres esta charla, u otra, en tu evento? <a href="mailto:info@blindersgroup.com?subject=Colaboraci%C3%B3n%20con%20Nacho%20Benavides%3A%20%5Bevento%20o%20canal%5D&body=Hola%2C%20Nacho%3A%0D%0A%0D%0AEvento%20o%20canal%3A%0D%0AQu%C3%A9%20propones%20%28charla%2C%20clase%20en%20un%20m%C3%A1ster%2C%20p%C3%B3dcast%2C%20v%C3%ADdeo%2C%20post%E2%80%A6%29%3A%0D%0AFecha%3A%0D%0ACiudad%20u%20online%3A%0D%0AP%C3%BAblico%3A%0D%0A%0D%0AUn%20saludo." data-goatcounter-click="invitame-email-busqueda-con-ia" data-goatcounter-title="Invítame · email · busqueda-con-ia">Escríbeme <span aria-hidden="true">→</span></a></p>
+</aside>
+<footer class="site-foot">
+  <div class="site-foot__in">
+    <span>Nacho Benavides · <a href="https://blindersgroup.com/" target="_blank" rel="noopener">Blinders Group</a></span>
+    <a href="#">Volver arriba <span aria-hidden="true">↑</span></a>
+  </div>
+</footer>
+<script>
+/* Pasar las diapositivas desde fuera del marco: botones, contador, flechas del teclado y pantalla completa. */
+(() => {
+  const frame = document.getElementById('deck-frame');
+  const prev = document.getElementById('deck-prev'), next = document.getElementById('deck-next');
+  const count = document.getElementById('deck-count'), full = document.getElementById('deck-full');
+  const R = () => { try { const r = frame.contentWindow.Reveal; return r && r.isReady() ? r : null; } catch (e) { return null; } };
+  const sync = () => {
+    const r = R(); if (!r) return;
+    count.textContent = (r.getSlidePastCount() + 1) + ' / ' + r.getTotalSlides();
+    prev.disabled = r.isFirstSlide() && !r.availableFragments().prev;
+    next.disabled = r.isLastSlide() && !r.availableFragments().next;
+  };
+  const hook = () => {
+    const r = R(); if (!r) return setTimeout(hook, 200);
+    ['slidechanged', 'fragmentshown', 'fragmenthidden'].forEach((e) => r.on(e, sync));
+    sync();
+  };
+  frame.addEventListener('load', hook); hook();
+  prev.addEventListener('click', () => R()?.prev());
+  next.addEventListener('click', () => R()?.next());
+  full.addEventListener('click', () => (frame.requestFullscreen || frame.webkitRequestFullscreen || (() => window.open(frame.src)))?.call(frame));
+  // Flechas del teclado en la página, mientras las diapositivas se vean en pantalla.
+  let visible = false;
+  new IntersectionObserver(([e]) => { visible = e.intersectionRatio > 0.5; }, { threshold: [0, 0.5, 1] }).observe(frame);
+  document.addEventListener('keydown', (e) => {
+    if (!visible || e.altKey || e.ctrlKey || e.metaKey || /input|textarea|select/i.test(document.activeElement?.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); e.key === 'ArrowRight' ? R()?.next() : R()?.prev(); }
+  });
+})();
+</script>
+</body>
+</html>

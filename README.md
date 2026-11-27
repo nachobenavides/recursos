@@ -4,6 +4,7 @@ Material de trabajo de mis charlas y webinars, para hacer los ejercicios con cal
 
 | Recurso | Charla |
 |---|---|
+| [Aprovecha la revolución de la búsqueda con IA](busqueda-con-ia/) · [versión web](https://nachobenavides.github.io/recursos/busqueda-con-ia/) | Talent Land España 2026, Málaga |
 | [Primeros pasos para salir en ChatGPT y en la IA de Google](geo-primeros-pasos/) · [versión web](https://nachobenavides.github.io/recursos/geo-primeros-pasos/) | Webinar de Raiola Networks (#RaiolaWebinar) · [vídeo](https://webinars.raiola.link/acceso/) |
 
 ## Cómo está organizado
